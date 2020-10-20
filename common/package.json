@@ -1,6 +1,6 @@
 {
   "name": "@chortec/common",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
@@ -10,7 +10,7 @@
   "scripts": {
     "clean": "del-cli ./build/*",
     "build": "npm run clean && tsc",
-    "pub": "git add . && git commit -m \"Updated Common Module\" && git push && npm version patch && npm run build && npm publish --access=public"
+    "pub": "npm version patch && npm run build && npm publish --access=public && git add . && git commit -m \"Updated Common Module\" && git push"
   },
   "keywords": [],
   "author": "",
