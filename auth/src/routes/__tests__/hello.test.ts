@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../src/app";
+import { app } from "../../app";
 
 it("shoud show a status of 200", async () => {
   await request(app).get("/api/hello").send().expect(200);
