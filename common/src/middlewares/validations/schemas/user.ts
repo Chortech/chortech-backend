@@ -1,4 +1,4 @@
-import Joi, { options } from "joi";
+import Joi from "joi";
 
 const schema = Joi.object({
   email: Joi.string().email(),
@@ -11,6 +11,6 @@ const schema = Joi.object({
     .message("Invalid phone number"),
   name: Joi.string().min(6).max(255).alphanum().required(),
   password: Joi.string().min(8).max(16).required(),
-}).or("email", "phone");
+}).xor("email", "phone");
 
 export { schema };
