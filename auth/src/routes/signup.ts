@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { SchemaType, validate } from "@chortec/common";
-import mongoose from "mongoose";
+import { ResourceConflictError } from "@chortec/common";
 import User from "../models/user";
 
 const router = Router();
@@ -20,7 +20,7 @@ router.post("/", validate(SchemaType.USER), async (req, res) => {
 
   const savedUser = User.findOne(option);
   if (savedUser) {
-    throw new Error("User already exists!");
+    throw new ResourceConflictError("User already exists!");
   }
 
   // TODO hash the password
