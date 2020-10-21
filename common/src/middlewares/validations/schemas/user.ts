@@ -11,6 +11,6 @@ const schema = Joi.object({
     .message("Invalid phone number"),
   name: Joi.string().min(6).max(255).alphanum().required(),
   password: Joi.string().min(8).max(16).required(),
-}).xor("email", "phone");
+}).or("email", "phone");
 
 export { schema };
