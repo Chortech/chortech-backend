@@ -1,4 +1,22 @@
 import { app } from "./app";
-const port = process.env.PORT || 3000;
+import mongoose from "mongoose";
 
-app.listen(port, () => console.log(`Server is listening on port ${port}`));
+async function start() {
+  // TODO check for enviornment variables and throw an error
+  // when they dont exist
+  const port = process.env.PORT || 3000;
+  const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/chortec";
+
+  try {
+    await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+
+  app.listen(port, () => console.log(`Server is listening on port ${port}`));
+}
+
+start();

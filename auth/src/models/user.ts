@@ -32,3 +32,5 @@ userSchema.statics.build = (user: IUser) => new User(user);
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
 
 export { User };
+
+export default User;
