@@ -1,5 +1,9 @@
 import Joi from "joi";
 
+/**
+ * user schema for validating inputs about the user
+ */
+
 const schema = Joi.object({
   email: Joi.string().email(),
   phone: Joi.string()
@@ -11,6 +15,8 @@ const schema = Joi.object({
     .message("Invalid phone number"),
   name: Joi.string().min(6).max(255).alphanum().required(),
   password: Joi.string().min(8).max(16).required(),
-}).or("email", "phone");
+})
+  .or("email", "phone")
+  .label("body");
 
 export { schema };
