@@ -4,12 +4,12 @@ import { ErrorBase } from "./errorBase";
  * with status of 400
  *
  */
-export class BadRequestError extends ErrorBase {
-  status = 400;
-  constructor(public message: string) {
-    super(message);
+export class NotFoundError extends ErrorBase {
+  status = 404;
+  constructor() {
+    super("Resource Not Found!");
 
-    Object.setPrototypeOf(this, BadRequestError.prototype);
+    Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 
   serialize() {

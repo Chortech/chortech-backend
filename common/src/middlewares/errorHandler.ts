@@ -10,16 +10,16 @@ import { ErrorBase } from "../errors/errorBase";
  * general 400 code and the meesage of "Something went wrong"
  */
 
-export function errorHandler(
+export const errorHandler = (
   err: Error,
   req: Request,
   res: Response,
   next: NextFunction
-) {
+) => {
   if (err instanceof ErrorBase) {
-    res.status(err.status).json({ errors: err.serialize() });
+    return res.status(err.status).json({ errors: err.serialize() });
   }
 
   console.error(err);
   res.status(400).json({ errors: ["Something went wrong!"] });
-}
+};

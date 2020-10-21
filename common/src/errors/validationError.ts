@@ -1,12 +1,12 @@
 import { ErrorBase } from "./errorBase";
-import Joi, { ValidationError as JoiValidationError } from "joi";
+import { ValidationError as JoiValidationError } from "joi";
 
 export class ValidationError extends ErrorBase {
   status = 400;
-  error: JoiValidationError;
-  constructor(error: JoiValidationError) {
+
+  constructor(public error: JoiValidationError) {
     super("Invalid request body or parameters");
-    this.error = error;
+
     Object.setPrototypeOf(this, ValidationError.prototype);
   }
 

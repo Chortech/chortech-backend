@@ -4,12 +4,12 @@ import { ErrorBase } from "./errorBase";
  * with status of 400
  *
  */
-export class BadRequestError extends ErrorBase {
-  status = 400;
-  constructor(public message: string) {
+export class ResourceConflictError extends ErrorBase {
+  status = 409;
+  constructor(message: string) {
     super(message);
 
-    Object.setPrototypeOf(this, BadRequestError.prototype);
+    Object.setPrototypeOf(this, ResourceConflictError.prototype);
   }
 
   serialize() {
