@@ -12,30 +12,26 @@ router.post("/", validate(SchemaType.USER), async (req, res) => {
     email,
     password,
     phone,
-    name,
+    name: name,
   });
 
   // Check to see if the user already exists or not
-  const option = email ? email : phone;
+  const savedUser = await User.find({
+    $or: [{ email: email }, { phone: phone }],
+  });
 
-  const savedUser = User.findOne(option);
-  if (savedUser) {
+  if (savedUser.length != 0) {
     throw new ResourceConflictError("User already exists!");
   }
 
   // TODO hash the password
-  // TODO remove the try catch after implementing the error handler
 
-  try {
-    const { _id, name } = await user.save();
-    return res.status(201).send({
-      id: _id,
-      name,
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(400).send({ message: err.message });
-  }
+  const { _id } = await user.save();
+
+  return res.status(201).send({
+    id: _id,
+    name,
+  });
 });
 
 export { router };
