@@ -1,4 +1,4 @@
-import { userShema, SchemaType } from "../validations/schema";
+import { signupSchema, loginSchema, SchemaType } from "../validations/schema";
 import { Request, Response, NextFunction } from "express";
 import { ValidationError } from "../errors/validationError";
 
@@ -19,15 +19,26 @@ const validate = (type: SchemaType) => (
   next: NextFunction
 ) => {
   switch (type) {
-    case SchemaType.USER:
-      const { error } = userShema.validate(req.body);
+    case SchemaType.SINGUP: {
+      const { error } = signupSchema.validate(req.body);
 
       if (error) {
         throw new ValidationError(error);
       }
 
       return next();
+    }
+    case SchemaType.LOGIN:
+      {
+        const { error } = loginSchema.validate(req.body);
 
+        if (error) {
+          throw new ValidationError(error);
+        }
+
+        return next();
+      }
+      break;
     default:
       break;
   }
