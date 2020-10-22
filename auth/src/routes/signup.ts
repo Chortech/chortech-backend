@@ -5,7 +5,7 @@ import User from "../models/user";
 
 const router = Router();
 
-router.post("/", validate(SchemaType.USER), async (req, res) => {
+router.post("/", validate(SchemaType.SINGUP), async (req, res) => {
   const { email, phone, name, password } = req.body;
 
   const user = User.build({
