@@ -183,14 +183,15 @@ it("should not signup a user with by chaning email or phone and keeping the othe
 it("should not save user's password as plain text", async () => {
   const password = "1234mypass4567";
 
-  const req = await request(app).post("/api/auth/signup").send({
-    email: "example@domain.com",
-    phone: "09333333333",
-    name: "example123",
-    password: password,
-  });
-  console.log(req.body);
-  expect(req.status).toBe(201);
+  const req = await request(app)
+    .post("/api/auth/signup")
+    .send({
+      email: "example@domain.com",
+      phone: "09333333333",
+      name: "example123",
+      password: password,
+    })
+    .expect(201);
   const { id } = req.body;
   const user = await User.findOne({ _id: id });
   expect(user).toBeDefined();

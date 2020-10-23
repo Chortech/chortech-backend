@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { SchemaType, validate } from "@chortec/common";
 import { ResourceConflictError } from "@chortec/common";
 import { Password } from "../utils/password";
 import User from "../models/user";
+import { validate, SchemaType } from "../validations/validationHandler";
 
 const router = Router();
-
 router.post("/", validate(SchemaType.SINGUP), async (req, res) => {
   const { email, phone, name, password } = req.body;
 
@@ -21,6 +20,7 @@ router.post("/", validate(SchemaType.SINGUP), async (req, res) => {
   // hash the password
   const hash = await Password.hash(password);
 
+  // save the user to database
   const user = User.build({
     email,
     phone,
