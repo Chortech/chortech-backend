@@ -1,5 +1,7 @@
 import request from "supertest";
 import { app } from "../../app";
+import { Password } from "../../utils/password";
+import User from "../../models/user";
 
 it("should signup a user with email and password", async () => {
   await request(app)
@@ -176,4 +178,21 @@ it("should not signup a user with by chaning email or phone and keeping the othe
       password: "123456789",
     })
     .expect(409);
+});
+
+it("should not save user's password as plain text", async () => {
+  const password = "1234mypass4567";
+
+  const req = await request(app).post("/api/auth/signup").send({
+    email: "example@domain.com",
+    phone: "09333333333",
+    name: "example123",
+    password: password,
+  });
+  console.log(req.body);
+  expect(req.status).toBe(201);
+  const { id } = req.body;
+  const user = await User.findOne({ _id: id });
+  expect(user).toBeDefined();
+  expect(await Password.compare(password, user?.password!)).toBe(true);
 });

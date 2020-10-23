@@ -1,9 +1,12 @@
+import bcrypt from "bcrypt";
+const saltrounds = 10;
+
 export class Password {
-  static encrypt(str: string): string {
-    return "";
+  static async hash(data: string): Promise<string> {
+    return bcrypt.hash(data, saltrounds);
   }
 
-  static compare(str: string, hash: string): boolean {
-    return false;
+  static async compare(data: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(data, hash);
   }
 }
