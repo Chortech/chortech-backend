@@ -19,15 +19,17 @@ const validate = (type: SchemaType) => (
   next: NextFunction
 ) => {
   switch (type) {
-    case SchemaType.SINGUP: {
-      const { error } = signupSchema.validate(req.body);
+    case SchemaType.SINGUP:
+      {
+        const { error } = signupSchema.validate(req.body);
 
-      if (error) {
-        throw new ValidationError(error);
+        if (error) {
+          throw new ValidationError(error);
+        }
+
+        return next();
       }
-
-      return next();
-    }
+      break;
     case SchemaType.LOGIN:
       {
         const { error } = loginSchema.validate(req.body);
