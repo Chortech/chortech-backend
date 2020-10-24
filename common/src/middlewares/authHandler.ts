@@ -1,7 +1,7 @@
 import { UnauthenticatedError } from "../errors/unauthenticatedError";
 import { Request, Response, NextFunction } from "express";
 import fs from "fs";
-import jwt from "jsonwebtoken";
+import jwt, { decode } from "jsonwebtoken";
 import path from "path";
 
 const joinedpath = path.join(__dirname, "..", "keys", "chortec.key.pub");
@@ -34,8 +34,20 @@ const verify = async (token: string): Promise<JWTPayload> => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, public_key, (err, decoded) => {
       if (err) reject(err);
-
-      resolve(decoded as JWTPayload);
+      const payload = decoded as any;
+      const result = {
+        user: {
+          id: payload.id,
+          email: payload.email,
+          phone: payload.phone,
+        },
+        iat: payload.iat,
+        exp: payload.exp,
+        aud: payload.aud,
+        iss: payload.iss,
+        sub: payload.sub,
+      };
+      resolve(result);
     });
   });
 };
