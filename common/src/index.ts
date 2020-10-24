@@ -4,3 +4,7 @@ export * from "./errors/badRequestError";
 export * from "./errors/validationError";
 export * from "./errors/notFoundError";
 export * from "./errors/resouceConflictError";
+export * from "./errors/unauthenticatedError";
+
+// Auth
+export * from "./middlewares/errorHandler";
