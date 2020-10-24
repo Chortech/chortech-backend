@@ -9,3 +9,6 @@ export * from "./errors/unauthorizedError";
 
 // Auth
 export * from "./middlewares/authHandler";
+
+// Validation
+export * from "./middlewares/validationHandler";
