@@ -64,12 +64,8 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   const token = auth.split(" ");
-  try {
-    const decoded = await verify(token[1]);
-    req.user = decoded.user;
-  } catch (err) {
-    throw err;
-  }
+  const decoded = await verify(token[1]);
+  req.user = decoded.user;
 };
 
 export { JWTPayload, UserPayload, requireAuth, verify };
