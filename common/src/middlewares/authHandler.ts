@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 
-const public_key = fs.readFileSync("../../keys/chortec.key.pub", "utf-8");
+const public_key = fs.readFileSync("../keys/chortec.key.pub", "utf-8");
 
 interface JWTPayload {
   user: UserPayload;
