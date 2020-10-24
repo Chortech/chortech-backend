@@ -2,8 +2,10 @@ import { UnauthenticatedError } from "../errors/unauthenticatedError";
 import { Request, Response, NextFunction } from "express";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import path from "path";
 
-const public_key = fs.readFileSync("../keys/chortec.key.pub", "utf-8");
+const joinedpath = path.join(__dirname, "..", "keys", "chortec.key.pub");
+const public_key = fs.readFileSync(joinedpath, "utf-8");
 
 interface JWTPayload {
   user: UserPayload;
