@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ResourceConflictError } from "@chortec/common";
 import { Password } from "../utils/password";
+import { generateToken } from "../utils/jwt";
 import User from "../models/user";
 import { validate, SchemaType } from "../validations/validationHandler";
 
@@ -30,9 +31,12 @@ router.post("/", validate(SchemaType.SINGUP), async (req, res) => {
 
   const { _id } = await user.save();
 
+  const token = await generateToken({ id: _id, email, phone }, email || phone);
+
   return res.status(201).send({
     id: _id,
     name,
+    token: token,
   });
 });
 

@@ -1,7 +1,9 @@
 import request from "supertest";
 import { app } from "../../app";
 import { Password } from "../../utils/password";
+import { Token } from "../../utils/jwt";
 import User from "../../models/user";
+import { verify } from "@chortec/common";
 
 it("should signup a user with email and password", async () => {
   await request(app)
@@ -196,4 +198,23 @@ it("should not save user's password as plain text", async () => {
   const user = await User.findOne({ _id: id });
   expect(user).toBeDefined();
   expect(await Password.compare(password, user?.password!)).toBe(true);
+});
+
+it("should respond with avalid access token", async () => {
+  const req = await request(app)
+    .post("/api/auth/signup")
+    .send({
+      email: "example@domain.com",
+      phone: "09333333333",
+      name: "example123",
+      password: "1234mypass4567",
+    })
+    .expect(201);
+
+  const { id, token } = req.body;
+  const { access, expires, created } = token as Token;
+  const decoded = await verify(access);
+  expect(decoded.user.id).toBe(id);
+  expect(decoded.exp).toBe(expires);
+  expect(decoded.iat).toBe(created);
 });

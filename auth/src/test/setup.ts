@@ -1,5 +1,5 @@
 // setup file for test about auth service
-import mongoose, { connection } from "mongoose";
+import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 let mongo: MongoMemoryServer;

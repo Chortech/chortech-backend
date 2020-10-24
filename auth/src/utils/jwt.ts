@@ -1,55 +1,58 @@
-import jwt, { decode } from "jsonwebtoken";
-import util from "util";
-import mongoose from "mongoose";
+import jwt, { SignOptions } from "jsonwebtoken";
+import { UserPayload, verify } from "@chortec/common";
 import fs from "fs";
+import path from "path";
 
-const private_key = fs.readFileSync("../keys/chortec.key", "utf-8");
-const public_key = fs.readFileSync("../keys/chortec.key.pub", "utf-8");
+const joinedPath = path.join(__dirname, "..", "keys", "chortec.key");
+const private_key = fs.readFileSync(joinedPath, "utf-8");
 
-const i = "Chortec"; // Issuer
-const a = "chortect.com"; // Audience
+const issuer = "Chortec";
+const audience = "chortect.com";
+let expire = 60 * 60;
+const algorithm = "RS256";
 
-// const signOptions = {
-//   issuer: i,
-//   subject: that is yet to be determined,
-//   audience: a,
-//   expiresIn: "1h",
-//   algorithm: "RS256",
-// };
+const signOptions: SignOptions = {
+  issuer,
+  audience,
+  algorithm,
+};
 
-class JWT {
-  static generateToken(payload: any, subject: string): string {
-    jwt.sign(payload, private_key, {
-      expiresIn: "1m",
-    });
-    const token = jwt.sign(payload, private_key, {
-      issuer: i,
-      subject: subject,
-      audience: a,
-      expiresIn: "1h",
-      algorithm: "RS256",
-    });
-
-    return token;
-  }
-
-  static verify(token: string): string | object {
-    const decoded = jwt.verify(token, public_key, {
-      issuer: i,
-      audience: a,
-      algorithms: ["RS256"],
-    });
-    return decoded;
-  }
+interface Token {
+  access: string;
+  expires: number;
+  created: number;
 }
 
-// const token = JWT.generateToken(
-//   {
-//     id: new mongoose.Types.ObjectId().toHexString(),
-//     name: "myName",
-//   },
-//   "example@gmail.com"
-// );
+const setExpire = (exp: number) => (expire = exp);
 
-// console.log(token);
-// console.log(JWT.verify(token));
+const generateToken = async (
+  payload: UserPayload,
+  subject: string
+): Promise<Token> => {
+  return new Promise<Token>((resolve, reject) => {
+    const iat = Math.floor(Date.now() / 1000);
+    const exp = iat + expire;
+    jwt.sign(
+      { ...payload, exp },
+      private_key,
+      { ...signOptions, subject: subject },
+      (err, token) => {
+        if (err) reject(err);
+        resolve({
+          access: token!,
+          expires: exp,
+          created: iat,
+        });
+      }
+    );
+  });
+};
+
+export { setExpire, generateToken, Token };
+
+// setExpire(60);
+
+// generateToken({ id: "s" }, "sub").then((x) => {
+//   console.log(x);
+//   verify(x.access).then(console.log);
+// });
