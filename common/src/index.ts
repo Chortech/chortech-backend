@@ -7,4 +7,4 @@ export * from "./errors/resouceConflictError";
 export * from "./errors/unauthenticatedError";
 
 // Auth
-export * from "./middlewares/errorHandler";
+export * from "./middlewares/authHandler";
