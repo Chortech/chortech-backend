@@ -1,3 +1,4 @@
+import { NotFoundError, ResourceConflictError } from "@chortec/common";
 import redis, { RedisClient } from "redis";
 import util from "util";
 
@@ -47,15 +48,27 @@ const delAsync = (key: string): Promise<boolean> => {
     });
   });
 };
+const getCode = (key: string): Promise<CodeModel> => {
+  return new Promise(async (resolve, reject) => {
+    const code = await getAsync(key);
+    if (!code)
+      return reject(new NotFoundError(`There is no code generated for ${key}`));
+    resolve(JSON.parse(code) as CodeModel);
+  });
+};
 const generate = (): string => Math.floor(Math.random() * 999999999) + "";
 
-const setTTL = (ttl: number) => (TTL = ttl);
+const setTTL = (seconds: number) => (TTL = seconds);
 
 const generateCode = (key: string): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     try {
       if (await existsAsync(key))
-        return reject(new Error(`key: ${key}} already exists`));
+        return reject(
+          new ResourceConflictError(
+            `There is a code already generated for ${key}.`
+          )
+        );
 
       let code = generate();
       const model: CodeModel = {
@@ -74,18 +87,14 @@ const generateCode = (key: string): Promise<string> => {
 const verifyCode = (key: string, code: string): Promise<boolean> => {
   return new Promise(async (resolve, reject) => {
     try {
-      const codee = await getAsync(key);
-      if (!codee)
-        return reject(new Error(`There is no code available for ${key}`));
+      const codee = await getCode(key);
 
-      const model = JSON.parse(codee) as CodeModel;
-
-      if (codee === code) {
-        model.verified = true;
-        await setAsync(key, JSON.stringify(model));
+      if (codee.code === code) {
+        codee.verified = true;
+        await setAsync(key, JSON.stringify(codee));
       }
 
-      resolve(codee === code);
+      resolve(codee.code === code);
     } catch (err) {
       reject(err);
     }
@@ -102,7 +111,18 @@ const cancelCode = (key: string): Promise<boolean> => {
   });
 };
 
-export { setTTL, generateCode, verifyCode, cancelCode };
+const clientt = client!;
+
+export {
+  setTTL,
+  generateCode,
+  verifyCode,
+  cancelCode,
+  clientt as client,
+  getAsync,
+  CodeModel,
+  getCode,
+};
 
 async function test() {
   const code = await generateCode("09395536558");
