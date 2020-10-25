@@ -1,9 +1,6 @@
 import { Router } from "express";
 import Joi from "joi";
 import { validate } from "@chortec/common";
-import crypto from "crypto";
-import util from "util";
-import { generate } from "../utils/codeGen";
 import redis from "redis";
 import Queue from "bull";
 
@@ -12,7 +9,7 @@ interface Payload {
   value: string;
 }
 
-// const client = redis.createClient();
+const client = redis.createClient();
 
 const codeQueue = new Queue<Payload>(
   "handling code expiration",
@@ -21,9 +18,9 @@ const codeQueue = new Queue<Payload>(
 
 const router = Router();
 
-// client.on("error", function (error) {
-//   console.error("Hellllllo", error);
-// });
+client.on("error", function (error) {
+  console.error("Hellllllo", error);
+});
 
 // client.set("sina", "shabani");
 
@@ -58,10 +55,10 @@ codeQueue.process(async (job) => {
 
 async function expire() {
   try {
-    const num = await generate(tempMap);
+    // const num = await generate(tempMap);
     // client.set(num, "myemail");
-    console.log(num);
-    await codeQueue.add({ code: num, value: "myemail" });
+    // console.log(num);
+    // await codeQueue.add({ code: num, value: "myemail" });
   } catch (err) {
     console.log(err);
   }
@@ -84,15 +81,15 @@ const verifyShema = Joi.object({
 router.post("/verify", validate(verifyShema), async (req, res) => {
   const { phone, email } = req.body;
 
-  const code = await generate(tempMap);
+  // const code = await generate(tempMap);
 
-  if (phone) {
-    tempMap.set(code, phone);
-    // Send sms
-  } else {
-    tempMap.set(code, email);
-    // Send email
-  }
+  // if (phone) {
+  //   tempMap.set(code, phone);
+  //   // Send sms
+  // } else {
+  //   tempMap.set(code, email);
+  //   // Send email
+  // }
 });
 
 const checkShema = Joi.object({
