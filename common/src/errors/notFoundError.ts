@@ -6,8 +6,8 @@ import { ErrorBase } from "./errorBase";
  */
 export class NotFoundError extends ErrorBase {
   status = 404;
-  constructor() {
-    super("Resource Not Found!");
+  constructor(message?: string) {
+    super(message || "Resource Not Found!");
 
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
