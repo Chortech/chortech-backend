@@ -1,8 +1,15 @@
-import { NotFoundError, ResourceConflictError } from "@chortec/common";
+import {
+  BadRequestError,
+  NotFoundError,
+  ResourceConflictError,
+} from "@chortec/common";
+import { json } from "express";
 import redis, { RedisClient } from "redis";
 import util from "util";
+import generate from "./codeGenerator";
 
 let TTL = 60 * 2; // Time To Live
+let TTLAfterVerify = 60 * 5; // Time To Live
 const host = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 let client: RedisClient;
 
@@ -56,19 +63,24 @@ const getCode = (key: string): Promise<CodeModel> => {
     resolve(JSON.parse(code) as CodeModel);
   });
 };
-const generate = (): string => Math.floor(Math.random() * 999999999) + "";
 
 const setTTL = (seconds: number) => (TTL = seconds);
+const setTTLAfterVerify = (seconds: number) => (TTLAfterVerify = seconds);
 
 const generateCode = (key: string): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (await existsAsync(key))
+      const codee = await getAsync(key);
+      if (codee) {
+        const parsed = JSON.parse(codee) as CodeModel;
+        if (parsed.verified)
+          return reject(new ResourceConflictError(`User is already verified!`));
         return reject(
           new ResourceConflictError(
             `There is a code already generated for ${key}.`
           )
         );
+      }
 
       let code = generate();
       const model: CodeModel = {
@@ -88,10 +100,11 @@ const verifyCode = (key: string, code: string): Promise<boolean> => {
   return new Promise(async (resolve, reject) => {
     try {
       const codee = await getCode(key);
-
+      if (codee.verified)
+        return reject(new BadRequestError(`${key} has already been verified!`));
       if (codee.code === code) {
         codee.verified = true;
-        await setAsync(key, JSON.stringify(codee));
+        await setEXAsync(key, JSON.stringify(codee), TTLAfterVerify);
       }
 
       resolve(codee.code === code);
@@ -104,6 +117,16 @@ const verifyCode = (key: string, code: string): Promise<boolean> => {
 const cancelCode = (key: string): Promise<boolean> => {
   return new Promise(async (resolve, reject) => {
     try {
+      let code = await getAsync(key);
+      if (code) {
+        let parsed = JSON.parse(code) as CodeModel;
+        if (parsed.verified)
+          return reject(
+            new ResourceConflictError(
+              "The code you're trying to cancel has been already activated!"
+            )
+          );
+      }
       resolve(await delAsync(key));
     } catch (err) {
       reject(err);
@@ -115,6 +138,7 @@ const clientt = client!;
 
 export {
   setTTL,
+  setTTLAfterVerify,
   generateCode,
   verifyCode,
   cancelCode,
@@ -123,17 +147,3 @@ export {
   CodeModel,
   getCode,
 };
-
-async function test() {
-  const code = await generateCode("09395536558");
-  console.log("code", code);
-  setTimeout(
-    async () => console.log(await getAsync("09395536558")),
-    1000 * 60 * 2 + 1
-  );
-  // console.log(await verifyCode("09395536558", "sal;ska;"));
-  // console.log(await verifyCode("09395536558", code));
-  // await setEXAsync("sss", "sina shabani", 60);
-}
-
-// test();

@@ -5,8 +5,12 @@ import express from "express";
 // to our error handling middleware.
 import "express-async-errors";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 import { helloRouter } from "./routes/helloRoute";
 import { router as signupRouter } from "./routes/signup";
+import { router as verificationRouter } from "./routes/verification";
 import { errorHandler } from "@chortec/common";
 import { NotFoundError } from "@chortec/common";
 
@@ -17,6 +21,7 @@ app.use(express.json());
 // adding route handlers to express
 app.use("/api/hello", helloRouter);
 app.use("/api/auth/signup", signupRouter);
+app.use("/api/verification", verificationRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

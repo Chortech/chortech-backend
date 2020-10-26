@@ -1,12 +1,11 @@
 import { app } from "./app";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-dotenv.config();
 
 async function start() {
   if (!process.env.EMAIL) throw new Error("EMAIL is not defined!");
   if (!process.env.EMAIL_PASS) throw new Error("EMAIL_PASS is not defined!");
-  if (!process.env.MAIL_SERVICE) throw new Error("MAIL_SERVICE is not defined!");
+  if (!process.env.MAIL_SERVICE)
+    throw new Error("MAIL_SERVICE is not defined!");
 
   // TODO check for enviornment variables and throw an error
   // when they dont exist
