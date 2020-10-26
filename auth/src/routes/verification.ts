@@ -3,7 +3,8 @@ import Joi from "joi";
 import { BadRequestError, NotFoundError, validate } from "@chortec/common";
 import { generateCode, verifyCode, cancelCode } from "../utils/verification";
 import { sendMail } from "../utils/mailer";
-
+import pug from "pug";
+import path from "path";
 const router = Router();
 
 const generateShema = Joi.object({
@@ -27,11 +28,18 @@ router.post("/generate", validate(generateShema), async (req, res) => {
     throw new NotFoundError("Phone not implemented");
   } else {
     code = await generateCode(email);
+    const html = pug.renderFile(
+      path.join(__dirname, "..", "..", "views", "verify-template.pug"),
+      {
+        code: code,
+      }
+    );
     await sendMail({
       subject: "Chortec Verification Code",
       to: email,
-      text: `Your activation code is ${code}.
-      Enjoy managing you expenses.`,
+      // text: `Your activation code is ${code}.
+      // Enjoy managing you expenses.`,
+      html: html,
     });
     res
       .status(201)
@@ -48,7 +56,7 @@ const verifyShema = Joi.object({
       )
     )
     .message("Invalid phone number"),
-  code: Joi.string().min(9).max(9).required(),
+  code: Joi.string().min(6).max(6).required(),
 })
   .or("email", "phone")
   .label("body");

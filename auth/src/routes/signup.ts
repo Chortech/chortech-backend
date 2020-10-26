@@ -35,6 +35,8 @@ router.post("/", validate(signupSchema), async (req, res) => {
     throw new ResourceConflictError("User already exists!");
   }
 
+  // Check for email or phone being verified
+
   // hash the password
   const hash = await Password.hash(password);
 

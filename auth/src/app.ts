@@ -4,10 +4,9 @@ import express from "express";
 // we dont need to write next(err) each we want to send an error
 // to our error handling middleware.
 import "express-async-errors";
-
 import dotenv from "dotenv";
 dotenv.config();
-
+import pug from "pug";
 import { helloRouter } from "./routes/helloRoute";
 import { router as signupRouter } from "./routes/signup";
 import { router as verificationRouter } from "./routes/verification";

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import redis from "redis-mock";
 import { MailOptions } from "nodemailer/lib/ses-transport";
-const generateMock = () => "123456789";
+const generateMock = () => "123456";
 jest.mock("../utils/codeGenerator", () => generateMock);
 jest.mock("redis", () => redis);
 jest.mock("nodemailer");

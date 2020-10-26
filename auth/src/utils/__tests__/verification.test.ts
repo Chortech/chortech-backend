@@ -5,7 +5,18 @@ import {
   cancelCode,
   setTTL,
   getCode,
+  length,
 } from "../verification";
+
+it(`should generate a code with length of ${length}`, async () => {
+  const code = await generateCode("09123456789");
+  await expect(() => verifyCode("132", code)).rejects.toThrow(NotFoundError);
+  expect((await getCode("09123456789")).verified).toBe(false);
+  expect(await verifyCode("09123456789", "123")).toBe(false);
+  expect((await getCode("09123456789")).verified).toBe(false);
+  expect(await verifyCode("09123456789", code)).toBe(true);
+  expect((await getCode("09123456789")).verified).toBe(true);
+});
 
 it("should generate a code and verify it", async () => {
   const code = await generateCode("09123456789");

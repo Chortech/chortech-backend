@@ -12,6 +12,7 @@ let TTL = 60 * 2; // Time To Live
 let TTLAfterVerify = 60 * 5; // Time To Live
 const host = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 let client: RedisClient;
+export const length = 6;
 
 interface CodeModel {
   code: string;
@@ -82,7 +83,7 @@ const generateCode = (key: string): Promise<string> => {
         );
       }
 
-      let code = generate();
+      let code = generate(length);
       const model: CodeModel = {
         code: code,
         verified: false,
