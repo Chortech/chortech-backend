@@ -1,11 +1,15 @@
 import { Router } from "express";
-import { ResourceConflictError } from "@chortec/common";
+import {
+  BadRequestError,
+  NotFoundError,
+  ResourceConflictError,
+} from "@chortec/common";
 import { Password } from "../utils/password";
 import { generateToken } from "../utils/jwt";
 import User from "../models/user";
 import { validate } from "@chortec/common";
 import Joi from "joi";
-
+import { isVerified } from "../utils/verification";
 const router = Router();
 
 const signupSchema = Joi.object({
@@ -20,7 +24,7 @@ const signupSchema = Joi.object({
   name: Joi.string().min(6).max(255).alphanum().required(),
   password: Joi.string().min(8).max(16).required(),
 })
-  .or("email", "phone")
+  .xor("email", "phone")
   .label("body");
 
 router.post("/", validate(signupSchema), async (req, res) => {
@@ -36,6 +40,15 @@ router.post("/", validate(signupSchema), async (req, res) => {
   }
 
   // Check for email or phone being verified
+  if (phone) {
+    if (!(await isVerified(phone)))
+      throw new BadRequestError("Email not verified!");
+    // TODO fix this after getting access to the sms api
+    // throw new NotFoundError("Phone verification not implemented");
+  } else {
+    if (!(await isVerified(email)))
+      throw new BadRequestError("Email not verified!");
+  }
 
   // hash the password
   const hash = await Password.hash(password);

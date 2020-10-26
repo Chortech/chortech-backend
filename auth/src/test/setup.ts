@@ -10,12 +10,18 @@ jest.mock("nodemailer");
 const nodemailer = require("nodemailer");
 export const sendMailMock = jest.fn((mailOptions, callback) => callback());
 nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
-import { client } from "../utils/verification";
+import { client, generateCode, verifyCode } from "../utils/verification";
 let mongo: MongoMemoryServer;
 
 declare global {
   function delay(ms: number): Promise<void>;
+  function mockVerification(key: string): Promise<boolean>;
 }
+
+global.mockVerification = async (key: string): Promise<boolean> => {
+  const code = await generateCode(key);
+  return verifyCode(key, code);
+};
 
 global.delay = async (ms) => new Promise((res, rej) => setTimeout(res, ms));
 

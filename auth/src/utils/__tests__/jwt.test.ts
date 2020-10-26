@@ -9,11 +9,11 @@ import {
 
 it("should respond with 401 if the token is invalid", async () => {
   setExpire(1);
+  await global.mockVerification("example@domain.com");
   const req = await request(app)
     .post("/api/auth/signup")
     .send({
       email: "example@domain.com",
-      phone: "09333333333",
       name: "example123",
       password: "1234mypass4567",
     })
@@ -29,10 +29,10 @@ it("should respond with 401 if the token is invalid", async () => {
 it("should respond with 403 if the token is expired", async () => {
   setExpire(1);
   const delay = (ms: number) => new Promise((res, rej) => setTimeout(res, ms));
+  await global.mockVerification("09333333333");
   const req = await request(app)
     .post("/api/auth/signup")
     .send({
-      email: "example@domain.com",
       phone: "09333333333",
       name: "example123",
       password: "1234mypass4567",

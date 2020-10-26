@@ -25,7 +25,11 @@ router.post("/generate", validate(generateShema), async (req, res) => {
   let code;
   if (phone) {
     // Send sms
-    throw new NotFoundError("Phone not implemented");
+    // throw new NotFoundError("Phone not implemented");
+    code = await generateCode(phone);
+    res
+      .status(201)
+      .json({ message: `Activation code has been sent to your phone` });
   } else {
     code = await generateCode(email);
     const html = pug.renderFile(
@@ -34,13 +38,15 @@ router.post("/generate", validate(generateShema), async (req, res) => {
         code: code,
       }
     );
-    await sendMail({
+
+    sendMail({
       subject: "Chortec Verification Code",
       to: email,
-      // text: `Your activation code is ${code}.
-      // Enjoy managing you expenses.`,
       html: html,
-    });
+    })
+      .then(() => "mail sent")
+      .catch((ex) => console.log(ex));
+
     res
       .status(201)
       .json({ message: `Activation code has been sent to your email` });
@@ -65,7 +71,9 @@ router.post("/verify", validate(verifyShema), async (req, res) => {
   const { phone, email, code } = req.body;
 
   if (phone) {
-    throw new NotFoundError("Phone not implemented");
+    if (!(await verifyCode(phone, code)))
+      throw new BadRequestError("Wrong code!");
+    res.status(200).json({ message: "Activation was successful." });
   } else {
     if (!(await verifyCode(email, code)))
       throw new BadRequestError("Wrong code!");
@@ -76,12 +84,12 @@ router.post("/verify", validate(verifyShema), async (req, res) => {
 router.delete("/cancel", validate(generateShema), async (req, res) => {
   const { phone, email } = req.body;
   if (phone) {
-    throw new NotFoundError("Phone not implemented");
+    if (!(await cancelCode(phone))) throw new NotFoundError("Code not found!");
   } else {
     if (!(await cancelCode(email))) throw new NotFoundError("Code not found!");
-
-    res.status(202).json({ message: "Code was canceled successfully." });
   }
+
+  res.status(202).json({ message: "Code was canceled successfully." });
 });
 
 export { router };
