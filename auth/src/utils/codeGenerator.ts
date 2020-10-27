@@ -7,4 +7,4 @@ const generate = (len: number): string => {
 
   return code;
 };
-export { generate };
+export default generate;
