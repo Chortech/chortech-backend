@@ -344,3 +344,69 @@ it("should not signup a canceled verification phone", async () => {
     })
     .expect(404);
 });
+
+it("shoud signup two different users with email", async () => {
+  await global.mockVerification("example@domain.com");
+
+  await request(app)
+    .post("/api/auth/signup")
+    .send({
+      email: "example@domain.com",
+      name: "example123",
+      password: "123456789",
+    })
+    .expect(201);
+  await global.mockVerification("wrong@domain.com");
+  await request(app)
+    .post("/api/auth/signup")
+    .send({
+      email: "wrong@domain.com",
+      name: "example123",
+      password: "123456789",
+    })
+    .expect(201);
+});
+
+it("shoud signup two different users with phone", async () => {
+  await global.mockVerification("09123456789");
+
+  await request(app)
+    .post("/api/auth/signup")
+    .send({
+      phone: "09123456789",
+      name: "example123",
+      password: "123456789",
+    })
+    .expect(201);
+  await global.mockVerification("09987654321");
+  await request(app)
+    .post("/api/auth/signup")
+    .send({
+      phone: "09987654321",
+      name: "example123",
+      password: "123456789",
+    })
+    .expect(201);
+});
+
+it("shoud signup two different users with phone and email", async () => {
+  await global.mockVerification("example@domain.com");
+
+  await request(app)
+    .post("/api/auth/signup")
+    .send({
+      email: "example@domain.com",
+      name: "example123",
+      password: "123456789",
+    })
+    .expect(201);
+  await global.mockVerification("09123456789");
+  await request(app)
+    .post("/api/auth/signup")
+    .send({
+      phone: "09123456789",
+      name: "example123",
+      password: "123456789",
+    })
+    .expect(201);
+});

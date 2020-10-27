@@ -10,7 +10,7 @@ async function start() {
   if (!process.env.SMS_API_KEY)  throw new Error("SMS_API_KEY is not defined!");
 
   const port = process.env.PORT || 3000;
-  const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/chortec";
+  const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27018/chortec";
 
   try {
     await mongoose.connect(mongoURI, {

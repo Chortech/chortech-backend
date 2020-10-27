@@ -21,8 +21,8 @@ interface UserModel extends mongoose.Model<UserDoc> {
 }
 
 const userSchema = new Schema({
-  email: { type: String, unique: true },
-  phone: { type: String, unique: true },
+  email: { type: String, unique: true, sparse: true },
+  phone: { type: String, unique: true, sparse: true },
   name: String,
   password: { type: String, required: true },
 });
