@@ -28,10 +28,6 @@ it("should generate a code and verify it", async () => {
   expect((await getCode("09123456789")).verified).toBe(true);
 });
 
-// await expect(() => verify(access + "s")).rejects.toThrow(
-//   UnauthenticatedError
-// );
-
 it("should cancel a code and then fail to verify it", async () => {
   const code = await generateCode("09123456789");
   expect(await cancelCode("09123456789121")).toBe(false);

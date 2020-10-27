@@ -2,10 +2,20 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import redis from "redis-mock";
-import { MailOptions } from "nodemailer/lib/ses-transport";
 const generateMock = () => "123456";
 jest.mock("../utils/codeGenerator", () => generateMock);
 jest.mock("redis", () => redis);
+import { TokenBody, TokenResponse } from "../utils/smsSender";
+jest.mock("../utils/smsSender", () => {
+  return {
+    sendSMS: async (msg: string, phone: string): Promise<boolean> =>
+      new Promise((res, rej) => res(true)),
+    getToken: async (body: TokenBody): Promise<TokenResponse> =>
+      new Promise((res, rej) =>
+        res({ IsSuccessful: true, Message: "", TokenKey: "" })
+      ),
+  };
+});
 jest.mock("nodemailer");
 const nodemailer = require("nodemailer");
 export const sendMailMock = jest.fn((mailOptions, callback) => callback());

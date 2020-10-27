@@ -5,6 +5,7 @@ import { generateCode, verifyCode, cancelCode } from "../utils/verification";
 import { sendMail } from "../utils/mailer";
 import pug from "pug";
 import path from "path";
+import smsSender from "../utils/smsSender";
 const router = Router();
 
 const generateShema = Joi.object({
@@ -17,19 +18,18 @@ const generateShema = Joi.object({
     )
     .message("Invalid phone number"),
 })
-  .or("email", "phone")
+  .xor("email", "phone")
   .label("body");
 
 router.post("/generate", validate(generateShema), async (req, res) => {
   const { phone, email } = req.body;
   let code;
   if (phone) {
-    // Send sms
-    // throw new NotFoundError("Phone not implemented");
     code = await generateCode(phone);
-    res
-      .status(201)
-      .json({ message: `Activation code has been sent to your phone` });
+    const message = `کد تایید چرتک:‌ ${code}`;
+    smsSender
+      .sendSMS(message, phone)
+      .then((x) => console.log(`message status ${x}`), console.log);
   } else {
     code = await generateCode(email);
     const html = pug.renderFile(
@@ -46,11 +46,13 @@ router.post("/generate", validate(generateShema), async (req, res) => {
     })
       .then(() => "mail sent")
       .catch((ex) => console.log(ex));
-
-    res
-      .status(201)
-      .json({ message: `Activation code has been sent to your email` });
   }
+
+  res.status(201).json({
+    message: `Activation code has been sent to your ${
+      phone ? "phone" : "email"
+    }`,
+  });
 });
 
 const verifyShema = Joi.object({
@@ -64,7 +66,7 @@ const verifyShema = Joi.object({
     .message("Invalid phone number"),
   code: Joi.string().min(6).max(6).required(),
 })
-  .or("email", "phone")
+  .xor("email", "phone")
   .label("body");
 
 router.post("/verify", validate(verifyShema), async (req, res) => {
