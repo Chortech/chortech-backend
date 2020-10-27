@@ -6,7 +6,7 @@ import {
 import { json } from "express";
 import redis, { RedisClient } from "redis";
 import util from "util";
-import generate from "./codeGenerator";
+import { generate } from "./codeGenerator";
 
 let TTL = 60 * 2; // Time To Live
 let TTLAfterVerify = 60 * 5; // Time To Live
