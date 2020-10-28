@@ -9,6 +9,8 @@ dotenv.config();
 import { helloRouter } from "./routes/helloRoute";
 import { router as signupRouter } from "./routes/signup";
 import { router as loginRouter } from "./routes/login";
+import { router as resetpassRouter } from "./routes/resetpass";
+import { router as changepassRouter } from "./routes/changepass";
 import { router as verificationRouter } from "./routes/verification";
 import { errorHandler } from "@chortec/common";
 import { NotFoundError } from "@chortec/common";
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use("/api/hello", helloRouter);
 app.use("/api/auth/signup", signupRouter);
 app.use("/api/auth/login", loginRouter);
+app.use("/api/auth/resetpass", resetpassRouter);
+app.use("/api/auth/changepass", changepassRouter);
 app.use("/api/verification", verificationRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
