@@ -35,8 +35,9 @@ const verify = async (token: string): Promise<JWTPayload> => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, public_key, (err, decoded) => {
       if (err) {
-        if (err instanceof TokenExpiredError) reject(new UnauthorizedError());
-        else reject(new UnauthenticatedError());
+        if (err instanceof TokenExpiredError)
+          return reject(new UnauthorizedError());
+        else return reject(new UnauthenticatedError());
       }
       const payload = decoded as any;
       const result = {
@@ -57,8 +58,7 @@ const verify = async (token: string): Promise<JWTPayload> => {
 };
 
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
-  const auth = req.headers["Authorization"] as string;
-
+  const auth = req.headers["authorization"] as string;
   if (!auth) {
     throw new UnauthenticatedError();
   }
@@ -66,6 +66,7 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const token = auth.split(" ");
   const decoded = await verify(token[1]);
   req.user = decoded.user;
+  next();
 };
 
 export { JWTPayload, UserPayload, requireAuth, verify };
