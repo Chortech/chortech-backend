@@ -29,6 +29,17 @@ it("shoud not accept both email and phone", async () => {
     .expect(400);
 });
 
+it("shoud not accept invalid password", async () => {
+  await request(app)
+    .post("/api/auth/login")
+    .send({
+      email: "example@domain.com",
+      phone: "09333333333",
+      password: "123",
+    })
+    .expect(400);
+});
+
 it("shoud not authenticate a user that doesnt exists", async () => {
   await request(app)
     .post("/api/auth/login")
@@ -55,7 +66,7 @@ it("shoud not authenticate a user with wrong password", async () => {
     .expect(401);
 });
 
-it("shoud not authenticate a user with email or phone", async () => {
+it("shoud not authenticate a user with wrong email or phone", async () => {
   await signupEmail();
   await signupPhone();
   await request(app)

@@ -138,6 +138,11 @@ const cancelCode = (key: string): Promise<boolean> => {
 const isVerified = async (key: string): Promise<boolean> =>
   (await getCode(key)).verified;
 
+const removeVerified = async (key: string) => {
+  if ((await getCode(key)).verified) return await delAsync(key);
+  throw new Error("Code not verified!");
+};
+
 const clientt = client!;
 
 export {
@@ -152,4 +157,5 @@ export {
   getCode,
   isVerified,
   length,
+  removeVerified
 };

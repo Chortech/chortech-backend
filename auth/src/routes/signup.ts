@@ -9,7 +9,7 @@ import { generateToken } from "../utils/jwt";
 import User from "../models/user";
 import { validate } from "@chortec/common";
 import Joi from "joi";
-import { isVerified } from "../utils/verification";
+import { isVerified, removeVerified } from "../utils/verification";
 const router = Router();
 
 const signupSchema = Joi.object({
@@ -40,12 +40,14 @@ router.post("/", validate(signupSchema), async (req, res) => {
   // Check for email or phone being verified
   if (phone) {
     if (!(await isVerified(phone)))
-      throw new BadRequestError("Email not verified!");
-    // TODO fix this after getting access to the sms api
-    // throw new NotFoundError("Phone verification not implemented");
+      throw new BadRequestError("Phone not verified!");
+
+    removeVerified(phone);
   } else {
     if (!(await isVerified(email)))
       throw new BadRequestError("Email not verified!");
+
+    removeVerified(email);
   }
 
   // hash the password

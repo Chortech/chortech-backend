@@ -1,4 +1,4 @@
-import { BadRequestError, requireAuth, validate } from "@chortec/common";
+import { BadRequestError, validate, requireAuth } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
 import User from "../models/user";

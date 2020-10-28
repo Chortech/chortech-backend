@@ -12,8 +12,7 @@ import { router as loginRouter } from "./routes/login";
 import { router as resetpassRouter } from "./routes/resetpass";
 import { router as changepassRouter } from "./routes/changepass";
 import { router as verificationRouter } from "./routes/verification";
-import { errorHandler } from "@chortec/common";
-import { NotFoundError } from "@chortec/common";
+import { NotFoundError, errorHandler } from "@chortec/common";
 
 // setting up express
 const app = express();

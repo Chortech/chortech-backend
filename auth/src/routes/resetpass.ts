@@ -41,9 +41,6 @@ router.put("/", validate(resetPassSchema), async (req, res) => {
   if (!(await isVerified(phone ? phone : email)))
     throw new BadRequestError(`${phone ? "Phone" : "Email"} not verified!`);
 
-  //   if (!(await Password.compare(oldPass, user.password)))
-  //     throw new BadRequestError("Old password is wrong!");
-
   user.password = await Password.hash(newpass);
 
   await user.save();

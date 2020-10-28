@@ -27,9 +27,7 @@ router.post("/generate", validate(generateShema), async (req, res) => {
   if (phone) {
     code = await generateCode(phone);
     const message = `کد تایید چرتک:‌ ${code}`;
-    smsSender
-      .sendSMS(message, phone)
-      .then((x) => console.log(`message status ${x}`), console.log);
+    smsSender.sendSMS(message, phone).catch(console.log);
   } else {
     code = await generateCode(email);
     const html = pug.renderFile(
