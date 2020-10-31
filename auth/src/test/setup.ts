@@ -38,7 +38,7 @@ global.delay = async (ms) => new Promise((res, rej) => setTimeout(res, ms));
 beforeAll(async () => {
   jest.setTimeout(10000);
   process.env.JWT_KEY = "abcdefghij";
-  mongo = new MongoMemoryServer();
+  mongo = new MongoMemoryServer({binary: {version: '4.4.0'}});
   const uri = await mongo.getUri();
   await mongoose.connect(uri, {
     useNewUrlParser: true,
