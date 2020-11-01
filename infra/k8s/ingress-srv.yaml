@@ -10,7 +10,7 @@ spec:
     - host: localhost
       http:
         paths:
-          - path: /api/auth/?(.*)
+          - path: /api/?(.*)
             backend:
               serviceName: auth-srv
               servicePort: 3000
