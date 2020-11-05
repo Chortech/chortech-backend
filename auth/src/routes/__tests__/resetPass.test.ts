@@ -60,7 +60,7 @@ it("should not reset password without a newpass field", async () => {
 
 it("should not reset password when email is not verified", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ email: "example@domain.com" })
     .expect(201);
 
@@ -72,7 +72,7 @@ it("should not reset password when email is not verified", async () => {
 
 it("should not reset password when phone is not verified", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ phone: "09333333333" })
     .expect(201);
 
@@ -98,12 +98,12 @@ it("should not reset password when no code is generated for phone", async () => 
 
 it("should not reset password when the code is canceled for email", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ email: "example@domain.com" })
     .expect(201);
 
   await request(app)
-    .delete("/api/verification/cancel")
+    .delete("/api/auth/verification/cancel")
     .send({ email: "example@domain.com" })
     .expect(202);
 
@@ -115,11 +115,11 @@ it("should not reset password when the code is canceled for email", async () => 
 
 it("should not reset password when the code is canceled for phone", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ phone: "09333333333" })
     .expect(201);
   await request(app)
-    .delete("/api/verification/cancel")
+    .delete("/api/auth/verification/cancel")
     .send({ phone: "09333333333" })
     .expect(202);
   await request(app)

@@ -6,7 +6,6 @@ import express from "express";
 import "express-async-errors";
 import dotenv from "dotenv";
 dotenv.config();
-import { helloRouter } from "./routes/helloRoute";
 import { router as signupRouter } from "./routes/signup";
 import { router as loginRouter } from "./routes/login";
 import { router as resetpassRouter } from "./routes/resetpass";
@@ -19,12 +18,11 @@ const app = express();
 app.use(express.json());
 
 // adding route handlers to express
-app.use("/api/hello", helloRouter);
 app.use("/api/auth/signup", signupRouter);
 app.use("/api/auth/login", loginRouter);
 app.use("/api/auth/resetpass", resetpassRouter);
 app.use("/api/auth/changepass", changepassRouter);
-app.use("/api/verification", verificationRouter);
+app.use("/api/auth/verification", verificationRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

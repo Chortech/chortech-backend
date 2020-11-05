@@ -232,12 +232,12 @@ it("should respond with avalid access token", async () => {
 
 it("should signup a verified email", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ email: "example@domain.com" })
     .expect(201);
 
   await request(app)
-    .post("/api/verification/verify")
+    .post("/api/auth/verification/verify")
     .send({ email: "example@domain.com", code: "123456" })
     .expect(200);
 
@@ -253,12 +253,12 @@ it("should signup a verified email", async () => {
 
 it("should signup a verified phone", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ phone: "09333333333" })
     .expect(201);
 
   await request(app)
-    .post("/api/verification/verify")
+    .post("/api/auth/verification/verify")
     .send({ phone: "09333333333", code: "123456" })
     .expect(200);
 
@@ -274,7 +274,7 @@ it("should signup a verified phone", async () => {
 
 it("should not signup a pending verification email", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ email: "example@domain.com" })
     .expect(201);
 
@@ -290,7 +290,7 @@ it("should not signup a pending verification email", async () => {
 
 it("should not signup a pending verification phone", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ phone: "09333333333" })
     .expect(201);
   await request(app)
@@ -305,12 +305,12 @@ it("should not signup a pending verification phone", async () => {
 
 it("should not signup a canceled verification email", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ email: "example@domain.com" })
     .expect(201);
 
   await request(app)
-    .delete("/api/verification/cancel")
+    .delete("/api/auth/verification/cancel")
     .send({ email: "example@domain.com" })
     .expect(202);
 
@@ -326,12 +326,12 @@ it("should not signup a canceled verification email", async () => {
 
 it("should not signup a canceled verification phone", async () => {
   await request(app)
-    .post("/api/verification/generate")
+    .post("/api/auth/verification/generate")
     .send({ phone: "09333333333" })
     .expect(201);
 
   await request(app)
-    .delete("/api/verification/cancel")
+    .delete("/api/auth/verification/cancel")
     .send({ phone: "09333333333" })
     .expect(202);
 
