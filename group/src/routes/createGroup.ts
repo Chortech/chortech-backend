@@ -1,6 +1,4 @@
 import Router from 'express';
-const router = Router();
-
 import { BadRequestError, ResourceConflictError, requireAuth } from '@chortec/common';
 import { validate } from '@chortec/common';
 import Joi from 'joi';
@@ -8,11 +6,13 @@ import User from '../models/user'
 import Group from '../models/group';
 
 
+const router = Router();
+
 const createGroupSchema = Joi.object({
     name: Joi.string()
 }).label('body');
 
-router.post('/', validate(createGroupSchema), async (req, res) => {
+router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
     if (!req.user) throw new BadRequestError('Invalid state!');
 
     const { name } = req.body;
