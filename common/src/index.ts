@@ -19,3 +19,4 @@ export * from "./events/subjects";
 export * from "./events/base-listener";
 export * from "./events/base-pulisher";
 export * from "./events/user-events";
+export * from "./events/nats-wrapper";

@@ -1,6 +1,6 @@
 import nats, { Stan } from "node-nats-streaming";
 
-export class NatsWrapper {
+class NatsWrapper {
   private _client?: Stan;
 
   get client(): Stan {
@@ -26,3 +26,5 @@ export class NatsWrapper {
     });
   }
 }
+
+export const natsWrapper = new NatsWrapper();
