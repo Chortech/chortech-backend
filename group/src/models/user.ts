@@ -30,4 +30,4 @@ const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
 export { User, IUser, userSchema };
 
-export default { User };
+export default User;

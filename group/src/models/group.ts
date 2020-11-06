@@ -38,4 +38,4 @@ const Group = mongoose.model<GroupDoc, GroupModel>('Group', groupSchema);
 
 export { Group };
 
-export default { Group };
+export default Group;
