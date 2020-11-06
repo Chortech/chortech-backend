@@ -10,7 +10,7 @@ export abstract class Publisher<T extends Event> {
 
   publish(data: T["data"]): Promise<string> {
     return new Promise((res, rej) => {
-      this.client.publish(this.subject, data, (err, id) => {
+      this.client.publish(this.subject, JSON.stringify(data), (err, id) => {
         if (err) return rej(err);
         console.log(`Event ${this.subject}:${id} published.`);
         res(id);
