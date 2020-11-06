@@ -1,17 +1,15 @@
 import { Router } from "express";
 import {
   BadRequestError,
-  NotFoundError,
   ResourceConflictError,
+  validate,
 } from "@chortec/common";
 import { natsWrapper } from "../nats-wrapper";
 import { Password } from "../utils/password";
 import { generateToken } from "../utils/jwt";
 import User from "../models/user";
-import { validate } from "@chortec/common";
 import Joi from "joi";
 import { isVerified, removeVerified } from "../utils/verification";
-import mongoose from "mongoose";
 import { UserCreatedPub } from "../publishers/user-publishers";
 const router = Router();
 

@@ -1,6 +1,6 @@
 import { app } from "./app";
 import mongoose from "mongoose";
-import { natsWrapper } from "@chortec/common";
+import { natsWrapper } from "./nats-wrapper";
 import { randomBytes } from "crypto";
 
 async function start() {
