@@ -4,11 +4,10 @@ interface IUserCreated {
   subject: Subjects.UserCreated;
   data: {
     id: string;
-    ohone: string;
+    phone: string;
     email: string;
     name: string;
   };
 }
 
-
-export { IUserCreated }
+export { IUserCreated };
