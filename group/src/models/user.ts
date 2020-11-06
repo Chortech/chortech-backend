@@ -7,9 +7,9 @@ import mongoose, { Schema, Document } from 'mongoose';
  */
 
 interface IUser {
-    email?: string,
-    phone?: string,
-    name?: string
+    email?: string;
+    phone?: string;
+    name: string;
 }
 
 type UserDoc = IUser & Document;
@@ -28,6 +28,6 @@ userSchema.statics.build = (user: IUser) => new User(user);
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
-export { User, userSchema };
+export { User, IUser, userSchema };
 
 export default { User };
