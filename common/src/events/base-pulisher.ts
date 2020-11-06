@@ -8,7 +8,7 @@ abstract class Publisher<T extends Event> {
     this.client = client;
   }
 
-  async publish(data: T["data"]): Promise<string> {
+  publish(data: T["data"]): Promise<string> {
     return new Promise((res, rej) => {
       this.client.publish(this.subject, data, (err, id) => {
         if (err) return rej(err);
