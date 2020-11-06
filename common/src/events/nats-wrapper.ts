@@ -12,9 +12,6 @@ class NatsWrapper {
   connect(clusterId: string, clientId: string, url: string): Promise<void> {
     this._client = nats.connect(clusterId, clientId, { url });
 
-    process.on("SIGINT", this.client.close);
-    process.on("SIGTERM", this.client.close);
-
     return new Promise((res, rej) => {
       this.client.on("connect", () => {
         console.log("Connected to NATS");
