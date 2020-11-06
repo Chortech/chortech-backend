@@ -10,7 +10,7 @@ import generate from "./codeGenerator";
 
 let TTL = 60 * 2; // Time To Live
 let TTLAfterVerify = 60 * 5; // Time To Live
-const host = process.env.REDIS_URL || "redis://auth-redis-srv:6379";
+const host = process.env.REDIS_URL || "redis://localhost:6379";
 let client: RedisClient;
 const length = 6;
 
@@ -157,5 +157,5 @@ export {
   getCode,
   isVerified,
   length,
-  removeVerified
+  removeVerified,
 };

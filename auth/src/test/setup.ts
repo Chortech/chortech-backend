@@ -17,6 +17,7 @@ jest.mock("../utils/smsSender", () => {
   };
 });
 jest.mock("nodemailer");
+jest.mock("../nats-wrapper");
 const nodemailer = require("nodemailer");
 export const sendMailMock = jest.fn((mailOptions, callback) => callback());
 nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
@@ -38,7 +39,7 @@ global.delay = async (ms) => new Promise((res, rej) => setTimeout(res, ms));
 beforeAll(async () => {
   jest.setTimeout(10000);
   process.env.JWT_KEY = "abcdefghij";
-  mongo = new MongoMemoryServer({binary: {version: '4.4.0'}});
+  mongo = new MongoMemoryServer({ binary: { version: "4.4.0" } });
   const uri = await mongo.getUri();
   await mongoose.connect(uri, {
     useNewUrlParser: true,
@@ -49,7 +50,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   sendMailMock.mockClear();
   nodemailer.createTransport.mockClear();
-
+  jest.clearAllMocks();
   client.flushall();
   const collections = await mongoose.connection.db.collections();
   for (let col of collections) {
