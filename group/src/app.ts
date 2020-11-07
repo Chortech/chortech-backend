@@ -7,12 +7,14 @@ import 'express-async-errors';
 import dotenv from 'dotenv';
 dotenv.config();
 import { NotFoundError, errorHandler } from "@chortec/common";
+import { createGroupRouter } from './routes/createGroup';
 
 // setting up express
 const app = express();
 app.use(express.json());
 
 // adding route handlers to express
+app.use('/api/group/create', createGroupRouter)
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get('*', (req, res) => {
