@@ -15,6 +15,19 @@ spec:
       containers:
         - name: auth
           image: chortech/auth
+          env: 
+            - name: REDIS_URL
+              value: 'redis://auth-redis-srv:6379'
+            - name: MONGO_URL
+              value: 'mongodb://auth-mongo-srv:27017'
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: chortec
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef: 
+                  fieldPath: metadata.name 
 ---
 apiVersion: v1
 kind: Service

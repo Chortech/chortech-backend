@@ -1,15 +1,16 @@
 import { Router } from "express";
 import {
   BadRequestError,
-  NotFoundError,
   ResourceConflictError,
+  validate,
 } from "@chortec/common";
+import { natsWrapper } from "../utils/nats-wrapper";
 import { Password } from "../utils/password";
 import { generateToken } from "../utils/jwt";
 import User from "../models/user";
-import { validate } from "@chortec/common";
 import Joi from "joi";
 import { isVerified, removeVerified } from "../utils/verification";
+import { UserCreatedPub } from "../publishers/user-publishers";
 const router = Router();
 
 const signupSchema = Joi.object({
@@ -49,27 +50,48 @@ router.post("/", validate(signupSchema), async (req, res) => {
 
     removeVerified(email);
   }
+  // const session = await mongoose.startSession();
+  try {
+    // session.startTransaction();
 
-  // hash the password
-  const hash = await Password.hash(password);
+    // hash the password
+    const hash = await Password.hash(password);
 
-  // save the user to database
-  const user = User.build({
-    email,
-    phone,
-    password: hash,
-    name: name,
-  });
+    // save the user to database
+    const user = User.build({
+      email,
+      phone,
+      password: hash,
+      name: name,
+    });
 
-  const { _id } = await user.save();
+    const { _id } = await user.save();
 
-  const token = await generateToken({ id: _id, email, phone }, email || phone);
+    const token = await generateToken(
+      { id: _id, email, phone },
+      email || phone
+    );
 
-  return res.status(201).send({
-    id: _id,
-    name,
-    token: token,
-  });
+    await new UserCreatedPub(natsWrapper.client).publish({
+      id: user._id,
+      name: name,
+      email: email,
+      phone: phone,
+    });
+
+    // await session.commitTransaction();
+    // session.endSession();
+
+    return res.status(201).send({
+      id: _id,
+      name,
+      token: token,
+    });
+  } catch (err) {
+    // await session.abortTransaction();
+    // session.endSession();
+    throw err;
+  }
 });
 
 export { router };

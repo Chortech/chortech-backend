@@ -4,7 +4,7 @@ import { Password } from "../../utils/password";
 import { Token } from "../../utils/jwt";
 import User from "../../models/user";
 import { verify } from "@chortec/common";
-import { generateCode, verifyCode } from "../../utils/verification";
+import { natsWrapper } from "../../utils/nats-wrapper";
 
 it("should signup a user with email and password", async () => {
   await global.mockVerification("example@domain.com");
@@ -409,4 +409,20 @@ it("shoud signup two different users with phone and email", async () => {
       password: "123456789",
     })
     .expect(201);
+});
+
+it("shoud publish an event", async () => {
+  await global.mockVerification("example@domain.com");
+
+  await request(app)
+    .post("/api/auth/signup")
+    .send({
+      email: "example@domain.com",
+      name: "example123",
+      password: "123456789",
+    })
+    .expect(201);
+  await global.mockVerification("09123456789");
+
+  expect(natsWrapper.client.publish).toBeCalledTimes(1);
 });

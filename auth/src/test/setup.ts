@@ -2,9 +2,9 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import redis from "redis-mock";
+jest.mock("redis", () => redis);
 const generateMock = () => "123456";
 jest.mock("../utils/codeGenerator", () => generateMock);
-jest.mock("redis", () => redis);
 import { TokenBody, TokenResponse } from "../utils/smsSender";
 jest.mock("../utils/smsSender", () => {
   return {
@@ -17,10 +17,12 @@ jest.mock("../utils/smsSender", () => {
   };
 });
 jest.mock("nodemailer");
+jest.mock("../utils/nats-wrapper");
 const nodemailer = require("nodemailer");
 export const sendMailMock = jest.fn((mailOptions, callback) => callback());
 nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
-import { client, generateCode, verifyCode } from "../utils/verification";
+import { generateCode, verifyCode } from "../utils/verification";
+import { redisWrapper } from "../utils/redis-wrapper";
 let mongo: MongoMemoryServer;
 
 declare global {
@@ -37,8 +39,9 @@ global.delay = async (ms) => new Promise((res, rej) => setTimeout(res, ms));
 
 beforeAll(async () => {
   jest.setTimeout(10000);
+  redisWrapper.connect("");
   process.env.JWT_KEY = "abcdefghij";
-  mongo = new MongoMemoryServer({binary: {version: '4.4.0'}});
+  mongo = new MongoMemoryServer({ binary: { version: "4.4.0" } });
   const uri = await mongo.getUri();
   await mongoose.connect(uri, {
     useNewUrlParser: true,
@@ -49,8 +52,8 @@ beforeAll(async () => {
 beforeEach(async () => {
   sendMailMock.mockClear();
   nodemailer.createTransport.mockClear();
-
-  client.flushall();
+  jest.clearAllMocks();
+  redisWrapper.client.flushall();
   const collections = await mongoose.connection.db.collections();
   for (let col of collections) {
     await col.deleteMany({});

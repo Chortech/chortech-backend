@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "../../app";
 import { sendMailMock } from "../../test/setup";
-import { setTTL } from "../../utils/verification";
+import { redisWrapper } from "../../utils/redis-wrapper";
 
 const code = "123456";
 
@@ -68,7 +68,7 @@ it("should not verify a code after cancellation", async () => {
 });
 
 it("should not verify a code after expiration", async () => {
-  setTTL(1);
+  redisWrapper.ttl = 1;
 
   await request(app)
     .post("/api/auth/verification/generate")
