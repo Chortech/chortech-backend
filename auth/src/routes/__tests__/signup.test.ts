@@ -4,7 +4,7 @@ import { Password } from "../../utils/password";
 import { Token } from "../../utils/jwt";
 import User from "../../models/user";
 import { verify } from "@chortec/common";
-import { natsWrapper } from "../../nats-wrapper";
+import { natsWrapper } from "../../utils/nats-wrapper";
 
 it("should signup a user with email and password", async () => {
   await global.mockVerification("example@domain.com");

@@ -3,10 +3,10 @@ import {
   generateCode,
   verifyCode,
   cancelCode,
-  setTTL,
   getCode,
   length,
 } from "../verification";
+import { redisWrapper } from "../../utils/redis-wrapper";
 
 it(`should generate a code with length of ${length}`, async () => {
   const code = await generateCode("09123456789");
@@ -47,7 +47,7 @@ it("should not generate new code when there is already a code for given key", as
 it("should fail to verify an expired code", async () => {
   const delay = (ms: number) => new Promise((res, rej) => setTimeout(res, ms));
 
-  setTTL(1);
+  redisWrapper.ttl = 1;
   const code = await generateCode("09123456789");
   await delay(1000);
   await expect(() => verifyCode("09123456789", code)).rejects.toThrow(
@@ -58,7 +58,7 @@ it("should fail to verify an expired code", async () => {
 it("should fail to cancel an expired code", async () => {
   const delay = (ms: number) => new Promise((res, rej) => setTimeout(res, ms));
 
-  setTTL(1);
+  redisWrapper.ttl = 1;
   const code = await generateCode("09123456789");
   await delay(1000);
   expect(await cancelCode("09123456789")).toBe(false);

@@ -1,7 +1,8 @@
 import { app } from "./app";
 import mongoose from "mongoose";
-import { natsWrapper } from "./nats-wrapper";
+import { natsWrapper } from "./utils/nats-wrapper";
 import { randomBytes } from "crypto";
+import { redisWrapper } from "./utils/redis-wrapper";
 
 async function start() {
   if (!process.env.EMAIL) throw new Error("EMAIL is not defined!");
@@ -24,7 +25,10 @@ async function start() {
     process.env.NATS_CLUSTER_ID || randomBytes(4).toString("hex");
   const natsUrl = process.env.NATS_URL || "http://localhost:4222";
 
+  const redisURL = process.env.REDIS_URL || "redis://localhost:6379";
+
   try {
+    redisWrapper.connect(redisURL);
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,

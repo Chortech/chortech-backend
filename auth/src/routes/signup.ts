@@ -4,7 +4,7 @@ import {
   ResourceConflictError,
   validate,
 } from "@chortec/common";
-import { natsWrapper } from "../nats-wrapper";
+import { natsWrapper } from "../utils/nats-wrapper";
 import { Password } from "../utils/password";
 import { generateToken } from "../utils/jwt";
 import User from "../models/user";
