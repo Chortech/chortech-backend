@@ -12,17 +12,12 @@ async function start() {
   if (!process.env.LINE_NUMBER) throw new Error("LINE_NUMBER is not defined!");
   if (!process.env.SMS_SECRET) throw new Error("SMS_SECRET is not defined!");
   if (!process.env.SMS_API_KEY) throw new Error("SMS_API_KEY is not defined!");
-  // if (!process.env.NATS_URL) throw new Error("NATS_URL is not defined!");
-  // if (!process.env.NATS_CLUSTER_ID)
-  //   throw new Error("NATS_CLUSTER_ID is not defined!");
-  // if (!process.env.NATS_CLIENT_ID)
-  //   throw new Error("NATS_CLIENT_ID is not defined!");
 
   const port = process.env.PORT || 3000;
   const mongoURI = process.env.MONGO_URL || "mongodb://localhost:27017/auth";
   const natsClusterId = process.env.NATS_CLUSTER_ID || "chortec";
   const natsClientId =
-    process.env.NATS_CLUSTER_ID || randomBytes(4).toString("hex");
+    process.env.NATS_CLIENT_ID || randomBytes(4).toString("hex");
   const natsUrl = process.env.NATS_URL || "http://localhost:4222";
 
   const redisURL = process.env.REDIS_URL || "redis://localhost:6379";
@@ -34,8 +29,9 @@ async function start() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    console.log("Connected to mongo!");
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 
   app.listen(port, () => console.log(`Server is listening on port ${port}`));

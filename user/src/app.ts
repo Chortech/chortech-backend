@@ -4,15 +4,19 @@ import express from "express";
 // we dont need to write next(err) each we want to send an error
 // to our error handling middleware.
 import "express-async-errors";
-import dotenv from "dotenv";
-dotenv.config();
+
 import { NotFoundError, errorHandler } from "@chortec/common";
+import { router as addFriendRouter } from "./routes/addFriend";
+import { router as removeFriendRouter } from "./routes/removeFriend";
+import { validateId } from "./utils/idValidator";
 
 // setting up express
 const app = express();
 app.use(express.json());
-
+app.param("id", validateId);
 // adding route handlers to express
+app.use("/api/users/:id/friends", addFriendRouter);
+app.use("/api/users/:id/friends", removeFriendRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
