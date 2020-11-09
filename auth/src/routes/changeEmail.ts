@@ -23,7 +23,7 @@ router.put('/', requireAuth, validate(changeEmailSchema), async (req, res) => {
     if (!user)
         throw new BadRequestError('Invalid State!');
 
-    const users = newEmail ? User.find({ newEmail }) : null;
+    const users = newEmail ? await User.find({ newEmail }) : null;
 
     if (users != null)
         throw new ResourceConflictError('This email has already been used!');
