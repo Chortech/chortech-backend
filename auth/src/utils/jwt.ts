@@ -4,12 +4,12 @@ import fs from "fs";
 import path from "path";
 
 const joinedPath = path.join(__dirname, "..", "keys", "chortec.key");
-const private_key = fs.readFileSync(joinedPath, "utf-8");
+const private_key = process.env.JWT_KEY || fs.readFileSync(joinedPath, "utf-8");
 
 const issuer = "Chortec";
 const audience = "chortect.com";
 let expire = 60 * 60;
-const algorithm = "RS256";
+const algorithm = process.env.JWT_KEY ? "HS256" : "RS256";
 
 const signOptions: SignOptions = {
   issuer,
