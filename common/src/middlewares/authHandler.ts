@@ -6,7 +6,7 @@ import path from "path";
 import { UnauthorizedError } from "../errors/unauthorizedError";
 
 const joinedpath = path.join(__dirname, "..", "keys", "chortec.key.pub");
-const public_key = fs.readFileSync(joinedpath, "utf-8");
+const public_key = process.env.JWT_KEY || fs.readFileSync(joinedpath, "utf-8");
 
 interface JWTPayload {
   user: UserPayload;
