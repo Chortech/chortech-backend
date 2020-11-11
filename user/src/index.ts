@@ -12,10 +12,13 @@ async function start() {
   const natsClientId =
     process.env.NATS_CLIENT_ID || randomBytes(4).toString("hex");
   const natsUrl = process.env.NATS_URL || "http://localhost:4222";
-
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
     new UserCreatedListener(natsWrapper.client).listen();
+  } catch (err) {
+    console.error(err);
+  }
+  try {
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

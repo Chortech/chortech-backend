@@ -1,5 +1,5 @@
 import { IUserCreated, Listener, Subjects } from "@chortec/common";
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { Message } from "node-nats-streaming";
 import User from "../models/user";
 export class UserCreatedListener extends Listener<IUserCreated> {
@@ -12,6 +12,7 @@ export class UserCreatedListener extends Listener<IUserCreated> {
         name: data.name,
         email: data.email,
         phone: data.phone,
+        friends: [],
       });
 
       await user.save();

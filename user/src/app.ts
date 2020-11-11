@@ -8,15 +8,18 @@ import "express-async-errors";
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as addFriendRouter } from "./routes/addFriend";
 import { router as removeFriendRouter } from "./routes/removeFriend";
+import { router as getFriendsRouter } from "./routes/getFriends";
 import { validateId } from "./utils/idValidator";
 
 // setting up express
 const app = express();
 app.use(express.json());
 app.param("id", validateId);
+
 // adding route handlers to express
-app.use("/api/users/:id/friends", addFriendRouter);
-app.use("/api/users/:id/friends", removeFriendRouter);
+app.use("/api/user/friends", getFriendsRouter);
+app.use("/api/user/friends/:id", addFriendRouter);
+app.use("/api/user/friends/:id", removeFriendRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

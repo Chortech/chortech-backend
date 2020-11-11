@@ -19,7 +19,7 @@ export const validateId = (req: Request, res: Response, next: NextFunction) => {
     throw new ValidationError(
       new Joi.ValidationError(
         "Id must be a valid mongodb ObjectId!",
-        { context: { key: "id" } },
+        [{ context: { key: "id" } }],
         id
       )
     );
