@@ -6,7 +6,7 @@ import path from "path";
 import { UnauthorizedError } from "../errors/unauthorizedError";
 
 const joinedpath = path.join(__dirname, "..", "keys", "chortec.key.pub");
-const public_key = process.env.JWT_KEY || fs.readFileSync(joinedpath, "utf-8");
+const public_key = fs.readFileSync(joinedpath, "utf-8");
 
 interface JWTPayload {
   user: UserPayload;
@@ -33,7 +33,9 @@ declare global {
 
 const verify = async (token: string): Promise<JWTPayload> => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, public_key, (err, decoded) => {
+    const secret = process.env.JWT_KEY || public_key;
+    if (!secret) throw new Error("JWT Secret must be defined!!");
+    jwt.verify(token, secret, (err, decoded) => {
       if (err) {
         if (err instanceof TokenExpiredError)
           return reject(new UnauthorizedError());
