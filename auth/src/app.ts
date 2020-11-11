@@ -12,6 +12,8 @@ import { router as resetpassRouter } from "./routes/resetpass";
 import { router as changepassRouter } from "./routes/changepass";
 import { router as verificationRouter } from "./routes/verification";
 import { NotFoundError, errorHandler } from "@chortec/common";
+import { changeEmailRouter } from "./routes/changeEmail";
+import { changePhoneRouter } from "./routes/changePhone";
 
 // setting up express
 const app = express();
@@ -23,6 +25,8 @@ app.use("/api/auth/login", loginRouter);
 app.use("/api/auth/resetpass", resetpassRouter);
 app.use("/api/auth/changepass", changepassRouter);
 app.use("/api/auth/verification", verificationRouter);
+app.use('/api/auth/change-email', changeEmailRouter);
+app.use('/api/auth/change-phone', changePhoneRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
