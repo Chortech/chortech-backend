@@ -48,4 +48,4 @@ router.put('/edit', requireAuth, validate(editProfileSchema), async (req, res) =
     });
 });
 
-export { router as editProfileRouter };
+export { router as profileRouter };
