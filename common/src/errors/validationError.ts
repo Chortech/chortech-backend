@@ -13,7 +13,7 @@ export class ValidationError extends ErrorBase {
   serialize() {
     let errors = this.error.details.map((d) => {
       return {
-        message: d.message,
+        message: d.message || this.error.message,
         fields: d.context?.key ? [d.context?.key] : d.context?.peers,
       };
     });
