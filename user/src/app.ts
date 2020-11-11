@@ -1,10 +1,10 @@
 import express from "express";
+import { profileRouter } from './routes/profile';
 
 // this library helps throwing errors from async request handlers
 // we dont need to write next(err) each we want to send an error
 // to our error handling middleware.
 import "express-async-errors";
-
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as addFriendRouter } from "./routes/addFriend";
 import { router as removeFriendRouter } from "./routes/removeFriend";
@@ -20,6 +20,7 @@ app.param("id", validateId);
 app.use("/api/user/friends", getFriendsRouter);
 app.use("/api/user/friends/:id", addFriendRouter);
 app.use("/api/user/friends/:id", removeFriendRouter);
+app.use('/api/user/profile', profileRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
