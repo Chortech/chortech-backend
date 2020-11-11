@@ -10,7 +10,24 @@ const editProfileSchema = Joi.object({
     newName: Joi.string()
 });
 
-router.put('/', requireAuth, validate(editProfileSchema), async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
+    if (!req.user)
+        throw new BadRequestError('Invalid State!');
+
+    const { id } = req.user;
+    const user = await User.findById(id);
+
+    if (!user)
+        throw new BadRequestError('Invalid State!');
+
+    res.status(200).send({
+        email: user.email,
+        phone: user.phone,
+        name: user.name
+    });
+});
+
+router.put('/edit', requireAuth, validate(editProfileSchema), async (req, res) => {
     if (!req.user)
         throw new BadRequestError('Invalid State!');
 

@@ -4,8 +4,8 @@ import express from "express";
 // we dont need to write next(err) each we want to send an error
 // to our error handling middleware.
 import "express-async-errors";
-import dotenv from "dotenv";
-dotenv.config();
+// import dotenv from "dotenv";
+// dotenv.config();
 import { NotFoundError, errorHandler } from "@chortec/common";
 
 // setting up express
