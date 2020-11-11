@@ -29,9 +29,9 @@ router.put('/', requireAuth, validate(changePhoneSchema), async (req, res) => {
     if (!user)
         throw new BadRequestError('Invalid State!');
 
-    const users = newPhone ? User.find({ newPhone }) : null;
+    const users = newPhone ? await User.find({ newPhone }) : [];
 
-    if (users != null)
+    if (users.length != 0)
         throw new ResourceConflictError('This phone has already been used!');
 
     if (!(await isVerified(newPhone)))
