@@ -19,6 +19,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "4.4.0",
+      "disablePostinstall":"1"
+    }
+  },
   "devDependencies": {
     "@types/jest": "^26.0.14",
     "@types/redis-mock": "^0.17.0",

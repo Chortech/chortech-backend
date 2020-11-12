@@ -1,4 +1,9 @@
-import { BadRequestError, NotFoundError, requireAuth } from "@chortec/common";
+import {
+  BadRequestError,
+  NotFoundError,
+  requireAuth,
+  ResourceConflictError,
+} from "@chortec/common";
 import { raw, Router } from "express";
 import mongoose, { Schema, Types } from "mongoose";
 import User from "../models/user";
@@ -18,7 +23,7 @@ router.put("/", requireAuth, async (req, res) => {
   );
   // console.log(raw);
   if (raw.n === 0)
-    throw new BadRequestError(`${req.friend?.id} is already your friend`);
+    throw new ResourceConflictError(`${req.friend?.id} is already your friend`);
 
   const user = await User.findById(req.user?.id);
 
