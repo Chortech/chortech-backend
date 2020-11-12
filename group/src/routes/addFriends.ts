@@ -57,3 +57,5 @@ router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res
         members: group.members
     });
 });
+
+export { router as addFriendsToGroupRouter };
