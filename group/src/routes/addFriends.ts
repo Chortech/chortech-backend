@@ -28,10 +28,8 @@ router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res
 
     if (!group)
         throw new BadRequestError(`No groups exist with the id ${groupId}`);
-    
-    const members = group.members ? group.members : [];
-    
-    if (!members.includes(user))
+        
+    if (!group.members?.includes(user))
         throw new BadRequestError('You are not a member of this group!');
     
     for (let friendId of friends) {
@@ -40,13 +38,11 @@ router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res
         if (!friend)
             throw new BadRequestError(`There is no user with id ${friendId}`);
         
-        if (members.includes(friend))
+        if (group.members.includes(friend))
             throw new ResourceConflictError(`User ${friendId} is already in this group!`);
         
-        await members.push(friend);
+        group.members?.push(friend);
     }
-
-    group.members = members;
 
     await group.save();
 
