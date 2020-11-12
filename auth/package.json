@@ -11,7 +11,9 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "setupFiles": ["<rootDir>/src/test/config.ts"],
+    "setupFiles": [
+      "<rootDir>/src/test/config.ts"
+    ],
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
@@ -23,7 +25,7 @@
   "config": {
     "mongodbMemoryServer": {
       "version": "4.4.0",
-      "disablePostinstall":"1"
+      "disablePostinstall": "1"
     }
   },
   "devDependencies": {
@@ -37,7 +39,7 @@
     "ts-jest": "^26.4.1"
   },
   "dependencies": {
-    "@chortec/common": "^1.0.43",
+    "@chortec/common": "^1.0.45",
     "@types/bcrypt": "^3.0.0",
     "@types/bull": "^3.14.4",
     "@types/express": "^4.17.8",
