@@ -9,14 +9,13 @@ import Group from '../models/group';
 const router = Router();
 
 const addFriendsToGroupSchema = Joi.object({
-    groupId: Joi.string(),
     friends: Joi.array().items(Joi.string())
 }).label('body');
 
 router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res) => {
     if (!req.user) throw new BadRequestError('Invalid state!');
 
-    const { groupId, friends } = req.body;
+    const { friends } = req.body;
     const id = req.user;
 
     const user = await User.findById(id);
@@ -24,10 +23,10 @@ router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res
     if (!user)
         throw new BadRequestError('Invalid state!');
 
-    const group = await Group.findById(groupId);
+    const group = await Group.findById(req.group?.id);
 
     if (!group)
-        throw new BadRequestError(`No groups exist with the id ${groupId}`);
+        throw new BadRequestError(`No groups exist with the id ${req.group?.id}`);
         
     if (!group.members?.includes(user))
         throw new BadRequestError('You are not a member of this group!');
@@ -47,7 +46,6 @@ router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res
     await group.save();
 
     res.status(200).send({
-        id: groupId,
         name: group.name,
         creator: group.creator,
         members: group.members

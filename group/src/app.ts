@@ -7,6 +7,7 @@ import 'express-async-errors';
 import dotenv from 'dotenv';
 dotenv.config();
 import { NotFoundError, errorHandler } from "@chortec/common";
+import { validateId } from './utils/idValidator';
 import { createGroupRouter } from './routes/createGroup';
 import { addFriendsToGroupRouter } from './routes/addFriends';
 import { deleteGroupRouter } from './routes/deleteGroup';
@@ -14,11 +15,12 @@ import { deleteGroupRouter } from './routes/deleteGroup';
 // setting up express
 const app = express();
 app.use(express.json());
+app.param('id', validateId);
 
 // adding route handlers to express
 app.use('/api/group/create', createGroupRouter);
 app.use('/api/group/delete', deleteGroupRouter);
-app.use('/api/group/add', addFriendsToGroupRouter);
+app.use('/api/group/:id/add', addFriendsToGroupRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get('*', (req, res) => {
