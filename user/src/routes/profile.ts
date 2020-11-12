@@ -8,7 +8,7 @@ const router = Router();
 
 const editProfileSchema = Joi.object({
     newName: Joi.string()
-});
+}).label('body');
 
 router.get('/', requireAuth, async (req, res) => {
     if (!req.user)
