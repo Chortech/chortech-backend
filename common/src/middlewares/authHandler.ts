@@ -33,7 +33,9 @@ declare global {
 
 const verify = async (token: string): Promise<JWTPayload> => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, public_key, (err, decoded) => {
+    const secret = process.env.JWT_KEY || public_key;
+
+    jwt.verify(token, secret, (err, decoded) => {
       if (err) {
         if (err instanceof TokenExpiredError)
           return reject(new UnauthorizedError());
