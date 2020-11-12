@@ -27,8 +27,11 @@ router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res
 
     if (!group)
         throw new BadRequestError(`No groups exist with the id ${req.group?.id}`);
+    
+    if (!group.members)
+        group.members = [];
         
-    if (!group.members?.includes(user))
+    if (!group.members.includes(user))
         throw new BadRequestError('You are not a member of this group!');
     
     for (let friendId of friends) {
