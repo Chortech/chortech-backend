@@ -9,6 +9,7 @@ import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as addFriendRouter } from "./routes/add-friend";
 import { router as removeFriendRouter } from "./routes/remove-friend";
 import { router as getFriendsRouter } from "./routes/get-friends";
+import { router as inviteRouter } from "./routes/invite-friend";
 import { validateId } from "./utils/idValidator";
 
 // setting up express
@@ -20,6 +21,7 @@ app.param("id", validateId);
 app.use("/api/user/friends", getFriendsRouter);
 app.use("/api/user/friends/:id", addFriendRouter);
 app.use("/api/user/friends/:id", removeFriendRouter);
+app.use("/api/user/friends/invite", inviteRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

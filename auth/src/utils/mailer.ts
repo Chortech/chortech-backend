@@ -26,4 +26,14 @@ const sendMail = async (mailOptions: MailOptions) => {
   await sendAsync({ ...mailOptions, from: email });
 };
 
-export { sendMail };
+const sendMailMultiple = async (
+  subject: string,
+  mails: { text?: string; html?: string; email: string }[]
+) => {
+  for (const mail of mails) {
+    const { text, html, email } = mail;
+    await sendMail({ subject: subject, text: text, html: html, to: email });
+  }
+};
+
+export { sendMail, sendMailMultiple };

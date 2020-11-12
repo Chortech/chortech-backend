@@ -2,6 +2,7 @@ import request from "supertest";
 import User from "../../models/user";
 import { app } from "../../app";
 import { users } from "../../test/setup";
+import mongoose from "mongoose";
 
 it("should add a friend", async () => {
   const { id, token } = await global.signin(
@@ -103,4 +104,18 @@ it("should NOT add friend without a valid token", async () => {
     .set("authorization", `Bearer hajkhsakjhskahska`)
     .send()
     .expect(401);
+});
+
+it("should NOT add friend when the id doesn't exist in user collection", async () => {
+  const { id, token } = await global.signin(
+    users[0].id,
+    users[0].email,
+    users[0].phone
+  );
+
+  await request(app)
+    .put(`/api/user/friends/${new mongoose.Types.ObjectId()}`)
+    .set("authorization", `Bearer ${token}`)
+    .send()
+    .expect(404);
 });

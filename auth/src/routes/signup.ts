@@ -32,9 +32,14 @@ router.post("/", validate(signupSchema), async (req, res) => {
   const { email, phone, name, password } = req.body;
 
   // Check to see if the user already exists or not
-  const users = phone ? await User.find({ phone }) : await User.find({ email });
+  const exists = await User.exists({
+    $or: [
+      { email: { $exists: true, $eq: email } },
+      { phone: { $exists: true, $eq: phone } },
+    ],
+  });
 
-  if (users.length != 0) {
+  if (exists) {
     throw new ResourceConflictError("User already exists!");
   }
 
