@@ -19,9 +19,9 @@ app.param("id", validateId);
 
 // adding route handlers to express
 app.use("/api/user/friends", getFriendsRouter);
+app.use("/api/user/friends/invite", inviteRouter);
 app.use("/api/user/friends/:id", addFriendRouter);
 app.use("/api/user/friends/:id", removeFriendRouter);
-app.use("/api/user/friends/invite", inviteRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

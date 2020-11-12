@@ -4,6 +4,8 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import User from "../models/user";
 import jwt from "jsonwebtoken";
 
+jest.mock("../utils/nats-wrapper");
+
 let mongo: MongoMemoryServer;
 
 interface SigninMockResponse {

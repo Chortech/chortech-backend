@@ -39,11 +39,7 @@
     "ts-jest": "^26.4.1"
   },
   "dependencies": {
-<<<<<<< Updated upstream
     "@chortec/common": "^1.0.45",
-=======
-    "@chortec/common": "^1.0.44",
->>>>>>> Stashed changes
     "@types/express": "^4.17.8",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mongoose": "^5.7.36",

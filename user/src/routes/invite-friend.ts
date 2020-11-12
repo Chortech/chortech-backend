@@ -1,4 +1,9 @@
-import { requireAuth, validate } from "@chortec/common";
+import {
+  BadRequestError,
+  requireAuth,
+  ResourceConflictError,
+  validate,
+} from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
 import User from "../models/user";
@@ -19,32 +24,50 @@ const schema = Joi.object({
         .message("Invalid phone number"),
       name: Joi.string().min(6).max(255).alphanum().required(),
     })
+      .xor("email", "phone")
+      .label("body")
   ),
-})
-  .xor("email", "phone")
-  .label("body");
+});
 
 router.post("/", requireAuth, validate(schema), async (req, res) => {
-  const user = await User.findById(req.friend?.id).populate("friends");
+  const user = await User.findById(req.user?.id).populate("friends");
   if (!user) throw new Error("Shouldn't reach here");
 
   const phoneUsers = [];
   const emailUsers = [];
 
+  // Check for duplicates
+
   for (const invitee of req.body.invitees) {
-    if (invitee.phone) phoneUsers.push(invitee);
-    else if (invitee.email) emailUsers.push(invitee);
+    if (invitee.phone) {
+      if (phoneUsers.findIndex((x) => x === invitee.phone) != -1)
+        throw new BadRequestError("Found duplicate phone!");
+      phoneUsers.push(invitee.phone);
+    } else if (invitee.email) {
+      if (emailUsers.findIndex((x) => x === invitee.email) != -1)
+        throw new BadRequestError("Found duplicate email!");
+      emailUsers.push(invitee.email);
+    }
   }
 
   console.log(phoneUsers);
   console.log(emailUsers);
 
-  User.find({
+  // Check if the one the invitees is already a user or not
+
+  const exists = await User.exists({
     $or: [
       { email: { $exists: true, $in: emailUsers } },
       { phone: { $exists: true, $in: phoneUsers } },
     ],
   });
+
+  if (exists)
+    throw new ResourceConflictError(
+      "One of the invitees is already a user of this application!"
+    );
+
+  // Publish user:invited event
 
   await new UserInvitedPublisher(natsWrapper.client).publish({
     Inviter: {
