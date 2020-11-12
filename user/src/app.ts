@@ -6,9 +6,9 @@ import express from "express";
 import "express-async-errors";
 
 import { NotFoundError, errorHandler } from "@chortec/common";
-import { router as addFriendRouter } from "./routes/addFriend";
-import { router as removeFriendRouter } from "./routes/removeFriend";
-import { router as getFriendsRouter } from "./routes/getFriends";
+import { router as addFriendRouter } from "./routes/add-friend";
+import { router as removeFriendRouter } from "./routes/remove-friend";
+import { router as getFriendsRouter } from "./routes/get-friends";
 import { validateId } from "./utils/idValidator";
 
 // setting up express
