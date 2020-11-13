@@ -7,9 +7,11 @@ import mongoose, { Schema, Document } from 'mongoose';
  */
 
 interface IUser {
+    id: string
     email?: string;
     phone?: string;
     name: string;
+    friends: mongoose.Types.ObjectId[];
 }
 
 type UserDoc = IUser & Document;
@@ -21,10 +23,14 @@ interface UserModel extends mongoose.Model<UserDoc> {
 const userSchema = new Schema({
     email: { type: String, unique: true, sparse: true },
     phone: { type: String, unique: true, sparse: true },
-    name: String
+    name: String,
+    friends: [{ type: Schema.Types.ObjectId }]
 });
 
-userSchema.statics.build = (user: IUser) => new User(user);
+userSchema.statics.build = (user: IUser) => new User({
+    ...user,
+    _id: user.id,
+  });
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
