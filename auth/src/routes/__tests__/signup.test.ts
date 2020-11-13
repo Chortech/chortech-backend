@@ -411,7 +411,7 @@ it("shoud signup two different users with phone and email", async () => {
     .expect(201);
 });
 
-it("shoud publish an event", async () => {
+it("shoud publish a user created event", async () => {
   await global.mockVerification("example@domain.com");
 
   await request(app)

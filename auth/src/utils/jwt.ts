@@ -9,12 +9,9 @@ const private_key = process.env.JWT_KEY || fs.readFileSync(joinedPath, "utf-8");
 const issuer = "Chortec";
 const audience = "chortect.com";
 let expire = 60 * 60;
-const algorithm = process.env.JWT_KEY ? "HS256" : "RS256";
-
 const signOptions: SignOptions = {
   issuer,
   audience,
-  algorithm,
 };
 
 interface Token {
@@ -32,10 +29,13 @@ const generateToken = async (
   return new Promise<Token>((resolve, reject) => {
     const iat = Math.floor(Date.now() / 1000);
     const exp = iat + expire;
+    const algorithm = process.env.JWT_KEY ? "HS256" : "RS256";
+    const secret = process.env.JWT_KEY || private_key;
+    if (!secret) throw new Error("JWT Secret must be defined!!");
     jwt.sign(
       { ...payload, exp },
-      private_key,
-      { ...signOptions, subject: subject },
+      secret,
+      { ...signOptions, algorithm, subject: subject },
       (err, token) => {
         if (err) reject(err);
         resolve({

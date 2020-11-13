@@ -3,7 +3,7 @@ import mongoose, { Schema, Types } from "mongoose";
 import { Message } from "node-nats-streaming";
 import User from "../models/user";
 export class UserCreatedListener extends Listener<IUserCreated> {
-  subject = Subjects.UserCreated;
+  subject: Subjects.UserCreated = Subjects.UserCreated;
   queueName = "user-service";
   async onMessage(data: IUserCreated["data"], done: Message) {
     try {

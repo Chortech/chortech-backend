@@ -1,6 +1,6 @@
 {
   "name": "@chortec/common",
-  "version": "1.0.43",
+  "version": "1.0.47",
   "description": "",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",

@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { natsWrapper } from "./utils/nats-wrapper";
 import { randomBytes } from "crypto";
 import { redisWrapper } from "./utils/redis-wrapper";
+import { UserInvitedListener } from "./listeners/user-invited-listener";
 
 async function start() {
   if (!process.env.EMAIL) throw new Error("EMAIL is not defined!");
@@ -24,7 +25,18 @@ async function start() {
 
   try {
     redisWrapper.connect(redisURL);
+  } catch (err) {
+    console.log(err);
+  }
+
+  try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
+    new UserInvitedListener(natsWrapper.client).listen();
+  } catch (err) {
+    console.error(err);
+  }
+
+  try {
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

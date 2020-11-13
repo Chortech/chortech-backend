@@ -2,8 +2,8 @@ import axois from "axios";
 import cron from "node-cron";
 
 interface SendBody {
-  Messages: [string];
-  MobileNumbers: [string];
+  Messages: string[];
+  MobileNumbers: string[];
   LineNumber: string;
 }
 
@@ -31,6 +31,41 @@ const sendSMS = async (msg: string, phone: string): Promise<boolean> => {
   const body: SendBody = {
     Messages: [msg],
     MobileNumbers: [phone],
+    LineNumber: process.env.LINE_NUMBER!,
+  };
+
+  if (!token) throw new Error("Missing token for sms api!");
+
+  const headers = {
+    "x-sms-ir-secure-token": token,
+    "Content-Type": "application/json",
+  };
+
+  const res: SendResponse = (
+    await axois.post("https://RestfulSms.com/api/MessageSend", body, {
+      headers,
+    })
+  ).data;
+
+  console.log(res);
+  if (!res.IsSuccessful) {
+    if (res.Message.indexOf("Token")) {
+      throw new Error("Token is invalid and this state is not acceptable!");
+    }
+  }
+
+  return res.IsSuccessful;
+};
+
+const sendSMSMultiple = async (
+  datas: { message: string; phone: string }[]
+): Promise<boolean> => {
+  const msgs = datas.map((d) => d.message);
+  const phones = datas.map((d) => d.phone);
+
+  const body: SendBody = {
+    Messages: msgs,
+    MobileNumbers: phones,
     LineNumber: process.env.LINE_NUMBER!,
   };
 
@@ -90,6 +125,7 @@ cron.schedule("*/29 * * * *", obtainToken);
 const smsSender = {
   sendSMS,
   obtainToken,
+  sendSMSMultiple,
 };
 
 export default smsSender;

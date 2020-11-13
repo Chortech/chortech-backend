@@ -106,3 +106,5 @@ benchmarks/graphs
 
 #Jetbrains IDE files
 .idea
+
+mongodb-binaries

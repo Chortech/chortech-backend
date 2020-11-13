@@ -6,9 +6,10 @@ import { profileRouter } from './routes/profile';
 // to our error handling middleware.
 import "express-async-errors";
 import { NotFoundError, errorHandler } from "@chortec/common";
-import { router as addFriendRouter } from "./routes/addFriend";
-import { router as removeFriendRouter } from "./routes/removeFriend";
-import { router as getFriendsRouter } from "./routes/getFriends";
+import { router as addFriendRouter } from "./routes/add-friend";
+import { router as removeFriendRouter } from "./routes/remove-friend";
+import { router as getFriendsRouter } from "./routes/get-friends";
+import { router as inviteRouter } from "./routes/invite-friend";
 import { validateId } from "./utils/idValidator";
 
 // setting up express
@@ -18,6 +19,7 @@ app.param("id", validateId);
 
 // adding route handlers to express
 app.use("/api/user/friends", getFriendsRouter);
+app.use("/api/user/friends/invite", inviteRouter);
 app.use("/api/user/friends/:id", addFriendRouter);
 app.use("/api/user/friends/:id", removeFriendRouter);
 app.use('/api/user/profile', profileRouter);

@@ -5,16 +5,25 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "test": "jest --watch-all --no-cache",
+    "test": "jest --watch-all --no-cache ",
     "common": "npm update @chortec/common"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/src/test/config.ts"
+    ],
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
     "testTimeout": 10000
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "4.4.0",
+      "disablePostinstall": "1"
+    }
   },
   "keywords": [],
   "author": "",
@@ -30,8 +39,9 @@
     "ts-jest": "^26.4.1"
   },
   "dependencies": {
-    "@chortec/common": "^1.0.40",
+    "@chortec/common": "^1.0.47",
     "@types/express": "^4.17.8",
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/mongoose": "^5.7.36",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",

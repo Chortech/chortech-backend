@@ -35,6 +35,7 @@ const verify = async (token: string): Promise<JWTPayload> => {
   return new Promise((resolve, reject) => {
     const secret = process.env.JWT_KEY || public_key;
     if (!secret) throw new Error("JWT Secret must be defined!!");
+
     jwt.verify(token, secret, (err, decoded) => {
       if (err) {
         if (err instanceof TokenExpiredError)

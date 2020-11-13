@@ -7,6 +7,7 @@ import "express-async-errors";
 import dotenv from "dotenv";
 dotenv.config();
 import { router as signupRouter } from "./routes/signup";
+import { router as signupInviteRouter } from "./routes/signup-invite";
 import { router as loginRouter } from "./routes/login";
 import { router as resetpassRouter } from "./routes/resetpass";
 import { router as changepassRouter } from "./routes/changepass";
@@ -14,19 +15,24 @@ import { router as verificationRouter } from "./routes/verification";
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { changeEmailRouter } from "./routes/changeEmail";
 import { changePhoneRouter } from "./routes/changePhone";
+import pug from "pug";
 
 // setting up express
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.set("view engine", "pug");
 
 // adding route handlers to express
+app.use("/api/auth/signup", signupRouter);
+app.use("/signup", signupInviteRouter);
 app.use("/api/auth/signup", signupRouter);
 app.use("/api/auth/login", loginRouter);
 app.use("/api/auth/resetpass", resetpassRouter);
 app.use("/api/auth/changepass", changepassRouter);
 app.use("/api/auth/verification", verificationRouter);
-app.use('/api/auth/change-email', changeEmailRouter);
-app.use('/api/auth/change-phone', changePhoneRouter);
+app.use("/api/auth/change-email", changeEmailRouter);
+app.use("/api/auth/change-phone", changePhoneRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
