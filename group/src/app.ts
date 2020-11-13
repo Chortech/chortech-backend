@@ -20,7 +20,7 @@ app.param('id', validateId);
 
 // adding route handlers to express
 app.use('/api/group/create', createGroupRouter);
-app.use('/api/group/delete', deleteGroupRouter);
+app.use('/api/group/:id/delete', deleteGroupRouter);
 app.use('/api/group/:id/add', addFriendsToGroupRouter);
 app.use('/api/group/:id', getGroupRouter);
 
