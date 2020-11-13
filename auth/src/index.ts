@@ -31,7 +31,7 @@ async function start() {
 
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
-    console.log("Connected to mongo!");
+    new UserInvitedListener(natsWrapper.client).listen();
   } catch (err) {
     console.error(err);
   }
@@ -41,11 +41,10 @@ async function start() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    console.log("Connected to mongo!");
   } catch (err) {
     console.error(err);
   }
-
-  new UserInvitedListener(natsWrapper.client).listen();
 
   app.listen(port, () => console.log(`Server is listening on port ${port}`));
 }

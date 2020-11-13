@@ -25,14 +25,12 @@ const schema = Joi.object({
       name: Joi.string().min(6).max(255).alphanum().required(),
     })
       .xor("email", "phone")
-      .label("body")
+      .label("invitee")
   ),
 });
 
 router.post("/", requireAuth, validate(schema), async (req, res) => {
-  console.log(req.user?.id);
   const user = await User.findById(req.user?.id).populate("friends");
-  console.log(user);
   if (!user) throw new Error("Shouldn't reach here");
 
   const phoneUsers = [];
@@ -51,9 +49,6 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
       emailUsers.push(invitee.email);
     }
   }
-
-  console.log(phoneUsers);
-  console.log(emailUsers);
 
   // Check if the one the invitees is already a user or not
 

@@ -103,6 +103,15 @@ router.post("/", validate(signupSchema), async (req, res) => {
       await redisWrapper.delAsync(key);
       return res.send("<h1>successful</h1>");
     } else {
+      // check if there's an invited link for user and remove it
+      // because he/she decided to signup without the invite link
+      const key = phone || (email as string);
+      const uid = await redisWrapper.getAsync(key);
+      if (uid) {
+        await redisWrapper.delAsync(uid!);
+        await redisWrapper.delAsync(key);
+      }
+
       const token = await generateToken(
         { id: _id, email, phone },
         email || phone

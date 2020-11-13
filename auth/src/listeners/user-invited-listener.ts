@@ -72,7 +72,7 @@ ${link} :لینک دعوت شما`;
       }
 
       if (mailList.length != 0) {
-        sendMailMultiple("test123", mailList);
+        sendMailMultiple("دعوتنامه", mailList);
       }
       if (smsList.length != 0) {
         smsSender.sendSMSMultiple(smsList);

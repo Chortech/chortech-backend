@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { natsWrapper } from "./utils/nats-wrapper";
 import { randomBytes } from "crypto";
 import { UserCreatedListener } from "./listeners/user-created-listener";
+import { InviteeCreatedListener } from "./listeners/invitee-created-listener";
 
 async function start() {
   const port = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ async function start() {
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
     new UserCreatedListener(natsWrapper.client).listen();
+    new InviteeCreatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.error(err);
   }
