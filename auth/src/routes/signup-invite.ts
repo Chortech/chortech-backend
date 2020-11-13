@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   BadRequestError,
+  NotFoundError,
   ResourceConflictError,
   validate,
 } from "@chortec/common";
@@ -29,11 +30,16 @@ const router = Router();
 //   .xor("email", "phone")
 //   .label("body");
 
-router.get("/:id", async (req, res) => {
+router.get("/i/:id", async (req, res) => {
   const id = Buffer.from(req.params.id, "base64").toString("utf-8");
-  console.log(id);
-  const user = await redisWrapper.getAsync(id);
-  res.render("signup", { id: id });
+  const data = await redisWrapper.getAsync(id);
+  if (!data) throw new NotFoundError("Invitiation expired or doesn't exists!");
+  const {
+    inviter,
+    invitee: { name, email, phone },
+  } = JSON.parse(data);
+
+  res.render("signup", { id, name, email, phone });
 });
 
 export { router };

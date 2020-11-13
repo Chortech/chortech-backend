@@ -662,12 +662,17 @@ head
   h1 Chortech
   .main-agileinfo
     .agileits-top
-      form(action='#' method='post')
-        input(type="hidden" , value= `${id}`)
-        input.text(type='text' name='name' placeholder='نام' required='')
-        input.text.email(type='email' name='email' placeholder='آدرس الکترونیک' required='')
-        input.text(type='password' name='password' placeholder='کلمه عبور' required='')
-        input.text.w3lpass(type='password' name='password' placeholder='تایید کلمه عبور' required='')
+      form(action='/api/auth/signup' method='post')
+        input(type="hidden" , value= `${id}` name="id")
+        input.text(type='text' name='name' placeholder='نام' required=true , value=`${name}`)
+        - if (typeof(email) !== 'undefined'){
+            input.text.email(type='email' name='email' placeholder='آدرس الکترونیک' required=true , value=`${email}`)
+        - } else {
+            input.text.email(type='text' name='phone' placeholder='شماره همراه' required=true , value=`${phone}`)
+        - }
+        
+        input.text(type='password' name='password' id="password" placeholder='کلمه عبور' required=true)
+        input.text.w3lpass(type='password' id="confirm_password" placeholder='تایید کلمه عبور' required=true)
         .wthree-text
           label.anim
             input.checkbox(type='checkbox' required='')
@@ -688,4 +693,18 @@ head
     li
     li
     li
+  script(type="").
+    const password = document.getElementById("password")
+    , confirm_password = document.getElementById("confirm_password");
+
+    function validatePassword(){
+      if(password.value != confirm_password.value) {
+        confirm_password.setCustomValidity("Passwords Don't Match");
+      } else {
+        confirm_password.setCustomValidity('');
+      }
+    }
+
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
 // //main

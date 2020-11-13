@@ -18,12 +18,12 @@ import pug from "pug";
 // setting up express
 const app = express();
 app.use(express.json());
-// app.set("views", "../views");
+app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "pug");
 
 // adding route handlers to express
 app.use("/api/auth/signup", signupRouter);
-app.use("/api/auth/signup", signupInviteRouter);
+app.use("/signup", signupInviteRouter);
 app.use("/api/auth/signup", signupRouter);
 app.use("/api/auth/login", loginRouter);
 app.use("/api/auth/resetpass", resetpassRouter);

@@ -13,7 +13,16 @@ import { sendMailMultiple } from "../utils/mailer";
 
 const INVITE_EXPIRATION = 60 * 60 * 24;
 
-export class UserInvitedListener extends Listener<IUserInvited> {
+interface Invite {
+  inviter: string;
+  invitee: {
+    name: string;
+    phone?: string;
+    email?: string;
+  };
+}
+
+class UserInvitedListener extends Listener<IUserInvited> {
   subject: Subjects.UserInvited = Subjects.UserInvited;
   queueName = "user-service";
   async onMessage(data: IUserInvited["data"], done: Message) {
@@ -36,14 +45,24 @@ export class UserInvitedListener extends Listener<IUserInvited> {
         const id = uuid();
         const base64 = Buffer.from(id).toString("base64");
 
+        const invite: Invite = {
+          inviter: data.Inviter.id,
+          invitee: {
+            name,
+            email,
+            phone,
+          },
+        };
+
         await redisWrapper.setEXAsync(
           id,
-          JSON.stringify(user),
+          JSON.stringify(invite),
           INVITE_EXPIRATION
         );
+
         await redisWrapper.setEXAsync(phone || email!, id, INVITE_EXPIRATION);
-        // /api/auth/signup/base64
-        const link = `localhost/api/auth/signup/${base64}`;
+        // /signup/i/base64
+        const link = `localhost/signup/i/${base64}`;
         const text = `شمارو به اپ چرتک دعوت کرده ${data.Inviter.name}
 ${link} :لینک دعوت شما`;
         const html = `شمارو به اپ چرتک دعوت کرده ${data.Inviter.name}<br/>
@@ -65,3 +84,5 @@ ${link} :لینک دعوت شما`;
     }
   }
 }
+
+export { UserInvitedListener, Invite };

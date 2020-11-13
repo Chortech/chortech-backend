@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   BadRequestError,
+  NotFoundError,
   ResourceConflictError,
   validate,
 } from "@chortec/common";
@@ -10,7 +11,12 @@ import { generateToken } from "../utils/jwt";
 import User from "../models/user";
 import Joi from "joi";
 import { isVerified, removeVerified } from "../utils/verification";
-import { UserCreatedPub } from "../publishers/user-publishers";
+import {
+  UserCreatedPub,
+  InviteeCreatedPub,
+} from "../publishers/user-publishers";
+import { redisWrapper } from "../utils/redis-wrapper";
+import { Invite } from "../listeners/user-invited-listener";
 const router = Router();
 
 const signupSchema = Joi.object({
@@ -24,12 +30,13 @@ const signupSchema = Joi.object({
     .message("Invalid phone number"),
   name: Joi.string().min(6).max(255).alphanum().required(),
   password: Joi.string().min(8).max(16).required(),
+  id: Joi.string().uuid({ version: "uuidv4" }).optional(),
 })
   .xor("email", "phone")
   .label("body");
 
 router.post("/", validate(signupSchema), async (req, res) => {
-  const { email, phone, name, password } = req.body;
+  const { email, phone, name, password, id: uuid } = req.body;
 
   // Check to see if the user already exists or not
   const exists = await User.exists({
@@ -43,8 +50,15 @@ router.post("/", validate(signupSchema), async (req, res) => {
     throw new ResourceConflictError("User already exists!");
   }
 
-  // Check for email or phone being verified
-  if (phone) {
+  // Check for email or phone being verified if not an invited user then don't need for any verification
+  let invite: Invite;
+  if (uuid) {
+    const data = await redisWrapper.getAsync(uuid);
+    if (!data)
+      throw new NotFoundError("Invitiation expired or doesn't exists!");
+
+    invite = JSON.parse(data);
+  } else if (phone) {
     if (!(await isVerified(phone)))
       throw new BadRequestError("Phone not verified!");
 
@@ -69,29 +83,43 @@ router.post("/", validate(signupSchema), async (req, res) => {
       password: hash,
       name: name,
     });
-
     const { _id } = await user.save();
-
-    const token = await generateToken(
-      { id: _id, email, phone },
-      email || phone
-    );
-
-    await new UserCreatedPub(natsWrapper.client).publish({
-      id: user._id,
-      name: name,
-      email: email,
-      phone: phone,
-    });
 
     // await session.commitTransaction();
     // session.endSession();
 
-    return res.status(201).send({
-      id: _id,
-      name,
-      token: token,
-    });
+    if (uuid) {
+      await new InviteeCreatedPub(natsWrapper.client).publish({
+        inviter: invite!.inviter,
+        invitee: {
+          id: _id,
+          email,
+          phone,
+          name,
+        },
+      });
+      await redisWrapper.delAsync(uuid);
+      const key = invite!.invitee.phone || (invite!.invitee.email as string);
+      await redisWrapper.delAsync(key);
+      return res.send("<h1>successful</h1>");
+    } else {
+      const token = await generateToken(
+        { id: _id, email, phone },
+        email || phone
+      );
+      await new UserCreatedPub(natsWrapper.client).publish({
+        id: user._id,
+        name: name,
+        email: email,
+        phone: phone,
+      });
+
+      return res.status(201).send({
+        id: _id,
+        name,
+        token: token,
+      });
+    }
   } catch (err) {
     // await session.abortTransaction();
     // session.endSession();
