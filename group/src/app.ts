@@ -11,6 +11,7 @@ import { validateId } from './utils/idValidator';
 import { createGroupRouter } from './routes/createGroup';
 import { addFriendsToGroupRouter } from './routes/addFriends';
 import { deleteGroupRouter } from './routes/deleteGroup';
+import { getGroupRouter } from './routes/getGroup';
 
 // setting up express
 const app = express();
@@ -21,6 +22,7 @@ app.param('id', validateId);
 app.use('/api/group/create', createGroupRouter);
 app.use('/api/group/delete', deleteGroupRouter);
 app.use('/api/group/:id/add', addFriendsToGroupRouter);
+app.use('/api/group/:id', getGroupRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get('*', (req, res) => {
