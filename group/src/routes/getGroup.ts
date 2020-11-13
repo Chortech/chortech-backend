@@ -1,7 +1,5 @@
 import Router from 'express';
 import { BadRequestError, NotFoundError, requireAuth, UnauthorizedError } from '@chortec/common';
-import { validate } from '@chortec/common';
-import Joi from 'joi';
 import User from '../models/user'
 import Group from '../models/group';
 
@@ -28,3 +26,5 @@ router.get('/', requireAuth, async (req, res) => {
     
     res.status(200).json({ group });
 });
+
+export { router as getGroupRouter };
