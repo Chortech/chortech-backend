@@ -41,7 +41,7 @@ beforeAll(async () => {
   jest.setTimeout(10000);
   redisWrapper.connect("");
   process.env.JWT_KEY = "abcdefghij";
-  mongo = new MongoMemoryServer({ binary: { version: "4.4.0" } });
+  mongo = new MongoMemoryServer();
   const uri = await mongo.getUri();
   await mongoose.connect(uri, {
     useNewUrlParser: true,

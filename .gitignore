@@ -108,3 +108,4 @@ benchmarks/graphs
 .idea
 
 mongodb-binaries
+config.ts
