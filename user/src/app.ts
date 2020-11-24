@@ -1,5 +1,5 @@
 import express from "express";
-import { profileRouter } from './routes/profile';
+import { profileRouter } from "./routes/profile";
 
 // this library helps throwing errors from async request handlers
 // we dont need to write next(err) each we want to send an error
@@ -10,6 +10,7 @@ import { router as addFriendRouter } from "./routes/add-friend";
 import { router as removeFriendRouter } from "./routes/remove-friend";
 import { router as getFriendsRouter } from "./routes/get-friends";
 import { router as inviteRouter } from "./routes/invite-friend";
+import { router as imageUploadRouter } from "./routes/image-upload";
 import { validateId } from "./utils/idValidator";
 
 // setting up express
@@ -22,7 +23,8 @@ app.use("/api/user/friends", getFriendsRouter);
 app.use("/api/user/friends/invite", inviteRouter);
 app.use("/api/user/friends/:id", addFriendRouter);
 app.use("/api/user/friends/:id", removeFriendRouter);
-app.use('/api/user/profile', profileRouter);
+app.use("/api/user/profile", profileRouter);
+app.use("/api/user/image/upload", imageUploadRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

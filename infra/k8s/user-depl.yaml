@@ -25,7 +25,32 @@ spec:
             - name: NATS_CLIENT_ID
               valueFrom:
                 fieldRef: 
-                  fieldPath: metadata.name 
+                  fieldPath: metadata.name
+            - name: STORAGE_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: storage-secret
+                  key: STORAGE_REGION
+            - name: STORAGE_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: storage-secret
+                  key: STORAGE_ENDPOINT
+            - name: STORAGE_ACCESSKEYID
+              valueFrom:
+                secretKeyRef:
+                  name: storage-secret
+                  key: STORAGE_ACCESSKEYID
+            - name: STORAGE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: storage-secret
+                  key: STORAGE_SECRET
+            - name: STORAGE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: storage-secret
+                  key: STORAGE_BUCKET
 ---
 apiVersion: v1
 kind: Service
