@@ -42,7 +42,7 @@ class RedisWrapper {
     });
   }
 
-  setAsync(key: string, value: string) {
+  setAsync(key: string, value: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.client.set(key, value, (err, reply) => {
         if (err) return reject(err);
