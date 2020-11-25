@@ -1,17 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-/**
- * @param email this is email
- * @param phone
- * @param name
- * @param password
- */
 
 interface IUser {
   id: string;
   email?: string;
   phone?: string;
   name: string;
+  picture?: string,
   friends: mongoose.Types.ObjectId[];
 }
 
@@ -26,6 +21,7 @@ const userSchema = new Schema({
   phone: { type: String, unique: true, sparse: true },
   name: String,
   friends: [{ type: Schema.Types.ObjectId }],
+  picture: String,
 });
 
 userSchema.statics.build = (user: IUser) =>
