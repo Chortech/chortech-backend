@@ -12,6 +12,7 @@ import { router as inviteRouter } from "./routes/invite-friend";
 import { router as imageUploadRouter } from "./routes/image-upload";
 import { getProfileRouter } from "./routes/get-profile";
 import { validateId } from "./utils/idValidator";
+import { editProfileRouter } from "./routes/edit-profile";
 
 // setting up express
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/user/friends/:id", addFriendRouter);
 app.use("/api/user/friends/:id", removeFriendRouter);
 app.use("/api/user/profile", getProfileRouter);
 app.use("/api/user/image/upload", imageUploadRouter);
+app.use('/api/user/profile/edit', editProfileRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
