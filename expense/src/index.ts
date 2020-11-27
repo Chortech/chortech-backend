@@ -16,6 +16,7 @@ async function start() {
   const neoPassword = process.env.NEO4J_PASSWORD || "neo4j";
 
   try {
+    console.log(neoUrl);
     await graph.init(neoUrl, neoUsername, neoPassword);
     console.log("connected to neo4j");
     process.on("SIGTERM", () => graph.driver.close());

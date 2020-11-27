@@ -27,7 +27,7 @@ interface Expense {
   id: string;
   description: string;
   participants: Participant[];
-  price: number;
+  total: number;
   comments?: Comment[];
   group?: string;
   notes?: string;
@@ -42,7 +42,7 @@ interface Participant {
   role: PRole;
 }
 
-enum PRole {
+export enum PRole {
   Debtor = "debtor",
   Creditor = "creditor",
 }
@@ -66,9 +66,13 @@ class Graph {
     this._driver = neo4j.driver(url);
     const session = this.driver.session();
     await session.run(
-      `CREATE CONSTRAINT U_UNIQUE IF NOT EXISTS ON (u:${Nodes.User}) ASSERT u.id IS UNIQUE;
-      CREATE CONSTRAINT EX_UNIQUE IF NOT EXISTS ON (e:${Nodes.Expense}) ASSERT e.id IS UNIQUE;
-      CREATE CONSTRAINT GP_UNIQUE IF NOT EXISTS ON (g:${Nodes.Group}) ASSERT g.id IS UNIQUE`
+      `CREATE CONSTRAINT U_UNIQUE IF NOT EXISTS ON (u:${Nodes.User}) ASSERT u.id IS UNIQUE`
+    );
+    await session.run(
+      `CREATE CONSTRAINT EX_UNIQUE IF NOT EXISTS ON (e:${Nodes.Expense}) ASSERT e.id IS UNIQUE`
+    );
+    await session.run(
+      `CREATE CONSTRAINT GP_UNIQUE IF NOT EXISTS ON (g:${Nodes.Group}) ASSERT g.id IS UNIQUE`
     );
 
     await session.close();
@@ -130,7 +134,7 @@ class Graph {
   }
   async addExpense(e: Expense) {
     // Check if the expense,paid and received amount are equal
-    this.checkPriceFlow(e.participants, e.price);
+    this.checkPriceFlow(e.participants, e.total);
 
     const session = this.driver.session();
     try {
@@ -143,7 +147,7 @@ class Graph {
       let creditor = creditors.pop();
       let debtor = debtors.pop();
 
-      while (Math.abs(total - e.price) > Number.EPSILON) {
+      while (Math.abs(total - e.total) > Number.EPSILON) {
         let lent = creditor!.amount;
         let borrowed = debtor!.amount;
         if (Math.abs(lent - borrowed) < Number.EPSILON) {
@@ -245,7 +249,7 @@ class Graph {
     MERGE (u)-[:PARTICIPATE {role: p.role, amount: p.amount}]->(expense);`,
       {
         expense: {
-          price: e.price,
+          price: e.total,
           comments: e.comments,
           group: e.group,
           notes: e.notes,
@@ -271,7 +275,7 @@ class Graph {
       for (let debtor of debtors) {
         if (debtor.id === creditor.id) {
           let index = debtors.indexOf(debtor);
-          e.price -= debtor.amount;
+          e.total -= debtor.amount;
           creditor.amount -= debtor.amount;
           debtors.splice(index, 1);
         }
