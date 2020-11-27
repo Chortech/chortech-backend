@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { ICreditCard } from './credit-card';
+import { CreditCardDoc, ICreditCard } from './credit-card';
 
 
 interface IUser {
@@ -9,8 +9,8 @@ interface IUser {
   name: string;
   picture?: string,
   friends: mongoose.Types.ObjectId[];
-  myCreditCards: ICreditCard[];
-  otherCreditCards: ICreditCard[];
+  myCreditCards: mongoose.Types.ObjectId[];
+  otherCreditCards: mongoose.Types.ObjectId[];
 }
 
 type UserDoc = IUser & Document;

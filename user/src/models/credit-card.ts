@@ -21,6 +21,6 @@ creditCardSchema.statics.build = (creditCard: ICreditCard) => new CreditCard(cre
 
 const CreditCard = mongoose.model<CreditCardDoc, CreditCardModel>('CreditCard', creditCardSchema);
 
-export { ICreditCard, CreditCard };
+export { CreditCardDoc, ICreditCard, CreditCard };
 
 export default CreditCard;
