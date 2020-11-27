@@ -22,3 +22,7 @@ spec:
             backend:
               serviceName: user-srv
               servicePort: 3000
+          - path: /api/expense/?(.*)
+            backend:
+              serviceName: expense-srv
+              servicePort: 3000
