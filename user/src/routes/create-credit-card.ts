@@ -40,3 +40,5 @@ router.post('/', requireAuth, validate(addMyCreditCardSchema), async (req, res) 
 
     res.status(201).json({ creditCard });
 });
+
+export { router as createCreditCardRouter };
