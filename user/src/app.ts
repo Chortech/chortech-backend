@@ -17,6 +17,7 @@ import { createCreditCardRouter } from "./routes/create-credit-card";
 import { addMyCreditCardRouter } from "./routes/add-my-credit-card";
 import { removeMyCreditCardRouter } from "./routes/remove-my-credit-card";
 import { addOtherCreditCardRouter } from "./routes/add-other-credit-card";
+import { removeOtherCreditCardRouter } from "./routes/remove-other-credit-card";
 
 // setting up express
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/user/credit-card/create', createCreditCardRouter);
 app.use('/api/user/credit-card/my/add', addMyCreditCardRouter);
 app.use('/api/user/credit-card/my/remove', removeMyCreditCardRouter);
 app.use('/api/user/credit-card/other/add', addOtherCreditCardRouter);
+app.use('/api/user/credit-card/other/remove', removeOtherCreditCardRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
