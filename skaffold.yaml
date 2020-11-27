@@ -24,3 +24,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: chortech/expense
+      context: expense
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

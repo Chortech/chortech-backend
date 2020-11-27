@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expense-neo4j-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expense-neo4j
+  template:
+    metadata:
+      labels:
+        app: expense-neo4j
+    spec:
+      containers:
+        - name: expense-neo4j
+          image: neo4j
+          env:
+            - name: NEO4J_AUTH
+              value: none
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expense-neo4j-srv
+spec:
+  selector:
+    app: expense-neo4j
+  ports:
+    - name: db-bolt
+      protocol: TCP
+      port: 7687
+      targetPort: 7687
+    - name: db-http
+      protocol: TCP
+      port: 7474
+      targetPort: 7474
