@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { CreditCardDoc, ICreditCard } from './credit-card';
 
 
 interface IUser {
@@ -8,6 +9,8 @@ interface IUser {
   name: string;
   picture?: string,
   friends: mongoose.Types.ObjectId[];
+  myCreditCards: mongoose.Types.ObjectId[];
+  otherCreditCards: mongoose.Types.ObjectId[];
 }
 
 type UserDoc = IUser & Document;
@@ -22,6 +25,8 @@ const userSchema = new Schema({
   name: String,
   friends: [{ type: Schema.Types.ObjectId }],
   picture: String,
+  myCreditCards: [{ type: String, ref: 'CreditCard' }],
+  otherCreditCards: [{ type: String, ref: 'CreditCard' }]
 });
 
 userSchema.statics.build = (user: IUser) =>
@@ -31,6 +36,7 @@ userSchema.statics.build = (user: IUser) =>
   });
 
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
+
 export { User };
 
 export default User;
