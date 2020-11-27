@@ -38,7 +38,11 @@ router.post('/', requireAuth, validate(createCreditCardSchema), async (req, res)
 
     const { _id } = await creditCard.save();
 
-    res.status(201).json({ creditCard });
+    res.status(201).send({
+        id: _id, 
+        number: number,
+        name: name
+    });
 });
 
 export { router as createCreditCardRouter };
