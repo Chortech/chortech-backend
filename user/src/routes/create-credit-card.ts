@@ -13,27 +13,27 @@ import CreditCard from '../models/credit-card';
 
 const router = Router();
 
-const addMyCreditCardSchema = Joi.object({
+const createCreditCardSchema = Joi.object({
     number: Joi.string().min(16).max(16).required(),
     name: Joi.string().required()
-});
+}).label('body');
 
-router.post('/', requireAuth, validate(addMyCreditCardSchema), async (req, res) => {
+router.post('/', requireAuth, validate(createCreditCardSchema), async (req, res) => {
     if (!req.user)
         throw new BadRequestError('Invalid State!');
     
-    const { cardNumber, cardName } = req.body;
+    const { number, name } = req.body;
 
     const exists = await CreditCard.exists({
-        number: { $exists: true, $eq: cardNumber }
+        number: { $exists: true, $eq: number }
     });
 
     if (exists)
         throw new ResourceConflictError('Credit Card already exists');
     
     const creditCard = CreditCard.build({
-        number: cardName,
-        name: cardName
+        number: number,
+        name: name
     });
 
     const { _id } = await creditCard.save();
