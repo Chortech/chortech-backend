@@ -14,6 +14,7 @@ import { getProfileRouter } from "./routes/get-profile";
 import { validateId } from "./utils/idValidator";
 import { editProfileRouter } from "./routes/edit-profile";
 import { createCreditCardRouter } from "./routes/create-credit-card";
+import { addMyCreditCardRouter } from "./routes/add-my-credit-card";
 
 // setting up express
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/user/profile", getProfileRouter);
 app.use("/api/user/image/upload", imageUploadRouter);
 app.use('/api/user/profile/edit', editProfileRouter);
 app.use('/api/user/credit-card/create', createCreditCardRouter);
+app.use('/api/user/credit-card/my/add', addMyCreditCardRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
