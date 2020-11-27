@@ -98,6 +98,8 @@ global.signup = (
         email: email,
         phone: phone,
         friends: [],
+        myCreditCards: [],
+        otherCreditCards: []
       });
 
       await user.save();
