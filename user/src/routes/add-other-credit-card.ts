@@ -24,7 +24,7 @@ router.post('/', requireAuth, validate(addOtherCreditCardSchema), async(req, res
 
     const { cardId } = req.body;
     
-    if (!(CreditCard.exists({ _id: cardId })))
+    if (!(await CreditCard.exists({ _id: cardId })))
         throw new NotFoundError(`${cardId} does not exist!`);
     
     const id = mongoose.Types.ObjectId(cardId);
@@ -42,7 +42,7 @@ router.post('/', requireAuth, validate(addOtherCreditCardSchema), async(req, res
     
     const user = await User.findById(req.user.id);
 
-    res.status(201).json({ user });
+    res.status(200).json({ user });
 });
 
 export { router as addOtherCreditCardRouter };
