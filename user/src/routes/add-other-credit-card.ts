@@ -14,11 +14,11 @@ import User from '../models/user';
 
 const router = Router();
 
-const addMyCreditCardSchema = Joi.object({
+const addOtherCreditCardSchema = Joi.object({
     cardId: Joi.string()
 });
 
-router.post('/', requireAuth, validate(addMyCreditCardSchema), async(req, res) => {
+router.post('/', requireAuth, validate(addOtherCreditCardSchema), async(req, res) => {
     if (!req.user)
         throw new BadRequestError('Invalid State!');
 
@@ -45,4 +45,4 @@ router.post('/', requireAuth, validate(addMyCreditCardSchema), async(req, res) =
     res.status(201).json({ user });
 });
 
-export { router as addMyCreditCardRouter };
+export { router as addOtherCreditCardRouter };
