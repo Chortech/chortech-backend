@@ -15,16 +15,20 @@ async function start() {
   const neoUsername = process.env.NEO4J_USERNAME || "neo4j";
   const neoPassword = process.env.NEO4J_PASSWORD || "neo4j";
 
-  try {
-    console.log(neoUrl);
-    await graph.init(neoUrl, neoUsername, neoPassword);
-    console.log("connected to neo4j");
-    process.on("SIGTERM", () => graph.driver.close());
-    process.on("SIGINT", () => graph.driver.close());
-  } catch (err) {
-    console.log(err);
+  while(true){
+    try {
+      // console.log(neoUrl);
+      await graph.init(neoUrl, neoUsername, neoPassword);
+      console.log("connected to neo4j");
+      process.on("SIGTERM", () => graph.driver.close());
+      process.on("SIGINT", () => graph.driver.close());
+      break;
+    } catch (err) {
+      // console.log(err);
+      continue;
+    }
+  
   }
-
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
     new UserCreatedListener(natsWrapper.client).listen();

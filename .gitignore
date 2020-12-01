@@ -109,3 +109,5 @@ benchmarks/graphs
 
 mongodb-binaries
 config.ts
+
+secrets

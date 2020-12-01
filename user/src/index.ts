@@ -5,8 +5,16 @@ import { randomBytes } from "crypto";
 import { UserCreatedListener } from "./listeners/user-created-listener";
 import { InviteeCreatedListener } from "./listeners/invitee-created-listener";
 import { fileManager } from "./utils/file-manager";
+import fs from "fs";
 
 async function start() {
+  const secrets = JSON.parse(fs.readFileSync(process.env.SECRETS!, "utf-8"));
+  process.env.STORAGE_REGION = secrets.STORAGE_REGION;
+  process.env.STORAGE_ENDPOINT = secrets.STORAGE_ENDPOINT;
+  process.env.STORAGE_ACCESSKEYID = secrets.STORAGE_ACCESSKEYID;
+  process.env.STORAGE_SECRET = secrets.STORAGE_SECRET;
+  process.env.STORAGE_BUCKET = secrets.STORAGE_BUCKET;
+
   if (!process.env.STORAGE_REGION)
     throw new Error("STORAGE_REGION must be defined!");
   if (!process.env.STORAGE_ENDPOINT)
@@ -27,15 +35,15 @@ async function start() {
   try {
     fileManager.init({
       S3: {
-        region: process.env.STORAGE_REGION,
-        endpoint: process.env.STORAGE_ENDPOINT,
+        region: process.env.STORAGE_REGION!,
+        endpoint: process.env.STORAGE_ENDPOINT!,
         credentials: {
-          accessKeyId: process.env.STORAGE_ACCESSKEYID,
-          secretAccessKey: process.env.STORAGE_SECRET,
+          accessKeyId: process.env.STORAGE_ACCESSKEYID!,
+          secretAccessKey: process.env.STORAGE_SECRET!,
         },
       },
       urlExpire: 60 * 60,
-      bucket: process.env.STORAGE_BUCKET,
+      bucket: process.env.STORAGE_BUCKET!,
     });
   } catch (err) {
     console.log(err);

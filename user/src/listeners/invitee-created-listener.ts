@@ -27,6 +27,8 @@ export class InviteeCreatedListener extends Listener<IInviteeCreated> {
         email: email,
         phone: phone,
         friends: [inviterId],
+        myCreditCards:[],
+        otherCreditCards:[]
       });
 
       await User.updateOne(
