@@ -1,18 +1,16 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { CreditCardDoc, ICreditCard } from './credit-card';
 
-/**
- * @param email this is email
- * @param phone
- * @param name
- * @param password
- */
 
 interface IUser {
   id: string;
   email?: string;
   phone?: string;
   name: string;
+  picture?: string,
   friends: mongoose.Types.ObjectId[];
+  myCreditCards: mongoose.Types.ObjectId[];
+  otherCreditCards: mongoose.Types.ObjectId[];
 }
 
 type UserDoc = IUser & Document;
@@ -26,6 +24,9 @@ const userSchema = new Schema({
   phone: { type: String, unique: true, sparse: true },
   name: String,
   friends: [{ type: Schema.Types.ObjectId }],
+  picture: String,
+  myCreditCards: [{ type: String, ref: 'CreditCard' }],
+  otherCreditCards: [{ type: String, ref: 'CreditCard' }]
 });
 
 userSchema.statics.build = (user: IUser) =>
@@ -35,6 +36,7 @@ userSchema.statics.build = (user: IUser) =>
   });
 
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
+
 export { User };
 
 export default User;

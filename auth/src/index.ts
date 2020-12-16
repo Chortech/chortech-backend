@@ -4,8 +4,17 @@ import { natsWrapper } from "./utils/nats-wrapper";
 import { randomBytes } from "crypto";
 import { redisWrapper } from "./utils/redis-wrapper";
 import { UserInvitedListener } from "./listeners/user-invited-listener";
+import fs from "fs";
 
 async function start() {
+  const secrets = JSON.parse(fs.readFileSync(process.env.SECRETS!, "utf-8"));
+  process.env.EMAIL = secrets.EMAIL;
+  process.env.EMAIL_PASS = secrets.EMAIL_PASS;
+  process.env.MAIL_SERVICE = secrets.MAIL_SERVICE;
+  process.env.LINE_NUMBER = secrets.LINE_NUMBER;
+  process.env.SMS_SECRET = secrets.SMS_SECRET;
+  process.env.SMS_API_KEY = secrets.SMS_API_KEY;
+
   if (!process.env.EMAIL) throw new Error("EMAIL is not defined!");
   if (!process.env.EMAIL_PASS) throw new Error("EMAIL_PASS is not defined!");
   if (!process.env.MAIL_SERVICE)
