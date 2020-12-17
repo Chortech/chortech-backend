@@ -30,4 +30,3 @@ services:
       - auth
       - expense
       - user
-      - group
