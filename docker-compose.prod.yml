@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  auth:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: 'true'
+  user:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: 'true'
+  group:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: 'true'
+  expense:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: 'true'
+  nginx:
+    image: nginx
+    container_name: nginx
+    depends_on:
+      - auth
+      - expense
+      - user
+      - group
+    ports:
+      - 80:80
+    environment:
+      PRODUCTION: 'true'
