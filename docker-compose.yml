@@ -6,8 +6,6 @@ services:
     image: redis
   auth-db:
     image: mongo
-  group-db:
-    image: mongo
   user-db:
     image: mongo
   expense-db:
@@ -21,10 +19,6 @@ services:
     image: chortech/user:latest
     depends_on:
       - user-db
-  group:
-    image: chortech/group:latest
-    depends_on:
-      - group-db
   expense:
     image: chortech/expense:latest
     depends_on:

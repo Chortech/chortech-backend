@@ -10,11 +10,6 @@ services:
       - 3000
     environment:
       PRODUCTION: 'true'
-  group:
-    expose:
-      - 3000
-    environment:
-      PRODUCTION: 'true'
   expense:
     expose:
       - 3000
@@ -27,7 +22,6 @@ services:
       - auth
       - expense
       - user
-      - group
     ports:
       - 80:80
     environment:
