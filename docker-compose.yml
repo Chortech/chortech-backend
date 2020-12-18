@@ -2,27 +2,110 @@ version: "3.8"
 services:
   nats-streaming:
     image: nats-streaming:0.17.0
+    container_name: nats-streaming
+    command:
+      [
+        "-p",
+        "4222",
+        "-m",
+        "8222",
+        "-hbi",
+        "5s",
+        "-hbt",
+        "5s",
+        "-hbf",
+        "2",
+        "-SD",
+        "-cid",
+        "chortec",
+      ]
+    expose:
+      - 4222
+      - 8222
+    ports:
+      - 4222:4222
+      - 8222:8222
+    logging:
+      driver: none
   auth-cache:
     image: redis
+    container_name: auth-cache-redis
+    expose:
+      - 6379
+    logging:
+      driver: none
   auth-db:
     image: mongo
+    container_name: auth-db-mongo
+    expose:
+      - 27017
+    logging:
+      driver: none
   user-db:
     image: mongo
+    container_name: user-db-mongo
+    expose:
+      - 27017
+    logging:
+      driver: none
   expense-db:
     image: neo4j
+    container_name: expense-db-neo4j
+    environment:
+      NEO4J_AUTH: none
+    expose:
+      - 7687
+      - 7474
+    ports:
+      - 7687:7687
+      - 7474:7474
+    logging:
+      driver: none
   auth:
     image: chortech/auth:latest
+    container_name: auth-service
+    expose:
+      - 3000
     depends_on:
-      - auth-db
       - auth-cache
+      - auth-db
+    environment:
+      REDIS_URL: redis://auth-cache:6379
+      MONGO_URL: mongodb://auth-db:27017
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      SECRETS: /run/secrets/auth-service-secrets
+      DEBUG: 'true'
+    secrets:
+      - auth-service-secrets
   user:
     image: chortech/user:latest
+    container_name: user-service
+    expose:
+      - 3000
     depends_on:
       - user-db
+    environment:
+      MONGO_URL: mongodb://user-db:27017
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      SECRETS: /run/secrets/user-service-secrets
+      DEBUG: 'true'
+    secrets:
+      - user-service-secrets
   expense:
     image: chortech/expense:latest
+    container_name: expense-service
+    environment:
+      NEO4J_URL: bolt://expense-db:7687
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      DEBUG: 'true'
+    expose:
+      - 3000
     depends_on:
       - expense-db
+      - nats-streaming
   nginx:
     image: nginx
     container_name: nginx
@@ -30,3 +113,14 @@ services:
       - auth
       - expense
       - user
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    logging:
+      driver: none
+secrets:
+  user-service-secrets:
+    file: ./secrets/user-service-secrets.json
+  auth-service-secrets:
+    file: ./secrets/auth-service-secrets.json
