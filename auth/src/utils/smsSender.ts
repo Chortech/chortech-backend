@@ -118,13 +118,16 @@ async function obtainToken() {
   token = res.TokenKey;
 }
 
-obtainToken();
+const init = async () => {
+  await obtainToken();
 
-cron.schedule("*/29 * * * *", obtainToken);
+  cron.schedule("*/29 * * * *", obtainToken);
+};
 
 const smsSender = {
   sendSMS,
   obtainToken,
+  init,
   sendSMSMultiple,
 };
 

@@ -15,7 +15,6 @@ import { router as verificationRouter } from "./routes/verification";
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { changeEmailRouter } from "./routes/changeEmail";
 import { changePhoneRouter } from "./routes/changePhone";
-import pug from "pug";
 
 // setting up express
 const app = express();
