@@ -1,6 +1,6 @@
 import Router from 'express';
 import { BadRequestError, NotFoundError, requireAuth, UnauthorizedError } from '@chortec/common';
-import User from '../models/user'
+import User from '../models/user';
 import Group from '../models/group';
 
 

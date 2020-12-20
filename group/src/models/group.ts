@@ -30,12 +30,6 @@ groupSchema.statics.build = (group: IGroup) => new Group(group);
 
 const Group = mongoose.model<GroupDoc, GroupModel>('Group', groupSchema);
 
-// Group.build({
-//     name: 'Hello',
-//     creator: User.build({email: 'test@test.com', name: 'nima'}),
-//     members: []
-// });
-
 export { Group };
 
 export default Group;
