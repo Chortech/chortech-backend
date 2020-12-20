@@ -8,10 +8,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { validateId } from './utils/idValidator';
-import { createGroupRouter } from './routes/createGroup';
-import { addFriendsToGroupRouter } from './routes/addFriends';
-import { deleteGroupRouter } from './routes/deleteGroup';
-import { getGroupRouter } from './routes/getGroup';
+import { createGroupRouter } from './routes/create-group';
+import { addFriendsToGroupRouter } from './routes/add-friends';
+import { deleteGroupRouter } from './routes/delete-group';
+import { getGroupRouter } from './routes/get-group';
 
 // setting up express
 const app = express();
