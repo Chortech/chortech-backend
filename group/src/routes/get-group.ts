@@ -22,7 +22,7 @@ router.get('/', requireAuth, async (req, res) => {
         throw new BadRequestError('Invalid State!');
 
     if (!group.members?.includes(user))
-        throw new UnauthorizedError();
+        throw new BadRequestError('You are not a member of this group!');
     
     res.status(200).json({ group });
 });
