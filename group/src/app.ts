@@ -19,9 +19,9 @@ app.use(express.json());
 app.param('id', validateId);
 
 // adding route handlers to express
-app.use('/api/group/create', createGroupRouter);
-app.use('/api/group/:id/delete', deleteGroupRouter);
-app.use('/api/group/:id/add', addFriendsToGroupRouter);
+app.use('/api/group/', createGroupRouter);
+app.use('/api/group/:id', deleteGroupRouter);
+app.use('/api/group/:id', addFriendsToGroupRouter);
 app.use('/api/group/:id', getGroupRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
