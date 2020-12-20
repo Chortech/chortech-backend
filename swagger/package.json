@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev src/app.ts",
-    "test": "jest --watch-all --no-cache ",
     "common": "npm update @chortec/common",
     "clear-doc": "rm -f chortech.json chortech.yml",
     "build-doc-json": "npm run clear-doc && swagger-cli bundle docs/main.yml --outfile chortech.json --type json",

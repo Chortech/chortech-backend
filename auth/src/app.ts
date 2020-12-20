@@ -25,13 +25,12 @@ app.set("view engine", "pug");
 // adding route handlers to express
 app.use("/api/auth/signup", signupRouter);
 app.use("/signup", signupInviteRouter);
-app.use("/api/auth/signup", signupRouter);
 app.use("/api/auth/login", loginRouter);
 app.use("/api/auth/resetpass", resetpassRouter);
 app.use("/api/auth/changepass", changepassRouter);
-app.use("/api/auth/verification", verificationRouter);
 app.use("/api/auth/change-email", changeEmailRouter);
 app.use("/api/auth/change-phone", changePhoneRouter);
+app.use("/api/auth/verification", verificationRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
