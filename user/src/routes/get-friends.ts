@@ -9,7 +9,7 @@ router.get("/", requireAuth, async (req, res) => {
 
   if (!user) throw new NotFoundError("User doesn't exists.");
 
-  res.json({ user });
+  res.json(user.toJSON());
 });
 
 export { router };
