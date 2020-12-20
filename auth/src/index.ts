@@ -4,6 +4,7 @@ import { natsWrapper } from "./utils/nats-wrapper";
 import { randomBytes } from "crypto";
 import { redisWrapper } from "./utils/redis-wrapper";
 import { UserInvitedListener } from "./listeners/user-invited-listener";
+import smsSender from "./utils/smsSender";
 import fs from "fs";
 
 async function start() {
@@ -31,6 +32,12 @@ async function start() {
   const natsUrl = process.env.NATS_URL || "http://localhost:4222";
 
   const redisURL = process.env.REDIS_URL || "redis://localhost:6379";
+
+  try {
+    await smsSender.init();
+  } catch (err) {
+    console.log(err);
+  }
 
   try {
     redisWrapper.connect(redisURL);

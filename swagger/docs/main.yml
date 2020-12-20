@@ -1,0 +1,1460 @@
+openapi: 3.0.0
+# servers:
+# Added by API Auto Mocking Plugin
+# - description: SwaggerHub API Auto Mocking
+#   url: https://virtserver.swaggerhub.com/c8444/Chortec/1.0.0
+info:
+  version: "1.0.0"
+  title: Chortech Api Documentation
+  description: >-
+    Chortech is an splitwise clone application
+tags:
+  - name: "auth"
+    description: "Authentication Section"
+  - name: "verification"
+    description: "Verification Section"
+  - name: "user"
+    description: "User Section"
+  - name: "group"
+    description: "Group Section"
+  - name: "expense"
+    description: "Expense Section"
+paths:
+  /api/auth/signup:
+    post:
+      tags:
+        - "auth"
+      summary: Signup a user
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/SignupPhone"
+                - $ref: "#/components/schemas/SignupEmail"
+            examples:
+              email:
+                value:
+                  email: "example@domain.com"
+                  name: "example"
+                  password: "password"
+              phone:
+                value:
+                  phone: "09123456789"
+                  name: "example"
+                  password: "password"
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  token:
+                    type: object
+                    properties:
+                      access:
+                        type: string
+                      created:
+                        type: integer
+                        format: int64
+                        example: 1603968863
+                      expired:
+                        type: integer
+                        format: int64
+                        example: 1603972463
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                verification:
+                  value:
+                    errors:
+                      - message: "Phone not verified!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "409":
+          description: CONFLICT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "User already exists!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "There is no code generated for this email or phone"
+  /api/auth/signup/i/{id}:
+    get:
+      tags:
+        - "auth"
+      summary: Signup page
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+
+      responses:
+        "200":
+          description: OK
+          content:
+            text/html:
+              schema:
+                type: string
+              example: <html><body>The Signup page</body></html>
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invitiation expired or doesn't exists!"
+  /api/auth/login:
+    post:
+      tags:
+        - "auth"
+      summary: Login
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/LoginPhone"
+                - $ref: "#/components/schemas/LoginEmail"
+            examples:
+              phone:
+                value:
+                  phone: "09123456789"
+                  password: "password"
+              email:
+                value:
+                  email: "example@domain.com"
+                  password: "password"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  token:
+                    $ref: "#/components/schemas/Token"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "409":
+          description: CONFLICT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "This email has been already used!"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+  /api/auth/resetpass:
+    put:
+      tags:
+        - "auth"
+      summary: Change your password
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/ResetPassWithMobile"
+                - $ref: "#/components/schemas/ResetPassWithEmail"
+            examples:
+              phone:
+                value:
+                  phone: "09123456789"
+                  newpass: "password"
+              email:
+                value:
+                  email: "example@domain.com"
+                  newpass: "password"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Password reset was successful"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                credentials:
+                  value:
+                    errors:
+                      - message: "Wrong Credentials"
+                verification:
+                  value:
+                    errors:
+                      - message: "Email or Phone not verified!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+  /api/auth/changepass:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "auth"
+      summary: Change your password
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/LoginPhone"
+                - $ref: "#/components/schemas/LoginEmail"
+            examples:
+              phone:
+                value:
+                  phone: "09123456789"
+                  password: "password"
+              email:
+                value:
+                  email: "example@domain.com"
+                  password: "password"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Password was changed successfully"
+  /api/auth/change-email:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "auth"
+      summary: Change your email
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeEmail"
+            example:
+              newEmail: "example@domain.com"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "Email changed successfully."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid email"
+                        fields: ["newEmail"]
+                verification:
+                  value:
+                    errors:
+                      - message: "Email is not verified!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "409":
+          description: CONFLICT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "This email has been already used!"
+  /api/auth/change-phone:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "auth"
+      summary: Change your email
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePhone"
+            example:
+              newPhone: "09123456789"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "Phone changed successfully."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid email"
+                        fields: ["newEmail"]
+                verification:
+                  value:
+                    errors:
+                      - message: "Phone is not verified!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "409":
+          description: CONFLICT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "This phone has already been used!"
+  /api/auth/verification/generate:
+    post:
+      tags:
+        - "verification"
+      summary: Generate Code
+      description: >-
+        This endpoint will generate a verification code for a given phone or email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/GeneratePhone"
+                - $ref: "#/components/schemas/GenerateEmail"
+            examples:
+              phone:
+                value:
+                  phone: "09123456789"
+              email:
+                value:
+                  email: "example@domain.com"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "Activation code has been sent to your email or phone"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+  /api/auth/verification/verify:
+    post:
+      tags:
+        - "verification"
+      summary: Verify Code
+      description: >-
+        This endpoint will verify a given code. you need to pass both the code and the phone or email the code is generated for.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/VerifyPhone"
+                - $ref: "#/components/schemas/VerifyEmail"
+            examples:
+              phone:
+                value:
+                  phone: "09123456789"
+                  code: "123456"
+              email:
+                value:
+                  email: "example@domain.com"
+                  code: "123456"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "Activation was successful."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                wrongcode:
+                  value:
+                    errors:
+                      - message: "Wrong code!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+  /api/auth/verification/cancel:
+    delete:
+      tags:
+        - "verification"
+      summary: Cancel a Code
+      description: >-
+        This endpoint will generate a verification code for a given phone or email.
+      responses:
+        "202":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: "Code was canceled successfully."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Code not found!"
+  /api/user/friends:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "user"
+      summary: Friend list
+      description: >-
+        Get a list of all your friends.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  friends:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Friends"
+              examples:
+                user-with-email:
+                  value:
+                    - email: "example@domain.com"
+                      name: "nameee"
+                      picture: "url.domain/pic"
+                user-with-phone:
+                  value:
+                    - phone: "09123456789"
+                      name: "nameee"
+                      picture: "url.domain/pic"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "User doesn't exists."
+  /api/user/friends/invite:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "user"
+      summary: Invite a friend
+      description: >-
+        Invite sb with a phone or email to use the app.
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invitees:
+                  type: array
+                  items:
+                    oneOf:
+                      - $ref: "#/components/schemas/InvitePhone"
+                      - $ref: "#/components/schemas/InviteEmail"
+            examples:
+              email:
+                value:
+                  invitees:
+                    - email: "example@domain.com"
+                      name: "example"
+                    - email: "example2@domain.com"
+                      name: "example2"
+              phone:
+                value:
+                  invitees:
+                    - phone: "09123456789"
+                      name: "example"
+                    - phone: "09987654321"
+                      name: "example2"
+              combo:
+                value:
+                  invitees:
+                    - phone: "09123456789"
+                      name: "example"
+                    - email: "example2@domain.com"
+                      name: "example2"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Invite sent."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                duplicate:
+                  value:
+                    errors:
+                      - message: "Found duplicate phone or email!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "409":
+          description: CONFLICT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "One of the invitees is already a user of this application!"
+  # /api/user/friends/{id}:
+  #   post:
+  #     security:
+  #       - bearerAuth: []
+  #     tags:
+  #       - "user"
+  #     summary: Adding a friend
+  #     parameters:
+  #       - in: path
+  #         name: id
+  #         schema:
+  #           type: string
+  #         required: true
+  #     description: >-
+  #       Add A friend based on their id.
+  #     requestBody:
+  #     responses:
+  #   delete:
+  #     security:
+  #       - bearerAuth: []
+  #     tags:
+  #       - "user"
+  #     summary: Signup a user
+  #     parameters:
+  #       - in: path
+  #         name: id
+  #         schema:
+  #           type: string
+  #         required: true
+  #     description: >-
+  #       Get a list of all your friends.
+  #     requestBody:
+  #     responses:
+  /api/user/profile:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "user"
+      summary: Get profile
+      description: >-
+        Get your profile.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Profile edited successfully."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+  /api/user/image/upload:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "user"
+      summary: Upload an image
+      description: >-
+        Upload an image
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  url:
+                    type: string
+              example:
+                key: "userid/41baeed7-3946-479b-8c44-d1bcc1eaf293.jpg"
+                url: "url.domain/"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                content-type:
+                  value:
+                    errors:
+                      - message: "Content-Type must be set!"
+                image:
+                  value:
+                    errors:
+                      - message: "Content-Type must be an image type"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+  /api/user/profile/edit:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "user"
+      summary: Edit profile
+      description: >-
+        Edit your profile.
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                picture:
+                  type: string
+                newName:
+                  type: string
+            example:
+              picture: "the new picture url"
+              newName: "newName"
+
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Friends"
+              examples:
+                user-with-email:
+                  value:
+                    email: "example@domain.com"
+                    name: "nameee"
+                    picture: "url.domain/pic"
+                user-with-phone:
+                  value:
+                    phone: "09123456789"
+                    name: "nameee"
+                    picture: "url.domain/pic"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                unknown:
+                  value:
+                    errors:
+  # /api/user/credit-card/create:
+  #   post:
+  #     security:
+  #       - bearerAuth: []
+  #     tags:
+  #       - "user"
+  #     summary: Signup a user
+  #     description: >-
+  #       Get a list of all your friends.
+  #     requestBody:
+  #       description: this is the request body
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             required:
+  #               - number
+  #               - name
+  #             properties:
+  #               number:
+  #                 type: string
+  #                 minimum: 16
+  #                 maximum: 16
+  #                 example: "6037000000000000"
+  #               name:
+  #                 type: string
+  #                 example: "nameee"
+  #     responses:
+  #       "201":
+  #         description: CREATED
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 id:
+  #                   type: string
+  #                 number:
+  #                   type: string
+  #                   example: "6037000000000000"
+  #                 name:
+  #                   type: string
+  #                   example: "nameee"
+  #       "400":
+  #         description: BAD REQUEST
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Errors"
+  #             examples:
+  #               unknown:
+  #                 value:
+  #                   errors:
+  #                     - message: "Something went wrong"
+  #       "409":
+  #         description: CONFLICT
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Errors"
+  #             example:
+  #               errors:
+  #                 - message: "Credit Card already exists"
+  # /api/user/credit-card/my/add:
+  #   post:
+  #     tags:
+  #       - "user"
+  #     summary: Add Credit Card
+  #     description: >-
+  #       Add to my credit cards.
+  #     requestBody:
+  #     responses:
+  # /api/user/credit-card/my/remove:
+  #   post:
+  #     security:
+  #       - bearerAuth: []
+  #     tags:
+  #       - "user"
+  #     summary: Signup a user
+  #     description: >-
+  #       Get a list of all your friends.
+  #     requestBody:
+  #     responses:
+  # /api/user/credit-card/other/add:
+  #   post:
+  #     security:
+  #       - bearerAuth: []
+  #     tags:
+  #       - "user"
+  #     summary: Signup a user
+  #     description: >-
+  #       Get a list of all your friends.
+  #     requestBody:
+  #     responses:
+  # /api/user/credit-card/other/remove:
+  #   post:
+  #     security:
+  #       - bearerAuth: []
+  #     tags:
+  #       - "user"
+  #     summary: Signup a user
+  #     description: >-
+  #       Get a list of all your friends.
+  #     requestBody:
+  #     responses:
+  # POST      /api/groups
+  # DELETE    /api/groups/:id
+  # PUT       /api/groups/:id
+  # GET       /api/groups/:id
+  /api/groups:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Create Group
+      description: >-
+        Create a group
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "my group name"
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  creator:
+                    allOf:
+                      - $ref: "#/components/schemas/Friends"
+                    example:
+                      name: "nameee"
+                      email: "example@domaim.com"
+                      picture: "image url"
+                  members:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Friends"
+                    example: []
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+  /api/groups/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Signup page
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                    example: "group name"
+                  creator:
+                    $ref: "#/components/schemas/Friends"
+                  members:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Friends"
+                    example: []
+              example:
+                name: "group name"
+                creator:
+                  name: "nameee"
+                  email: "example@domaim.com"
+                  picture: "image url"
+                members:
+                  - name: "nameee"
+                    email: "example@domaim.com"
+                    picture: "image url"
+                  - name: "nameee2"
+                    email: "example2@domaim.com"
+                    picture: "image url"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                not-member:
+                  value:
+                    errors:
+                      - message: "You are not a member of this group!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No group exists with id gid"
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Signup page
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                friends:
+                  type: array
+                  items:
+                    type: string
+                    example: "user id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                    example: "group name"
+                  creator:
+                    $ref: "#/components/schemas/Friends"
+                  members:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Friends"
+                    example: []
+              example:
+                name: "group name"
+                creator:
+                  name: "nameee"
+                  email: "example@domaim.com"
+                  picture: "image url"
+                members:
+                  - name: "nameee"
+                    email: "example@domaim.com"
+                    picture: "image url"
+                  - name: "nameee2"
+                    email: "example2@domaim.com"
+                    picture: "image url"
+                  - name: "newusername"
+                    email: "newuseremail@domaim.com"
+                    picture: "image url"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                not-member:
+                  value:
+                    errors:
+                      - message: "You are not a member of this group!"
+                no-user:
+                  value:
+                    errors:
+                      - message: "There is no user with the given id"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "409":
+          description: CONFLICT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "User is already in this group!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No group exists with id gid"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Signup page
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Deleted the group successfully!"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                not-creator:
+                  value:
+                    errors:
+                      - message: "You are not the creator of this group!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No group exists with id gid"
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Friends:
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        picture:
+          type: string
+    SignupPhone:
+      required:
+        - phone
+        - name
+        - password
+      properties:
+        phone:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+          minimum: 8
+          maximum: 16
+      example:
+        phone: "09123456789"
+        name: "example"
+        password: "password"
+    SignupEmail:
+      required:
+        - email
+        - name
+        - password
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+          minimum: 8
+          maximum: 16
+    LoginEmail:
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          minimum: 8
+          maximum: 16
+    LoginPhone:
+      required:
+        - phone
+        - password
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+          minimum: 8
+          maximum: 16
+    ResetPassWithMobile:
+      required:
+        - phone
+        - newpass
+      properties:
+        phone:
+          type: string
+        newpass:
+          type: string
+          minimum: 8
+          maximum: 16
+    ResetPassWithEmail:
+      required:
+        - email
+        - newpass
+      properties:
+        email:
+          type: string
+        newpass:
+          type: string
+          minimum: 8
+          maximum: 16
+    ChangeEmail:
+      required:
+        - newEmail
+      properties:
+        newEmail:
+          type: string
+    ChangePhone:
+      required:
+        - newPhone
+      properties:
+        newPhone:
+          type: string
+    Token:
+      type: object
+      properties:
+        access:
+          type: string
+        expire:
+          type: number
+          format: int64
+        created:
+          type: number
+          format: int64
+    GenerateEmail:
+      required:
+        - email
+      properties:
+        email:
+          type: string
+    GeneratePhone:
+      required:
+        - phone
+      properties:
+        phone:
+          type: string
+    VerifyEmail:
+      required:
+        - email
+        - code
+      properties:
+        email:
+          type: string
+        code:
+          type: string
+    VerifyPhone:
+      required:
+        - phone
+        - code
+      properties:
+        phone:
+          type: string
+        code:
+          type: string
+    InviteEmail:
+      required:
+        - email
+        - name
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+    InvitePhone:
+      required:
+        - phone
+        - name
+      properties:
+        phone:
+          type: string
+        name:
+          type: string
+    Errors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+              fields:
+                nullable: true
+                type: array
+                items:
+                  type: string

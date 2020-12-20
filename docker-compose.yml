@@ -121,6 +121,11 @@ services:
     depends_on:
       - expense-db
       - nats-streaming
+  api-docs:
+    build: ./swagger
+    container_name: api-docs
+    expose:
+      - 3000
   nginx:
     image: nginx
     container_name: nginx
@@ -129,6 +134,7 @@ services:
       - expense
       - user
       - group
+      - api-docs
     ports:
       - 8080:80
     volumes:
