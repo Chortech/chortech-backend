@@ -62,7 +62,7 @@ services:
     logging:
       driver: none
   auth:
-    image: chortech/auth:latest
+    build: ./auth
     container_name: auth-service
     expose:
       - 3000
@@ -79,7 +79,7 @@ services:
     secrets:
       - auth-service-secrets
   user:
-    image: chortech/user:latest
+    build: ./user
     container_name: user-service
     expose:
       - 3000
@@ -94,7 +94,7 @@ services:
     secrets:
       - user-service-secrets
   expense:
-    image: chortech/expense:latest
+    build: ./expense
     container_name: expense-service
     environment:
       NEO4J_URL: bolt://expense-db:7687
@@ -106,11 +106,6 @@ services:
     depends_on:
       - expense-db
       - nats-streaming
-  api-docs:
-    build: ./swagger
-    container_name: api-docs
-    expose:
-      - 3000
   nginx:
     image: nginx
     container_name: nginx
@@ -118,8 +113,6 @@ services:
       - auth
       - expense
       - user
-      - group
-      - api-docs
     ports:
       - 8080:80
     volumes:
