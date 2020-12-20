@@ -2,7 +2,7 @@ import Router from 'express';
 import { BadRequestError, UnauthorizedError, requireAuth, NotFoundError } from '@chortec/common';
 import { validate } from '@chortec/common';
 import Joi from 'joi';
-import User from '../models/user'
+import User from '../models/user';
 import Group from '../models/group';
 
 
@@ -23,7 +23,7 @@ router.delete('/', requireAuth, async (req, res) => {
         throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
     
     if (group.creator != user)
-        throw new UnauthorizedError();
+        throw new BadRequestError('You are not the owner of this group!');
     
     await Group.deleteOne(group);
 

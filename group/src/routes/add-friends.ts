@@ -1,8 +1,8 @@
 import Router from 'express';
-import { BadRequestError, ResourceConflictError, requireAuth } from '@chortec/common';
+import { BadRequestError, ResourceConflictError, requireAuth, NotFoundError } from '@chortec/common';
 import { validate } from '@chortec/common';
 import Joi from 'joi';
-import User from '../models/user'
+import User from '../models/user';
 import Group from '../models/group';
 
 
@@ -12,7 +12,7 @@ const addFriendsToGroupSchema = Joi.object({
     friends: Joi.array().items(Joi.string())
 }).label('body');
 
-router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res) => {
+router.put('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res) => {
     if (!req.user) throw new BadRequestError('Invalid state!');
 
     const { friends } = req.body;
@@ -26,7 +26,7 @@ router.post('/', requireAuth, validate(addFriendsToGroupSchema), async (req, res
     const group = await Group.findById(req.group?.id);
 
     if (!group)
-        throw new BadRequestError(`No groups exist with the id ${req.group?.id}`);
+        throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
     
     if (!group.members)
         group.members = [];
