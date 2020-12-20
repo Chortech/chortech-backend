@@ -48,6 +48,13 @@ services:
       - 27017
     logging:
       driver: none
+  group-db:
+    image: mongo
+    container_name: group-db-mongo
+    expose:
+      - 27017
+    logging:
+      driver: none
   expense-db:
     image: neo4j
     container_name: expense-db-neo4j
@@ -91,8 +98,18 @@ services:
       NATS_CLUSTER_ID: chortec
       SECRETS: /run/secrets/user-service-secrets
       DEBUG: 'true'
-    secrets:
-      - user-service-secrets
+  group:
+    build: ./group
+    container_name: group-service
+    expose:
+      - 3000
+    depends_on:
+      - group-db
+    environment:
+      MONGO_URI: mongodb://group-db:27017
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      DEBUG: 'true'
   expense:
     build: ./expense
     container_name: expense-service
@@ -113,6 +130,7 @@ services:
       - auth
       - expense
       - user
+      - group
     ports:
       - 8080:80
     volumes:
