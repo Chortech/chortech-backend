@@ -17,20 +17,23 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
 
   const { name } = req.body;
 
-  const creator: IMember = {
-    id:  mongoose.Types.ObjectId(req.user.id),
-    expenseCheck: false
-  };
+  const creator = mongoose.Types.ObjectId(req.user.id);
 
   if (!creator)
     throw new BadRequestError('Invalid state!');
 
   const members = [creator];
+  const expenseCheck: IExpensCheck = {
+    id: creator,
+    expenseCheck: false
+  }
+  const expenseChecks: IExpensCheck[] = [expenseCheck];
 
   const group = Group.build({
     name,
     creator,
-    members
+    members,
+    expenseChecks
   });
 
   const { _id } = await group.save();
@@ -39,7 +42,8 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
     id: _id,
     name,
     creator,
-    members
+    members,
+    expenseChecks
   });
 });
 
