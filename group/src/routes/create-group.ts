@@ -2,7 +2,7 @@ import Router from 'express';
 import { BadRequestError, ResourceConflictError, requireAuth } from '@chortec/common';
 import { validate } from '@chortec/common';
 import Joi from 'joi';
-import User from '../models/user';
+import mongoose from 'mongoose';
 import Group from '../models/group';
 
 
@@ -16,13 +16,12 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
     if (!req.user) throw new BadRequestError('Invalid state!');
 
     const { name } = req.body;
-    const id = req.user;
+    // const id = req.user;
 
-    const creator = await User.findById(id);
+    const creator = mongoose.Types.ObjectId(req.user.id);
 
-    if (!creator) {
+    if (!creator)
         throw new BadRequestError('Invalid state!');
-    }
 
     const members = [creator];
 
