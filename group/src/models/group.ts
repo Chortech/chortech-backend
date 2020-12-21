@@ -7,15 +7,16 @@ import mongoose, { Schema, Document } from 'mongoose';
  */
 
 
-interface IMember {
+interface IExpensCheck {
   id: mongoose.Types.ObjectId;
   expenseCheck: boolean;
 }
 
 interface IGroup {
   name: string;
-  creator: IMember;
-  members?: IMember[];
+  creator: mongoose.Types.ObjectId;
+  members?: mongoose.Types.ObjectId[];
+  expenseChecks: IExpensCheck[];
 }
 
 type GroupDoc = IGroup & Document;
@@ -26,14 +27,15 @@ interface GroupModel extends mongoose.Model<GroupDoc> {
 
 const groupSchema = new Schema({
   name: { type: String, required: true },
-  creator: { type: Object, ref: 'User', required: true },
-  members: [{ type: Object }]
+  creator: { type: String, ref: 'User', required: true },
+  members: [{ type: String }],
+  expenseChecks: [{ type: Object }]
 });
 
 groupSchema.statics.build = (group: IGroup) => new Group(group);
 
 const Group = mongoose.model<GroupDoc, GroupModel>('Group', groupSchema);
 
-export { Group, IMember };
+export { Group, IExpensCheck as IMember };
 
 export default Group;
