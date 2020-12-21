@@ -547,13 +547,29 @@ paths:
                     errors:
                       - message: "Something went wrong"
   /api/auth/verification/cancel:
-    delete:
+    put:
       tags:
         - "verification"
       summary: Cancel a Code
       description: >-
         This endpoint will canvel a verification code for a given phone or email.
         your need to cancel a code to be able to generate a new one.
+      requestBody:
+        description: OK
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/GeneratePhone"
+                - $ref: "#/components/schemas/GenerateEmail"
+            examples:
+              phone:
+                value:
+                  phone: "09123456789"
+              email:
+                value:
+                  email: "example@domain.com"
       responses:
         "202":
           description: OK
@@ -902,10 +918,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  email:
                     type: string
-              example:
-                message: "Profile edited successfully."
+                  phone:
+                    type: string
+                  name:
+                    type: string
+                  picture:
+                    type: string
         "400":
           description: BAD REQUEST
           content:
@@ -1505,12 +1525,10 @@ components:
           type: string
           minimum: 8
           maximum: 16
-          exmaple: "987654321"
         oldpass:
           type: string
           minimum: 8
           maximum: 16
-          exmaple: "123456789"
     ChangeEmail:
       required:
         - newEmail

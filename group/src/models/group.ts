@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { User, IUser } from './user';
+import mongoose, { Schema, Document } from "mongoose";
+import { User, IUser } from "./user";
 
 /**
  * @param name
@@ -7,28 +7,27 @@ import { User, IUser } from './user';
  * @param users
  */
 
-
 interface IGroup {
-    name: string;
-    creator: IUser;
-    members?: Array<IUser>;
+  name: string;
+  creator: IUser;
+  members?: Array<IUser>;
 }
 
 type GroupDoc = IGroup & Document;
 
 interface GroupModel extends mongoose.Model<GroupDoc> {
-    build(group: IGroup): GroupDoc;
+  build(group: IGroup): GroupDoc;
 }
 
 const groupSchema = new Schema({
-    name: { type: String, required: true },
-    creator: { type: String, ref: 'User', required: true },
-    members: [{ type: String, ref: 'User' }]
+  name: { type: String, required: true },
+  creator: { type: String, ref: "User", required: true },
+  members: [{ type: String, ref: "User" }],
 });
 
 groupSchema.statics.build = (group: IGroup) => new Group(group);
 
-const Group = mongoose.model<GroupDoc, GroupModel>('Group', groupSchema);
+const Group = mongoose.model<GroupDoc, GroupModel>("Group", groupSchema);
 
 export { Group };
 

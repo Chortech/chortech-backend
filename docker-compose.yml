@@ -77,6 +77,8 @@ services:
       - auth-cache
       - auth-db
     environment:
+      STAGE: "true"
+      HOST: http://5.253.25.167/
       REDIS_URL: redis://auth-cache:6379
       MONGO_URL: mongodb://auth-db:27017
       NATS_URL: http://nats-streaming:4222
@@ -93,6 +95,7 @@ services:
     depends_on:
       - user-db
     environment:
+      HOST: http://5.253.25.167/
       MONGO_URL: mongodb://user-db:27017
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
@@ -108,6 +111,7 @@ services:
     depends_on:
       - group-db
     environment:
+      HOST: http://5.253.25.167/
       MONGO_URI: mongodb://group-db:27017
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
@@ -116,6 +120,7 @@ services:
     image: chortech/expense:latest
     container_name: expense-service
     environment:
+      HOST: http://5.253.25.167/
       NEO4J_URL: bolt://expense-db:7687
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec

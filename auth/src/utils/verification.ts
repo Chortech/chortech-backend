@@ -54,6 +54,38 @@ const generateCode = (key: string): Promise<string> => {
     }
   });
 };
+const generateCodeStage = (key: string): Promise<string> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const codee = await redisWrapper.getAsync(key);
+      if (codee) {
+        const parsed = JSON.parse(codee) as CodeModel;
+        if (parsed.verified)
+          return reject(new ResourceConflictError(`User is already verified!`));
+        return reject(
+          new ResourceConflictError(
+            `There is a code already generated for ${key}.`
+          )
+        );
+      }
+
+      let code = "069420";
+      const model: CodeModel = {
+        code: code,
+        verified: false,
+      };
+
+      await redisWrapper.setEXAsync(
+        key,
+        JSON.stringify(model),
+        redisWrapper.ttl
+      );
+      resolve(code);
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
 
 const verifyCode = (key: string, code: string): Promise<boolean> => {
   return new Promise(async (resolve, reject) => {
@@ -114,4 +146,5 @@ export {
   isVerified,
   length,
   removeVerified,
+  generateCodeStage,
 };
