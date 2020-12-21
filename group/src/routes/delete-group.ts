@@ -14,13 +14,12 @@ router.delete('/', requireAuth, async (req, res) => {
   if (!group)
       throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
     
-  if (group.creator.id.toHexString() != req.user.id)
+  if (group.creator.toHexString() != req.user.id)
       throw new BadRequestError('You are not the owner of this group!');
     
-  for(let member of group.members!) {
+  for(let member of group.expenseChecks)
     if (member.expenseCheck)
       throw new BadRequestError('You cannot delete this group because of existing expenses!');
-  }
 
   await Group.deleteOne(group);
 
