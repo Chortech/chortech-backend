@@ -16,7 +16,6 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
     if (!req.user) throw new BadRequestError('Invalid state!');
 
     const { name } = req.body;
-    // const id = req.user;
 
     const creator = mongoose.Types.ObjectId(req.user.id);
 
