@@ -36,6 +36,6 @@ groupSchema.statics.build = (group: IGroup) => new Group(group);
 
 const Group = mongoose.model<GroupDoc, GroupModel>('Group', groupSchema);
 
-export { Group, IExpensCheck as IMember };
+export { Group, IExpensCheck };
 
 export default Group;

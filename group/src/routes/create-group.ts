@@ -3,7 +3,7 @@ import { BadRequestError, ResourceConflictError, requireAuth } from '@chortec/co
 import { validate } from '@chortec/common';
 import Joi from 'joi';
 import mongoose from 'mongoose';
-import Group, { IMember } from '../models/group';
+import Group, { IExpensCheck } from '../models/group';
 
 
 const router = Router();

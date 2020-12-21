@@ -1,7 +1,7 @@
 import Router from 'express';
 import { BadRequestError, UnauthorizedError, requireAuth, NotFoundError } from '@chortec/common';
 import mongoose from 'mongoose';
-import Group, { IMember } from '../models/group';
+import Group, { IExpensCheck } from '../models/group';
 
 
 const router = Router();
