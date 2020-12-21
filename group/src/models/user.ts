@@ -11,7 +11,6 @@ interface IUser {
     email?: string;
     phone?: string;
     name: string;
-    friends: mongoose.Types.ObjectId[];
 }
 
 type UserDoc = IUser & Document;
@@ -24,7 +23,6 @@ const userSchema = new Schema({
     email: { type: String, unique: true, sparse: true },
     phone: { type: String, unique: true, sparse: true },
     name: String,
-    friends: [{ type: Schema.Types.ObjectId }],
 });
 
 userSchema.statics.build = (user: IUser) => new User({
