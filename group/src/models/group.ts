@@ -10,8 +10,8 @@ import { User, IUser } from './user';
 
 interface IGroup {
     name: string;
-    creator: IUser;
-    members?: Array<IUser>;
+    creator: mongoose.Types.ObjectId;
+    members?: mongoose.Types.ObjectId[];
 }
 
 type GroupDoc = IGroup & Document;
