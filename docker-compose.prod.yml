@@ -4,17 +4,22 @@ services:
     expose:
       - 3000
     environment:
-      PRODUCTION: 'true'
+      PRODUCTION: "true"
   user:
     expose:
       - 3000
     environment:
-      PRODUCTION: 'true'
+      PRODUCTION: "true"
   expense:
     expose:
       - 3000
     environment:
-      PRODUCTION: 'true'
+      PRODUCTION: "true"
+  api-docs:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: "true"
   nginx:
     image: nginx
     container_name: nginx
@@ -25,4 +30,4 @@ services:
     ports:
       - 80:80
     environment:
-      PRODUCTION: 'true'
+      PRODUCTION: "true"
