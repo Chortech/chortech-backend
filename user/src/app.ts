@@ -27,16 +27,16 @@ app.param("id", validateId);
 // adding route handlers to express
 app.use("/api/user/friends", getFriendsRouter);
 app.use("/api/user/friends/invite", inviteRouter);
-app.use("/api/user/friends/:id", addFriendRouter);
+app.use("/api/user/friends", addFriendRouter);
 app.use("/api/user/friends/:id", removeFriendRouter);
 app.use("/api/user/profile", getProfileRouter);
 app.use("/api/user/image/upload", imageUploadRouter);
-app.use('/api/user/profile/edit', editProfileRouter);
-app.use('/api/user/credit-card/create', createCreditCardRouter);
-app.use('/api/user/credit-card/my/add', addMyCreditCardRouter);
-app.use('/api/user/credit-card/my/remove', removeMyCreditCardRouter);
-app.use('/api/user/credit-card/other/add', addOtherCreditCardRouter);
-app.use('/api/user/credit-card/other/remove', removeOtherCreditCardRouter);
+app.use("/api/user/profile/edit", editProfileRouter);
+app.use("/api/user/credit-card/create", createCreditCardRouter);
+app.use("/api/user/credit-card/my/add", addMyCreditCardRouter);
+app.use("/api/user/credit-card/my/remove", removeMyCreditCardRouter);
+app.use("/api/user/credit-card/other/add", addOtherCreditCardRouter);
+app.use("/api/user/credit-card/other/remove", removeOtherCreditCardRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
