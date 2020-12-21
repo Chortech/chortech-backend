@@ -9,13 +9,16 @@ const addFriend = async (
     email?: string;
     phone?: string;
   },
-  fId: string
+  friend: {
+    email?: string;
+    phone?: string;
+  }
 ) => {
   const { id, token } = await global.signin(user.id, user.email, user.phone);
   const res = await request(app)
-    .put(`/api/user/friends/${fId}`)
+    .put(`/api/user/friends`)
     .set("authorization", `Bearer ${token}`)
-    .send()
+    .send({ email: friend.email, phone: friend.phone })
     .expect(200);
 };
 
@@ -25,7 +28,7 @@ it("should remove a friend", async () => {
     users[0].email,
     users[0].phone
   );
-  await addFriend(users[0], users[1].id);
+  await addFriend(users[0], users[1]);
 
   expect((await User.findById(id))?.friends.length).toBe(1);
   await request(app)
@@ -43,9 +46,9 @@ it("should remove 3 friends", async () => {
     users[0].email,
     users[0].phone
   );
-  await addFriend(users[0], users[1].id);
-  await addFriend(users[0], users[2].id);
-  await addFriend(users[0], users[3].id);
+  await addFriend(users[0], users[1]);
+  await addFriend(users[0], users[2]);
+  await addFriend(users[0], users[3]);
 
   expect((await User.findById(id))?.friends.length).toBe(3);
   await request(app)
@@ -73,7 +76,7 @@ it("should NOT remove a friend twice", async () => {
     users[0].email,
     users[0].phone
   );
-  await addFriend(users[0], users[1].id);
+  await addFriend(users[0], users[1]);
 
   expect((await User.findById(id))?.friends.length).toBe(1);
   await request(app)
@@ -97,7 +100,7 @@ it("should NOT accept invalid id", async () => {
     users[0].email,
     users[0].phone
   );
-  await addFriend(users[0], users[1].id);
+  await addFriend(users[0], users[1]);
 
   expect((await User.findById(id))?.friends.length).toBe(1);
   await request(app)
@@ -109,7 +112,7 @@ it("should NOT accept invalid id", async () => {
 });
 
 it("should NOT remove a friend with invalid token", async () => {
-  await addFriend(users[0], users[1].id);
+  await addFriend(users[0], users[1]);
 
   expect((await User.findById(users[0].id))?.friends.length).toBe(1);
   await request(app)
@@ -126,7 +129,7 @@ it("should NOT remove a friend that doesn't exists", async () => {
     users[0].email,
     users[0].phone
   );
-  await addFriend(users[0], users[1].id);
+  await addFriend(users[0], users[1]);
 
   expect((await User.findById(id))?.friends.length).toBe(1);
   await request(app)
@@ -144,7 +147,7 @@ it("should NOT accept equal values for friend and userid", async () => {
     users[0].email,
     users[0].phone
   );
-  await addFriend(users[0], users[1].id);
+  await addFriend(users[0], users[1]);
 
   expect((await User.findById(id))?.friends.length).toBe(1);
   await request(app)
