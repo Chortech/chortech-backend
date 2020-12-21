@@ -9,8 +9,6 @@ const router = Router();
 router.delete('/', requireAuth, async (req, res) => {
   if (!req.user) throw new BadRequestError('Invalid state!');
 
-  // const id = req.user;
-
   const user = mongoose.Types.ObjectId(req.user.id);
   const group = await Group.findById(req.group?.id);
 
