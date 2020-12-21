@@ -12,7 +12,6 @@ interface IUser {
     phone?: string;
     name: string;
     friends: mongoose.Types.ObjectId[];
-    expenseCheck: boolean;
 }
 
 type UserDoc = IUser & Document;
@@ -26,7 +25,6 @@ const userSchema = new Schema({
     phone: { type: String, unique: true, sparse: true },
     name: String,
     friends: [{ type: Schema.Types.ObjectId }],
-    expenseCheck: { type: Boolean, default: false }
 });
 
 userSchema.statics.build = (user: IUser) => new User({
@@ -36,6 +34,6 @@ userSchema.statics.build = (user: IUser) => new User({
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
-export { User, IUser, userSchema };
+export { User };
 
 export default User;

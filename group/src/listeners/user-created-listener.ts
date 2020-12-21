@@ -12,7 +12,6 @@ export class UserCreatedListener extends Listener<IUserCreated> {
         email: data.email,
         phone: data.phone,
         friends: [],
-        expenseCheck: false
       });
 
       await user.save();

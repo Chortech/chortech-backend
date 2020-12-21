@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { User, IUser } from './user';
 
 /**
  * @param name

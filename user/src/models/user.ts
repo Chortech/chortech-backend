@@ -7,7 +7,7 @@ interface IUser {
   email?: string;
   phone?: string;
   name: string;
-  picture?: string,
+  picture?: string;
   friends: mongoose.Types.ObjectId[];
   myCreditCards: mongoose.Types.ObjectId[];
   otherCreditCards: mongoose.Types.ObjectId[];
