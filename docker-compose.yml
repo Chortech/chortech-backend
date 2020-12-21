@@ -82,7 +82,7 @@ services:
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
       SECRETS: /run/secrets/auth-service-secrets
-      DEBUG: 'true'
+      DEBUG: "true"
     secrets:
       - auth-service-secrets
   user:
@@ -97,7 +97,7 @@ services:
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
       SECRETS: /run/secrets/user-service-secrets
-      DEBUG: 'true'
+      DEBUG: "true"
     secrets:
       - user-service-secrets
   group:
@@ -111,7 +111,7 @@ services:
       MONGO_URI: mongodb://group-db:27017
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
-      DEBUG: 'true'
+      DEBUG: "true"
   expense:
     image: chortech/expense:latest
     container_name: expense-service
@@ -119,14 +119,14 @@ services:
       NEO4J_URL: bolt://expense-db:7687
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
-      DEBUG: 'true'
+      DEBUG: "true"
     expose:
       - 3000
     depends_on:
       - expense-db
       - nats-streaming
   api-docs:
-    build: ./swagger
+    image: chortech/api-docs
     container_name: api-docs
     expose:
       - 3000

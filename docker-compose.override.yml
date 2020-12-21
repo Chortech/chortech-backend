@@ -124,7 +124,6 @@ services:
       - expense-db
       - nats-streaming
   api-docs:
-    image: chortech/api-docs
     build: ./swagger
     container_name: api-docs
     expose:
