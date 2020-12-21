@@ -291,18 +291,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: "#/components/schemas/LoginPhone"
-                - $ref: "#/components/schemas/LoginEmail"
-            examples:
-              phone:
-                value:
-                  phone: "09123456789"
-                  password: "password"
-              email:
-                value:
-                  email: "example@domain.com"
-                  password: "password"
+              $ref: "#/components/schemas/ChangePass"
       responses:
         "200":
           description: OK
@@ -563,7 +552,8 @@ paths:
         - "verification"
       summary: Cancel a Code
       description: >-
-        This endpoint will generate a verification code for a given phone or email.
+        This endpoint will canvel a verification code for a given phone or email.
+        your need to cancel a code to be able to generate a new one.
       responses:
         "202":
           description: OK
@@ -642,6 +632,173 @@ paths:
               example:
                 errors:
                   - message: "User doesn't exists."
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "user"
+      summary: Adding a friend
+      description: >-
+        Add A friend based on their id.
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/GenerateEmail"
+                - $ref: "#/components/schemas/GeneratePhone"
+            examples:
+              phone:
+                value:
+                  phone: "09123456789"
+              email:
+                value:
+                  email: "example@domain.com"
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "user id"
+                  name:
+                    type: string
+                    example: "name"
+                  email:
+                    type: string
+                    example: "user@domain.com"
+                  phone:
+                    type: string
+                    example: "09987654321"
+                  friends:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "friend id"
+                        name:
+                          type: string
+                          example: "friend name"
+                        email:
+                          type: string
+                          example: "friend@domain.com"
+                        phone:
+                          type: string
+                          example: "09123456789"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "Invalid phone number"
+                        fields: ["phone"]
+                self-friend:
+                  value:
+                    errors:
+                      - message: "You can't add your self as friend!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "409":
+          description: CONFLICT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "freind_id is already your friend"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "The user you're trying to add doesn't exist."
+  /api/user/friends/{id}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - "user"
+      summary: Remove a friend
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Get a list of all your friends.
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "user id"
+                  name:
+                    type: string
+                    example: "name"
+                  email:
+                    type: string
+                    example: "user@domain.com"
+                  phone:
+                    type: string
+                    example: "09987654321"
+                  friends:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "friend id"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                self-friend:
+                  value:
+                    errors:
+                      - message: "You can't remove your self as friend!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "friend_id is not your friend!"
+
   /api/user/friends/invite:
     post:
       security:
@@ -728,39 +885,6 @@ paths:
               example:
                 errors:
                   - message: "One of the invitees is already a user of this application!"
-  # /api/user/friends/{id}:
-  #   post:
-  #     security:
-  #       - bearerAuth: []
-  #     tags:
-  #       - "user"
-  #     summary: Adding a friend
-  #     parameters:
-  #       - in: path
-  #         name: id
-  #         schema:
-  #           type: string
-  #         required: true
-  #     description: >-
-  #       Add A friend based on their id.
-  #     requestBody:
-  #     responses:
-  #   delete:
-  #     security:
-  #       - bearerAuth: []
-  #     tags:
-  #       - "user"
-  #     summary: Signup a user
-  #     parameters:
-  #       - in: path
-  #         name: id
-  #         schema:
-  #           type: string
-  #         required: true
-  #     description: >-
-  #       Get a list of all your friends.
-  #     requestBody:
-  #     responses:
   /api/user/profile:
     get:
       security:
@@ -1060,7 +1184,7 @@ paths:
         - bearerAuth: []
       tags:
         - "group"
-      summary: Signup page
+      summary: Get group info
       parameters:
         - in: path
           name: id
@@ -1132,7 +1256,7 @@ paths:
         - bearerAuth: []
       tags:
         - "group"
-      summary: Signup page
+      summary: Add Freinds to Group
       parameters:
         - in: path
           name: id
@@ -1233,7 +1357,7 @@ paths:
         - bearerAuth: []
       tags:
         - "group"
-      summary: Signup page
+      summary: Delete Group
       parameters:
         - in: path
           name: id
@@ -1372,6 +1496,21 @@ components:
           type: string
           minimum: 8
           maximum: 16
+    ChangePass:
+      required:
+        - newpass
+        - oldpass
+      properties:
+        newpass:
+          type: string
+          minimum: 8
+          maximum: 16
+          exmaple: "987654321"
+        oldpass:
+          type: string
+          minimum: 8
+          maximum: 16
+          exmaple: "123456789"
     ChangeEmail:
       required:
         - newEmail

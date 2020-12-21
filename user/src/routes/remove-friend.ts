@@ -7,7 +7,7 @@ const router = Router();
 
 router.delete("/", requireAuth, async (req, res) => {
   if (req.user?.id === req.friend?.id)
-    throw new BadRequestError("User id and friend id can't be the same!");
+    throw new BadRequestError("You can't remove your self as friend!");
 
   const raw = await User.updateOne(
     {

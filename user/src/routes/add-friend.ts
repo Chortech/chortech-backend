@@ -45,10 +45,10 @@ router.put("/", requireAuth, validate(addFriendScheme), async (req, res) => {
   });
 
   if (!friend)
-    throw new NotFoundError("The user you're trying to add does't exist.");
+    throw new NotFoundError("The user you're trying to add doesn't exist.");
 
   if (friend._id.equals(req.user?.id))
-    throw new BadRequestError("Friend id and user id are the same!");
+    throw new BadRequestError("You can't add your self as friend!");
 
   let id = mongoose.Types.ObjectId(friend._id);
   let raw = await User.updateOne(
@@ -91,8 +91,7 @@ router.put("/", requireAuth, validate(addFriendScheme), async (req, res) => {
   // message.
 
   const user = await User.findById(req.user?.id);
-  const f = await User.findById(friend._id);
-  res.status(200).json({ user, f });
+  res.status(200).json({ user });
 });
 
 export { router };
