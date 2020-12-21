@@ -12,6 +12,7 @@ async function start() {
   // make sure you have a folder named secrets in rootdir of the
   // project and inside that folder there should be a file called
   // user-service-secrets.ts with the secrets required for this service.
+
   const secpath =
     process.env.SECRETS ||
     path.join(__dirname, "..", "..", "secrets", "auth-service-secrets.json");

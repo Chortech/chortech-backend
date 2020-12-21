@@ -71,6 +71,7 @@ services:
   auth:
     image: chortech/auth:latest
     container_name: auth-service
+    restart: always
     expose:
       - 3000
     depends_on:
@@ -90,6 +91,7 @@ services:
   user:
     image: chortech/user:latest
     container_name: user-service
+    restart: always
     expose:
       - 3000
     depends_on:
@@ -106,6 +108,7 @@ services:
   group:
     image: chortech/group:latest
     container_name: group-service
+    restart: always
     expose:
       - 3000
     depends_on:
@@ -119,6 +122,7 @@ services:
   expense:
     image: chortech/expense:latest
     container_name: expense-service
+    restart: always
     environment:
       HOST: http://5.253.25.167/
       NEO4J_URL: bolt://expense-db:7687
@@ -133,6 +137,7 @@ services:
   api-docs:
     image: chortech/api-docs
     container_name: api-docs
+    restart: always
     expose:
       - 3000
   nginx:
