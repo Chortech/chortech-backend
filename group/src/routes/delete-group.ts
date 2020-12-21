@@ -14,7 +14,7 @@ router.delete('/', requireAuth, async (req, res) => {
   if (!group)
       throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
     
-  if (group.creator.toHexString() != req.user.id)
+  if (group.creator != mongoose.Types.ObjectId(req.user.id))
       throw new BadRequestError('You are not the owner of this group!');
     
   for(let member of group.expenseChecks)

@@ -40,6 +40,10 @@ router.put('/', requireAuth, validate(addMembersToGroupSchema), async (req, res)
       throw new ResourceConflictError(`User ${memberId} is already in this group!`);
 
     group.members?.push(member);
+    group.expenseChecks.push({
+      id: member,
+      expenseCheck: false
+    });
   }
 
   await group.save();
