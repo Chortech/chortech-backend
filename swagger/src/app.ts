@@ -16,7 +16,17 @@ const doc = YAML.parse(fs.readFileSync(docpath, "utf8"));
 const port = process.env.PORT || 3000;
 // setting up express
 const app = express();
-app.use(helmet());
+app.use(helmet.contentSecurityPolicy());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+// app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
 // adding route handlers to express
 app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(doc));
