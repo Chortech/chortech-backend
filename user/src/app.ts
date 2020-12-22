@@ -4,6 +4,7 @@ import express from "express";
 // we dont need to write next(err) each we want to send an error
 // to our error handling middleware.
 import "express-async-errors";
+import helmet from "helmet";
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as addFriendRouter } from "./routes/add-friend";
 import { router as removeFriendRouter } from "./routes/remove-friend";
@@ -22,6 +23,7 @@ import { removeOtherCreditCardRouter } from "./routes/remove-other-credit-card";
 // setting up express
 const app = express();
 app.use(express.json());
+app.use(helmet());
 app.param("id", validateId);
 
 // adding route handlers to express

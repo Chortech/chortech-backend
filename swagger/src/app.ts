@@ -9,12 +9,14 @@ import swaggerUI from "swagger-ui-express";
 import fs from "fs";
 import path from "path";
 import YAML from "yamljs";
+import helmet from "helmet";
 
 const docpath = path.join(__dirname, "..", "docs", "main.yml");
 const doc = YAML.parse(fs.readFileSync(docpath, "utf8"));
 const port = process.env.PORT || 3000;
 // setting up express
 const app = express();
+app.use(helmet());
 
 // adding route handlers to express
 app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(doc));

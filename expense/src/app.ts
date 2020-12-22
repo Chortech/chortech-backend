@@ -4,12 +4,14 @@ import express from "express";
 // we dont need to write next(err) each we want to send an error
 // to our error handling middleware.
 import "express-async-errors";
+import helmet from "helmet";
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as createExpenseRouter } from "./routes/create-expense";
 
 // setting up express
 const app = express();
 app.use(express.json());
+app.use(helmet());
 
 // adding route handlers to express
 app.use("/api/expense", createExpenseRouter);

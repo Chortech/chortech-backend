@@ -5,6 +5,7 @@ import express from "express";
 // to our error handling middleware.
 import "express-async-errors";
 import dotenv from "dotenv";
+import helmet from "helmet";
 dotenv.config();
 import { router as signupRouter } from "./routes/signup";
 import { router as signupInviteRouter } from "./routes/signup-invite";
@@ -21,6 +22,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "pug");
+app.use(helmet());
 
 // adding route handlers to express
 app.use("/api/auth/signup", signupRouter);
