@@ -103,7 +103,7 @@ it("should not reset password when the code is canceled for email", async () => 
     .expect(201);
 
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ email: "example@domain.com" })
     .expect(202);
 
@@ -119,7 +119,7 @@ it("should not reset password when the code is canceled for phone", async () => 
     .send({ phone: "09333333333" })
     .expect(201);
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ phone: "09333333333" })
     .expect(202);
   await request(app)
