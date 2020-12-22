@@ -946,6 +946,13 @@ paths:
       summary: Upload an image
       description: >-
         Upload an image
+      parameters:
+        - in: header
+          name: X-Content-Type
+          schema:
+            type: string
+            example: "image/jpeg"
+          required: true
       responses:
         "200":
           description: OK
