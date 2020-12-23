@@ -4,6 +4,7 @@ import express from 'express';
 // we dont need to write next(err) each we want to send an error
 // to our error handling middleware.
 import 'express-async-errors';
+import helmet from 'helmet';
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { validateId } from './utils/idValidator';
 import { createGroupRouter } from './routes/create-group';
@@ -15,6 +16,7 @@ import { leaveGroupRouter } from './routes/leave-group';
 // setting up express
 const app = express();
 app.use(express.json());
+app.use(helmet());
 app.param('id', validateId);
 
 // adding route handlers to express
