@@ -11,6 +11,4 @@ COPY . .
 
 RUN tsc
 
-RUN mv src/keys build/keys
-
 CMD [ "npm", "run","start:prod" ]
