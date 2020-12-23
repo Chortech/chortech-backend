@@ -11,6 +11,7 @@ enum Relations {
   Owner = "OWNER",
   Participate = "PARTICIPATE",
   Owe = "OWE",
+  Wrote = "WROTE",
 }
 
 interface User {
@@ -49,9 +50,9 @@ export enum PRole {
 }
 
 interface Comment {
-  writer: string;
-  created_at: number;
-  text: string;
+  id: string;
+  created_at: number; // when the comment was written
+  text: string; // text of the comment
 }
 
 class Graph {
@@ -89,6 +90,67 @@ class Graph {
         id,
         name,
       });
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   *
+   * @param eid expense id
+   * @param uid writer id
+   * @param comment the actual comment
+   */
+
+  async addComment(eid: string, uid: string, comment: Comment) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        `MATCH (u:User {id: $uid})-[:PARTICIPATE]->(e:Expense {id: $eid})
+        CREATE (u)-[r:WROTE]->(e)
+        SET r = $comment
+        RETURN e,u`,
+        {
+          uid,
+          eid,
+          comment,
+        }
+      );
+      return res.records.length;
+      await session.close();
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
+  // TODO handle the case that user does not belong in this expense
+  async getComments(eid: string) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        `MATCH (e:${Nodes.Expense} {id: $eid})<-[comments:${Relations.Wrote}]-(u:${Nodes.User})
+        RETURN u ,comments`,
+        {
+          eid,
+        }
+      );
+      const comments: any[] = [];
+      for (const rec of res.records) {
+        let u = rec.get("u").properties;
+        let c = rec.get("comments").properties;
+        c.writer = { id: u.id, name: u.name };
+        comments.push(c);
+      }
+      await session.close();
+      return comments;
     } catch (err) {
       console.log(err);
       await session.close();
@@ -151,8 +213,9 @@ class Graph {
       }
 
       return {
-        expenses: res.records[0].get("e").properties,
+        ...res.records[0].get("e").properties,
         participants,
+        comments: await this.getComments(expense),
       };
     } catch (err) {
       console.log(err);
@@ -175,6 +238,7 @@ class Graph {
           gname: group.name,
         }
       );
+      await session.close();
     } catch (err) {
       console.log(err);
       await session.close();
@@ -192,6 +256,7 @@ class Graph {
           user: user.id,
         }
       );
+      await session.close();
     } catch (err) {
       console.log(err);
       await session.close();
