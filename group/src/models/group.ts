@@ -14,9 +14,9 @@ interface IExpensCheck {
 
 interface IGroup {
   name: string;
-  creator: mongoose.Types.ObjectId;
-  members?: mongoose.Types.ObjectId[];
-  expenseChecks: Map<mongoose.Types.ObjectId, boolean>;
+  creator: string;
+  members?: string[];
+  expenseChecks: Map<string, boolean>;
 }
 
 type GroupDoc = IGroup & Document;
@@ -29,7 +29,7 @@ const groupSchema = new Schema({
   name: { type: String, required: true },
   creator: { type: String, ref: 'User', required: true },
   members: [{ type: String }],
-  expenseChecks: [{ type: Map }]
+  expenseChecks: Map
 });
 
 groupSchema.statics.build = (group: IGroup) => new Group(group);
