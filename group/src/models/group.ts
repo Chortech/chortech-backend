@@ -21,13 +21,25 @@ interface GroupModel extends mongoose.Model<GroupDoc> {
   build(group: IGroup): GroupDoc;
 }
 
-const groupSchema = new Schema({
+const groupSchema = new Schema(
+  {
   name: { type: String, required: true },
   picture: String,
   creator: { type: String, ref: 'User', required: true },
   members: [{ type: String }],
   expenseChecks: Map
-});
+  },
+  {
+    toJSON: {
+      transform: function (doc, ret, options) {
+        const id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        ret.id = id;
+      }
+    }
+  }
+);
 
 groupSchema.statics.build = (group: IGroup) => new Group(group);
 
