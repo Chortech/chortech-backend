@@ -11,6 +11,7 @@ enum Relations {
   Owner = "OWNER",
   Participate = "PARTICIPATE",
   Owe = "OWE",
+  Wrote = "WROTE",
 }
 
 interface User {
@@ -25,6 +26,7 @@ interface Group {
 
 interface Expense {
   id: string;
+  creator: string;
   description: string;
   participants: Participant[];
   total: number;
@@ -36,7 +38,7 @@ interface Expense {
   modified_at: number;
 }
 
-interface Participant {
+export interface Participant {
   id: string;
   amount: number;
   role: PRole;
@@ -48,9 +50,9 @@ export enum PRole {
 }
 
 interface Comment {
-  writer: string;
-  created_at: number;
-  text: string;
+  id: string;
+  created_at: number; // when the comment was written
+  text: string; // text of the comment
 }
 
 class Graph {
@@ -95,6 +97,134 @@ class Graph {
       await session.close();
     }
   }
+
+  /**
+   *
+   * @param eid expense id
+   * @param uid writer id
+   * @param comment the actual comment
+   */
+
+  async addComment(eid: string, uid: string, comment: Comment) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        `MATCH (u:User {id: $uid})-[:PARTICIPATE]->(e:Expense {id: $eid})
+        CREATE (u)-[r:WROTE]->(e)
+        SET r = $comment
+        RETURN e,u`,
+        {
+          uid,
+          eid,
+          comment,
+        }
+      );
+      return res.records.length;
+      await session.close();
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
+  // TODO handle the case that user does not belong in this expense
+  async getComments(eid: string) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        `MATCH (e:${Nodes.Expense} {id: $eid})<-[comments:${Relations.Wrote}]-(u:${Nodes.User})
+        RETURN u ,comments`,
+        {
+          eid,
+        }
+      );
+      const comments: any[] = [];
+      for (const rec of res.records) {
+        let u = rec.get("u").properties;
+        let c = rec.get("comments").properties;
+        c.writer = { id: u.id, name: u.name };
+        comments.push(c);
+      }
+      await session.close();
+      return comments;
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
+  async getExpenses(user: string) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        "MATCH (:User {id: $uid})-[r:PARTICIPATE]->(e:Expense) RETURN e,r",
+        {
+          uid: user,
+        }
+      );
+
+      await session.close();
+
+      return res.records.map((rec) => {
+        let expense = rec.get("e").properties;
+        let relation = rec.get("r").properties;
+        expense.you = {
+          role: relation.role,
+          amount: relation.amount,
+        };
+        return expense;
+      });
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+  async getExpense(expense: string) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        "MATCH (u:User)-[r:PARTICIPATE]->(e:Expense {id: $eid}) RETURN *",
+        {
+          eid: expense,
+        }
+      );
+
+      await session.close();
+
+      const participants: any[] = [];
+
+      for (const rec of res.records) {
+        const p = rec.get("u");
+        const r = rec.get("r");
+
+        p.properties.role = r.properties.role;
+        p.properties.amount = r.properties.amount;
+        participants.push(p.properties);
+      }
+
+      return {
+        ...res.records[0].get("e").properties,
+        participants,
+        comments: await this.getComments(expense),
+      };
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
   async createGroup(group: Group, owner: User) {
     const session = this.driver.session();
     try {
@@ -108,6 +238,7 @@ class Graph {
           gname: group.name,
         }
       );
+      await session.close();
     } catch (err) {
       console.log(err);
       await session.close();
@@ -125,6 +256,7 @@ class Graph {
           user: user.id,
         }
       );
+      await session.close();
     } catch (err) {
       console.log(err);
       await session.close();
@@ -132,6 +264,29 @@ class Graph {
       await session.close();
     }
   }
+
+  async countParticipants(p: Participant[]) {
+    const session = this.driver.session();
+    try {
+      const res = await session.run(
+        `UNWIND $participants as p
+        MATCH (u:User {id: p.id})
+        RETURN COUNT(u) as count`,
+        {
+          participants: p,
+        }
+      );
+      await session.close();
+      let count = res.records[0].get("count") as Integer;
+      return count.toNumber();
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
   async addExpense(e: Expense) {
     // Check if the expense,paid and received amount are equal
     this.checkPriceFlow(e.participants, e.total);
@@ -242,6 +397,7 @@ class Graph {
   }
   private async createExpense(e: Expense, session: Session) {
     // Create the expense and attach the participants to it
+
     await session.run(
       `MERGE (e:${Nodes.Expense} {id: $eid}) ON CREATE SET e= $expense WITH e as expense
     UNWIND $participants as p
@@ -249,6 +405,8 @@ class Graph {
     MERGE (u)-[:PARTICIPATE {role: p.role, amount: p.amount}]->(expense);`,
       {
         expense: {
+          id: e.id,
+          creator: e.creator,
           price: e.total,
           comments: e.comments,
           group: e.group,
@@ -300,7 +458,7 @@ class Graph {
     );
     if (result.records[0]) {
       const isStart = result.records[0].get("isStart");
-      console.log(isStart);
+      // console.log(isStart);
       if (isStart === true) {
         // Just add to the existing relation
         await session.run(

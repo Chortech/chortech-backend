@@ -7,11 +7,6 @@ import mongoose, { Schema, Document } from 'mongoose';
  */
 
 
-interface IExpensCheck {
-  id: mongoose.Types.ObjectId;
-  expenseCheck: boolean;
-}
-
 interface IGroup {
   name: string;
   creator: string;
@@ -34,7 +29,7 @@ const groupSchema = new Schema({
 
 groupSchema.statics.build = (group: IGroup) => new Group(group);
 
-const Group = mongoose.model<GroupDoc, GroupModel>('Group', groupSchema);
+const Group = mongoose.model<GroupDoc, GroupModel>("Group", groupSchema);
 
 export { Group, IExpensCheck };
 

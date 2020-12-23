@@ -57,7 +57,7 @@ it("should not verify a code after cancellation", async () => {
     .expect(201);
 
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ email: "sssbbb@gmail.com" })
     .expect(202);
 
@@ -101,7 +101,7 @@ it("should not verify when the code is wrong", async () => {
 
 it("should not cancel a code that doesnt exist", async () => {
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ email: "sssbbb@gmail.com" })
     .expect(404);
 });
@@ -113,12 +113,12 @@ it("should not cancel a code twice", async () => {
     .expect(201);
 
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ email: "sssbbb@gmail.com" })
     .expect(202);
 
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ email: "sssbbb@gmail.com" })
     .expect(404);
 });
@@ -152,7 +152,7 @@ it("should not cancel a verified code", async () => {
     .expect(200);
 
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ email: "sssbbb@gmail.com" })
     .expect(409);
 });

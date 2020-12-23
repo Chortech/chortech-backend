@@ -1,7 +1,12 @@
 import { Router } from "express";
 import Joi from "joi";
 import { BadRequestError, NotFoundError, validate } from "@chortec/common";
-import { generateCode, verifyCode, cancelCode } from "../utils/verification";
+import {
+  generateCode,
+  verifyCode,
+  cancelCode,
+  generateCodeStage,
+} from "../utils/verification";
 import { sendMail } from "../utils/mailer";
 import pug from "pug";
 import path from "path";
@@ -24,26 +29,39 @@ const generateShema = Joi.object({
 router.post("/generate", validate(generateShema), async (req, res) => {
   const { phone, email } = req.body;
   let code;
+
+  // for testing putposes define STAGE variable so
+  // that a pre-defined code would be generated for
+  // each phone or email so that testers don't need
+  // to provide real email or phones. Keep in mind
+  // that the variable only need to be defined and
+  // the value doesn't matter at all.
+
   if (phone) {
-    code = await generateCode(phone);
+    code = process.env.STAGE
+      ? await generateCodeStage(phone)
+      : await generateCode(phone);
     const message = `کد تایید چرتک:‌ ${code}`;
-    smsSender.sendSMS(message, phone).catch(console.log);
+    if (!process.env.STAGE)
+      smsSender.sendSMS(message, phone).catch(console.log);
   } else {
-    code = await generateCode(email);
+    code = code = process.env.STAGE
+      ? await generateCodeStage(email)
+      : await generateCode(email);
     const html = pug.renderFile(
       path.join(__dirname, "..", "..", "views", "verify-template.pug"),
       {
         code: code,
       }
     );
-
-    sendMail({
-      subject: "Chortec Verification Code",
-      to: email,
-      html: html,
-    })
-      .then(() => "mail sent")
-      .catch((ex) => console.log(ex));
+    if (!process.env.STAGE)
+      sendMail({
+        subject: "Chortec Verification Code",
+        to: email,
+        html: html,
+      })
+        .then(() => "mail sent")
+        .catch((ex) => console.log(ex));
   }
 
   res.status(201).json({
@@ -81,7 +99,7 @@ router.post("/verify", validate(verifyShema), async (req, res) => {
   }
 });
 
-router.delete("/cancel", validate(generateShema), async (req, res) => {
+router.put("/cancel", validate(generateShema), async (req, res) => {
   const { phone, email } = req.body;
   if (phone) {
     if (!(await cancelCode(phone))) throw new NotFoundError("Code not found!");

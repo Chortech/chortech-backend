@@ -310,7 +310,7 @@ it("should not signup a canceled verification email", async () => {
     .expect(201);
 
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ email: "example@domain.com" })
     .expect(202);
 
@@ -331,7 +331,7 @@ it("should not signup a canceled verification phone", async () => {
     .expect(201);
 
   await request(app)
-    .delete("/api/auth/verification/cancel")
+    .put("/api/auth/verification/cancel")
     .send({ phone: "09333333333" })
     .expect(202);
 

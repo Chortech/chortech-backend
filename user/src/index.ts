@@ -6,9 +6,18 @@ import { UserCreatedListener } from "./listeners/user-created-listener";
 import { InviteeCreatedListener } from "./listeners/invitee-created-listener";
 import { fileManager } from "./utils/file-manager";
 import fs from "fs";
+import path from "path";
 
 async function start() {
-  const secrets = JSON.parse(fs.readFileSync(process.env.SECRETS!, "utf-8"));
+  // make sure you have a folder named secrets in rootdir of the
+  // project and inside that folder there should be a file called
+  // user-service-secrets.ts with the secrets required for this service.
+
+  const secpath =
+    process.env.SECRETS ||
+    path.join(__dirname, "..", "..", "secrets", "user-service-secrets.json");
+
+  const secrets = JSON.parse(fs.readFileSync(secpath, "utf-8"));
   process.env.STORAGE_REGION = secrets.STORAGE_REGION;
   process.env.STORAGE_ENDPOINT = secrets.STORAGE_ENDPOINT;
   process.env.STORAGE_ACCESSKEYID = secrets.STORAGE_ACCESSKEYID;
@@ -66,7 +75,9 @@ async function start() {
     console.error(err);
   }
 
-  app.listen(port, () => console.log(`Server is listening on port ${port}`));
+  app.listen(port, () =>
+    console.log(`\x1b[32mServer is listening on port ${port}\x1b[0m`)
+  );
 }
 
 start();
