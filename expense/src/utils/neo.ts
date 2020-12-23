@@ -25,6 +25,7 @@ interface Group {
 
 interface Expense {
   id: string;
+  creator: string;
   description: string;
   participants: Participant[];
   total: number;
@@ -101,14 +102,23 @@ class Graph {
 
     try {
       const res = await session.run(
-        "MATCH (:User {id: $uid})-[:PARTICIPATE]->(e:Expense) RETURN e",
+        "MATCH (:User {id: $uid})-[r:PARTICIPATE]->(e:Expense) RETURN e,r",
         {
           uid: user,
         }
       );
 
       await session.close();
-      return res.records.map((e) => e.get("e").properties);
+
+      return res.records.map((rec) => {
+        let expense = rec.get("e").properties;
+        let relation = rec.get("r").properties;
+        expense.you = {
+          role: relation.role,
+          amount: relation.amount,
+        };
+        return expense;
+      });
     } catch (err) {
       console.log(err);
       await session.close();
@@ -331,6 +341,7 @@ class Graph {
       {
         expense: {
           id: e.id,
+          creator: e.creator,
           price: e.total,
           comments: e.comments,
           group: e.group,

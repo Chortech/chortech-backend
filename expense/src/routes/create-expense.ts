@@ -48,7 +48,7 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
 
   const expenseid = uuid();
 
-  await graph.addExpense({ ...req.body, id: expenseid });
+  await graph.addExpense({ ...req.body, id: expenseid, creator: req.user?.id });
 
   res.status(201).json({ ...req.body, id: expenseid });
 });

@@ -58,6 +58,8 @@ services:
   expense-db:
     image: neo4j
     container_name: expense-db-neo4j
+    volumes:
+      - ./expense/plugins:/plugins
     environment:
       NEO4J_AUTH: none
     expose:

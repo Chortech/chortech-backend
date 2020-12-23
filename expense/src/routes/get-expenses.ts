@@ -9,7 +9,7 @@ router.get("/", requireAuth, async (req, res) => {
   const userid = req.user?.id;
   const expenses = await graph.getExpenses(userid!);
 
-  res.json(expenses);
+  res.json({ ...expenses });
 });
 
 export { router };
