@@ -8,13 +8,14 @@ import Group from '../models/group';
 const router = Router();
 
 const createGroupSchema = Joi.object({
-    name: Joi.string()
+    name: Joi.string(),
+    picture: Joi.string().allow(null)
 }).label('body');
 
 router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
   if (!req.user) throw new BadRequestError('Invalid state!');
 
-  const { name } = req.body;
+  const { name, picture } = req.body;
 
   const creator = req.user.id;
 
@@ -31,7 +32,8 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
     name,
     creator,
     members,
-    expenseChecks
+    expenseChecks,
+    picture
   });
 
   const { _id } = await group.save();
@@ -41,7 +43,8 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
     name,
     creator,
     members,
-    expenseChecks
+    expenseChecks,
+    picture
   });
 });
 
