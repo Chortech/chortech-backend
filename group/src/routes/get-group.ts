@@ -1,6 +1,5 @@
 import Router from 'express';
-import { BadRequestError, NotFoundError, requireAuth, UnauthorizedError } from '@chortec/common';
-import User from '../models/user';
+import { BadRequestError, NotFoundError, requireAuth } from '@chortec/common';
 import Group from '../models/group';
 
 
@@ -14,14 +13,7 @@ router.get('/', requireAuth, async (req, res) => {
     if (!group)
         throw new NotFoundError(`No group exists with id ${req.group?.id}`);
 
-    const id = req.user;
-
-    const user = await User.findById(id);
-
-    if (!user)
-        throw new BadRequestError('Invalid State!');
-
-    if (!group.members?.includes(user))
+    if (!group.members?.includes(req.user.id))
         throw new BadRequestError('You are not a member of this group!');
     
     res.status(200).json({ group });
