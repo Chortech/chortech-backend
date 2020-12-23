@@ -1,6 +1,6 @@
 import Router from 'express';
 import { BadRequestError, UnauthorizedError, requireAuth, NotFoundError } from '@chortec/common';
-import Group, { IExpensCheck } from '../models/group';
+import Group from '../models/group';
 
 
 const router = Router();
