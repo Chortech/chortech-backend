@@ -9,6 +9,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 interface IGroup {
   name: string;
+  picture?: string;
   creator: string;
   members?: string[];
   expenseChecks: Map<string, boolean>;
@@ -22,6 +23,7 @@ interface GroupModel extends mongoose.Model<GroupDoc> {
 
 const groupSchema = new Schema({
   name: { type: String, required: true },
+  picture: String,
   creator: { type: String, ref: 'User', required: true },
   members: [{ type: String }],
   expenseChecks: Map
