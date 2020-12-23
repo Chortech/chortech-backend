@@ -9,6 +9,8 @@ import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as createExpenseRouter } from "./routes/create-expense";
 import { router as getExpensesRouter } from "./routes/get-expenses";
 import { router as getExpenseRouter } from "./routes/get-expense";
+import { router as addCommentRouter } from "./routes/add-comment";
+import { router as getCommentsRouter } from "./routes/get-comments";
 
 // setting up express
 const app = express();
@@ -19,6 +21,9 @@ app.use(helmet());
 app.use("/api/expense", createExpenseRouter);
 app.use("/api/expense", getExpensesRouter);
 app.use("/api/expense/:id", getExpenseRouter);
+app.use("/api/expense/:id", getExpenseRouter);
+app.use("/api/expense/:id/comments", addCommentRouter);
+app.use("/api/expense/:id/comments", getCommentsRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
