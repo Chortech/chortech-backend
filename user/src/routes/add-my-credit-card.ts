@@ -38,7 +38,6 @@ router.post('/', requireAuth, validate(addMyCreditCardSchema), async(req, res) =
         id = await CreditCard.findOne({ number: number, name: name });
     }
     
-
     const raw = await User.updateOne(
         {
             _id: req.user?.id,
