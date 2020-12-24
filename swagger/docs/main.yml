@@ -304,6 +304,24 @@ paths:
                     type: string
               example:
                 message: "Password was changed successfully"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
   /api/auth/change-email:
     put:
       security:
@@ -363,6 +381,15 @@ paths:
               example:
                 errors:
                   - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "409":
           description: CONFLICT
           content:
@@ -431,6 +458,15 @@ paths:
               example:
                 errors:
                   - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "409":
           description: CONFLICT
           content:
@@ -639,6 +675,24 @@ paths:
                     - phone: "09123456789"
                       name: "nameee"
                       picture: "url.domain/pic"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "404":
           description: NOT FOUND
           content:
@@ -729,6 +783,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "409":
           description: CONFLICT
           content:
@@ -805,6 +877,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "404":
           description: NOT FOUND
           content:
@@ -892,6 +982,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "409":
           description: CONFLICT
           content:
@@ -937,6 +1045,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
   /api/user/image/upload:
     get:
       security:
@@ -987,6 +1113,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
   /api/user/profile/edit:
     put:
       security:
@@ -1040,6 +1184,25 @@ paths:
                 unknown:
                   value:
                     errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
   # /api/user/credit-card/create:
   #   post:
   #     security:
@@ -1205,6 +1368,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
   /api/groups/{id}:
     get:
       security:
@@ -1278,6 +1459,24 @@ paths:
               example:
                 errors:
                   - message: "No group exists with id gid"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
     put:
       security:
         - bearerAuth: []
@@ -1361,6 +1560,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "409":
           description: CONFLICT
           content:
@@ -1421,6 +1638,24 @@ paths:
                   value:
                     errors:
                       - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
         "404":
           description: NOT FOUND
           content:
@@ -1430,6 +1665,457 @@ paths:
               example:
                 errors:
                   - message: "No group exists with id gid"
+  /api/expenses:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "expense"
+      summary: Get expenses
+      description: >-
+        Get all your expenses
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    paid_at:
+                      type: string
+                      example: 1608673567
+                    description:
+                      type: string
+                      example: "this is an expense"
+                    creator:
+                      type: string
+                      example: "5fe4ecf9b4a623001922c24a"
+                    id:
+                      type: string
+                      example: "71cd9784-2ada-4008-bd14-4a3e2f827781"
+                    price:
+                      type: number
+                      example: 60
+                    you:
+                      type: object
+                      properties:
+                        role:
+                          type: string
+                          enum: [debtor, creditor]
+                        amount:
+                          type: string
+                          example: 60
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "expense"
+      summary: Create expenese
+      description: >-
+        Create an expense. Keep in mind that total, sum of debtor amounts and sum of creditor amount must be equal
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - description
+                - total
+                - paid_at
+                - participants
+              properties:
+                description:
+                  type: string
+                total:
+                  type: number
+                paid_at:
+                  type: number
+                group:
+                  type: string
+                notes:
+                  type: string
+                participants:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - id
+                      - role
+                      - amount
+                    properties:
+                      id:
+                        type: string
+                      role:
+                        type: string
+                        enum: [creditor, debtor]
+                      amount:
+                        type: number
+
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  description:
+                    type: string
+                  total:
+                    type: number
+                  paid_at:
+                    type: number
+                  group:
+                    type: string
+                  notes:
+                    type: string
+                  participants:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - role
+                        - amount
+                      properties:
+                        id:
+                          type: string
+                        role:
+                          type: string
+                          enum: [creditor, debtor]
+                        amount:
+                          type: number
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                not-a-user:
+                  value:
+                    errors:
+                      - message: "One of the participants doesn't exits!"
+                validation:
+                  value:
+                    errors:
+                      - message: "description in required"
+                        fields: ["description"]
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+
+  /api/expenses/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "expense"
+      summary: Get expenese
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Create a group
+        paid_at: 1608673567
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paid_at:
+                    type: number
+                    example: 1608843422
+                  description:
+                    type: string
+                  creator:
+                    type: string
+                  id:
+                    type: string
+                    format: uuid
+                  price:
+                    type: number
+                  participants:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        id:
+                          type: string
+                        role:
+                          type: string
+                          enum: [debtor, creditor]
+                        amount:
+                          type: number
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                        created_at:
+                          type: number
+                        id:
+                          type: string
+                          format: uuid
+                        writer:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Didn't found expense with given id!"
+    # delete:
+    #   security:
+    #     - bearerAuth: []
+    #   tags:
+    #     - "expense"
+    #   summary: Delete an expense
+    #   parameters:
+    #     - in: path
+    #       name: id
+    #       schema:
+    #         type: string
+    #       required: true
+    #   description: >-
+    #     Create a group
+    #   responses:
+    #     "401":
+    #       description: UNAUTHORIZED
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/Errors"
+    #           example:
+    #             errors:
+    #               - message: "Invalid authentication credentials provided!"
+    #     "403":
+    #       description: FORBIDDEN
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/Errors"
+    #           example:
+    #             errors:
+    #               - message: "You are not authorized to access this resource!"
+    # put:
+    #   security:
+    #     - bearerAuth: []
+    #   tags:
+    #     - "expense"
+    #   summary: Update expense
+    #   parameters:
+    #     - in: path
+    #       name: id
+    #       schema:
+    #         type: string
+    #       required: true
+    #   description: >-
+    #     Create a group
+    #   requestBody:
+    #   responses:
+    #     "401":
+    #       description: UNAUTHORIZED
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/Errors"
+    #           example:
+    #             errors:
+    #               - message: "Invalid authentication credentials provided!"
+    #     "403":
+    #       description: FORBIDDEN
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/Errors"
+    #           example:
+    #             errors:
+    #               - message: "You are not authorized to access this resource!"
+  /api/expenses/:id/comments:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "expense"
+      summary: Add a comment
+      description: >-
+        Add a comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                created_at:
+                  type: number
+                  example: 1608843422
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Comment added."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "text must be less than 255 characters"
+                        fields: ["text"]
+                no-part:
+                  value:
+                    errors:
+                      - message: "user doesn't participate in expense"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Expenese doesn't exists!"
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "expense"
+      summary: Get all comments
+      description: >-
+        Get all comments
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    text:
+                      type: string
+                    created_at:
+                      type: number
+                    id:
+                      type: string
+                      format: uuid
+                    writer:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Expenese doesn't exists!"
 components:
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme

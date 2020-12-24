@@ -18,12 +18,11 @@ app.use(express.json());
 app.use(helmet());
 
 // adding route handlers to express
-app.use("/api/expense", createExpenseRouter);
-app.use("/api/expense", getExpensesRouter);
-app.use("/api/expense/:id", getExpenseRouter);
-app.use("/api/expense/:id", getExpenseRouter);
-app.use("/api/expense/:id/comments", addCommentRouter);
-app.use("/api/expense/:id/comments", getCommentsRouter);
+app.use("/api/expenses", createExpenseRouter);
+app.use("/api/expenses", getExpensesRouter);
+app.use("/api/expenses/:id", getExpenseRouter);
+app.use("/api/expenses/:id/comments", addCommentRouter);
+app.use("/api/expenses/:id/comments", getCommentsRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
