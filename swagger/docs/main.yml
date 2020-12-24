@@ -1844,6 +1844,7 @@ paths:
           name: id
           schema:
             type: string
+            format: uuid
           required: true
       description: >-
         Create a group
@@ -1997,13 +1998,20 @@ paths:
     #           example:
     #             errors:
     #               - message: "You are not authorized to access this resource!"
-  /api/expenses/:id/comments:
+  /api/expenses/{id}/comments:
     post:
       security:
         - bearerAuth: []
       tags:
         - "expense"
       summary: Add a comment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
       description: >-
         Add a comment
       requestBody:
@@ -2063,6 +2071,13 @@ paths:
       tags:
         - "expense"
       summary: Get all comments
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
       description: >-
         Get all comments
       responses:
