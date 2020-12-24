@@ -51,7 +51,15 @@ router.post('/', requireAuth, validate(addOtherCreditCardSchema), async(req, res
     
     const user = await User.findById(req.user.id).populate('myCreditCards').populate('otherCreditCards').populate('friends');
 
-    res.status(200).json({ user });
+    res.status(200).send({
+        id: user?._id,
+        name: user?.name,
+        phone: user?.phone,
+        email: user?.email,
+        myCreditCards: user?.myCreditCards,
+        otherCreditCards: user?.otherCreditCards,
+        friends: user?.friends
+    });
 });
 
 export { router as addOtherCreditCardRouter };
