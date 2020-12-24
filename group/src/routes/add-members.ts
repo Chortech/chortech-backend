@@ -26,7 +26,7 @@ router.put('/', requireAuth, validate(addMembersToGroupSchema), async (req, res)
     throw new BadRequestError('You are not a member of this group!');
   
   for (let memberId of members) {
-    if (!(User.exists(memberId)))
+    if (!(await User.exists({ _id: memberId })))
       throw new BadRequestError(`There is no user with id ${memberId}`);
 
     if (group.members?.includes(memberId))
