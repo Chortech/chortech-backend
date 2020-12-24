@@ -1,6 +1,6 @@
 import neo4j, { Driver, Integer, Session } from "neo4j-driver";
 
-enum Nodes {
+export enum Nodes {
   Group = "Gruop",
   User = "User",
   Expense = "Expense",
@@ -120,8 +120,8 @@ class Graph {
           comment,
         }
       );
-      return res.records.length;
       await session.close();
+      return res.records.length;
     } catch (err) {
       console.log(err);
       await session.close();
@@ -146,11 +146,35 @@ class Graph {
       for (const rec of res.records) {
         let u = rec.get("u").properties;
         let c = rec.get("comments").properties;
+
         c.writer = { id: u.id, name: u.name };
         comments.push(c);
       }
       await session.close();
       return comments;
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
+  async exists(node: Nodes, id: string) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        `MATCH (n:${node} {id: $id})
+        RETURN count(n) as count`,
+        {
+          id,
+        }
+      );
+
+      await session.close();
+
+      return (res.records[0].get("count") as Integer).toNumber() > 0;
     } catch (err) {
       console.log(err);
       await session.close();
@@ -172,15 +196,19 @@ class Graph {
 
       await session.close();
 
-      return res.records.map((rec) => {
+      const expenses: any[] = [];
+      for (const rec of res.records) {
         let expense = rec.get("e").properties;
         let relation = rec.get("r").properties;
+
         expense.you = {
           role: relation.role,
           amount: relation.amount,
         };
-        return expense;
-      });
+        expenses.push(expense);
+      }
+
+      return expenses;
     } catch (err) {
       console.log(err);
       await session.close();
