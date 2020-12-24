@@ -14,7 +14,6 @@ import { router as imageUploadRouter } from "./routes/image-upload";
 import { getProfileRouter } from "./routes/get-profile";
 import { validateId } from "./utils/idValidator";
 import { editProfileRouter } from "./routes/edit-profile";
-import { createCreditCardRouter } from "./routes/create-credit-card";
 import { addMyCreditCardRouter } from "./routes/add-my-credit-card";
 import { removeMyCreditCardRouter } from "./routes/remove-my-credit-card";
 import { addOtherCreditCardRouter } from "./routes/add-other-credit-card";
@@ -34,11 +33,10 @@ app.use("/api/user/friends/:id", removeFriendRouter);
 app.use("/api/user/profile", getProfileRouter);
 app.use("/api/user/image/upload", imageUploadRouter);
 app.use("/api/user/profile/edit", editProfileRouter);
-app.use("/api/user/credit-card/create", createCreditCardRouter);
-app.use("/api/user/credit-card/my/add", addMyCreditCardRouter);
-app.use("/api/user/credit-card/my/remove", removeMyCreditCardRouter);
-app.use("/api/user/credit-card/other/add", addOtherCreditCardRouter);
-app.use("/api/user/credit-card/other/remove", removeOtherCreditCardRouter);
+app.use("/api/user/credit-card/my", addMyCreditCardRouter);
+app.use("/api/user/credit-card/my", removeMyCreditCardRouter);
+app.use("/api/user/credit-card/other", addOtherCreditCardRouter);
+app.use("/api/user/credit-card/other", removeOtherCreditCardRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

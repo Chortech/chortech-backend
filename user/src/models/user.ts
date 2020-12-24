@@ -25,8 +25,8 @@ const userSchema = new Schema(
     name: String,
     friends: [{ type: Schema.Types.ObjectId }],
     picture: String,
-    myCreditCards: [{ type: String, ref: "CreditCard" }],
-    otherCreditCards: [{ type: String, ref: "CreditCard" }],
+    myCreditCards: [{ type: Schema.Types.ObjectId, ref: "CreditCard" }],
+    otherCreditCards: [{ type: Schema.Types.ObjectId, ref: "CreditCard" }],
   },
   {
     toJSON: {
