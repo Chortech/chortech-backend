@@ -11,7 +11,7 @@ import { createGroupRouter } from './routes/create-group';
 import { getGroupRouter } from './routes/get-group';
 import { deleteGroupRouter } from './routes/delete-group';
 import { addMembersToGroupRouter } from './routes/add-members';
-// import { leaveGroupRouter } from './routes/leave-group';
+import { leaveGroupRouter } from './routes/leave-group';
 // import { removeMemberRouter } from './routes/remove-member';
 // import { editGroupInfoRouter } from './routes/edit-group-info';
 
@@ -26,7 +26,7 @@ app.use('/api/group/', createGroupRouter);
 app.use('/api/group/:id', getGroupRouter);
 app.use('/api/group/:id', deleteGroupRouter);
 app.use('/api/group/:id', addMembersToGroupRouter);
-// app.use('/api/group/:id/leave', leaveGroupRouter);
+app.use('/api/group/:id/leave', leaveGroupRouter);
 // app.use('/api/group/:id/remove', removeMemberRouter);
 // app.use('/api/group/:id', editGroupInfoRouter);
 
