@@ -1,6 +1,7 @@
 import Router from 'express';
 import { BadRequestError, UnauthorizedError, requireAuth, NotFoundError } from '@chortec/common';
 import Group from '../models/group';
+import mongoose from 'mongoose';
 
 
 const router = Router();
@@ -12,12 +13,12 @@ router.delete('/', requireAuth, async (req, res) => {
     
   if (!group)
       throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
-    
-  if (group.creator != req.user.id)
+
+  if (group.creator.toHexString() != req.user.id)
       throw new BadRequestError('You are not the owner of this group!');
     
   for(let member of group.members!)
-    if (group.expenseChecks.get(member))
+    if (group.expenseChecks.get(member.toHexString()))
       throw new BadRequestError('You cannot delete this group because of existing expenses!');
 
   await Group.deleteOne(group);
