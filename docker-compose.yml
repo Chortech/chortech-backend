@@ -60,6 +60,7 @@ services:
     container_name: expense-db-neo4j
     volumes:
       - ./expense/plugins:/plugins
+      - ./expense/conf:/conf
     environment:
       NEO4J_AUTH: none
     expose:
