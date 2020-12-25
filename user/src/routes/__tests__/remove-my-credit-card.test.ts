@@ -25,7 +25,7 @@ it('should remove a credit card from from my cards', async () => {
 });
 
 
-it('should not remove a credit card from from my other cards without an auth token', async () => {
+it('should not remove a credit card from from my cards without an auth token', async () => {
     const { id, token } = await global.signin(
       users[0].id,
       users[0].email,
@@ -47,7 +47,7 @@ it('should not remove a credit card from from my other cards without an auth tok
 });
 
 
-it('should not remove a credit card from my other cards with an invalid auth token', async () => {
+it('should not remove a credit card from my cards with an invalid auth token', async () => {
   const { id, token } = await global.signin(
     users[0].id,
     users[0].email,
@@ -70,7 +70,7 @@ it('should not remove a credit card from my other cards with an invalid auth tok
 });
 
 
-it('should not remove a credit card from my other cards if the card does not exist', async () => {
+it('should not remove a credit card from my cards if the card does not exist', async () => {
     const { id, token } = await global.signin(
       users[0].id,
       users[0].email,
