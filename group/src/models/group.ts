@@ -10,8 +10,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 interface IGroup {
   name: string;
   picture?: string;
-  creator: string;
-  members?: string[];
+  creator: mongoose.Types.ObjectId;
+  members?: mongoose.Types.ObjectId[];
   expenseChecks: Map<string, boolean>;
 }
 
@@ -23,11 +23,11 @@ interface GroupModel extends mongoose.Model<GroupDoc> {
 
 const groupSchema = new Schema(
   {
-  name: { type: String, required: true },
-  picture: String,
-  creator: { type: String, ref: 'User', required: true },
-  members: [{ type: String }],
-  expenseChecks: Map
+    name: { type: String, required: true },
+    picture: String,
+    creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    expenseChecks: Map,
   },
   {
     toJSON: {
@@ -36,8 +36,9 @@ const groupSchema = new Schema(
         delete ret._id;
         delete ret.__v;
         ret.id = id;
-      }
-    }
+      },
+    },
+    timestamps: true
   }
 );
 
