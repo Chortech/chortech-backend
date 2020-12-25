@@ -15,8 +15,8 @@ import User from '../models/user';
 const router = Router();
 
 const addOtherCreditCardSchema = Joi.object({
-    number: Joi.string(),
-    name: Joi.string()
+    number: Joi.string().length(16).required(),
+    name: Joi.string().required()
 });
 
 router.post('/', requireAuth, validate(addOtherCreditCardSchema), async(req, res) => {

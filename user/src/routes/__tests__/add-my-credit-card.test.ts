@@ -91,6 +91,6 @@ it('should not add a credit card to my cards without a name', async () => {
   await request(app)
     .post('/api/user/credit-card/my')
     .set('Authorization', `Bearer ${token}`)
-    .send({ number: '1234567812' })
+    .send({ number: '1234567812345678' })
     .expect(400)
 });
