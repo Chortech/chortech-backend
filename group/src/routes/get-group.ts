@@ -18,7 +18,6 @@ router.get('/', requireAuth, async (req, res) => {
         members: { $in: [mongoose.Types.ObjectId(req.user.id)] } })))
         throw new BadRequestError('You are not a member of this group!');
 
-    
     const group = await Group.findById(req.group?.id).populate('members').populate('creator');
     
     res.status(200).json({ group });

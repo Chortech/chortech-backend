@@ -25,15 +25,13 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
 
   const members = [creator];
 
-  const expenseChecks: Map<string, boolean> = new Map([
-    [req.user.id, false]
-  ]);
+  const inActiveExpenses:mongoose.Types.ObjectId[] = [];
 
   const group = Group.build({
     name,
     creator,
     members,
-    expenseChecks,
+    inActiveExpenses,
     picture
   });
 
