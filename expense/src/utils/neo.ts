@@ -26,7 +26,7 @@ interface Group {
 }
 
 interface Expense {
-  id?: string;
+  id: string;
   creator: string;
   description: string;
   participants: Participant[];
@@ -467,10 +467,73 @@ class Graph {
         { participants: participants }
       );
 
+      await session.close();
+
       return id;
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async removeExpense(id: string) {
+    const session = this.driver.session();
+    try {
+      const res = await session.run(
+        `MATCH (u:${Nodes.User})-[r:${Relations.Participate} {role:$role}]-(e:${Nodes.Expense} {id: $id})
+        UNWIND apoc.convert.fromJsonList(r.owes) as owes
+        MATCH (u)-[o:${Relations.Owe}]-(u2:${Nodes.User} {id: owes.id})
+        SET o.amount = o.amount - owes.amount
+        WITH o,e
+        CALL apoc.do.case(
+        [
+          o.amount = 0 , "DELETE o",
+          o.amount < 0, "CALL apoc.refactor.invert(o) YIELD output as out SET out.amount = out.amount * -1"
+        ],
+        "RETURN o" , {o:o}
+        ) 
+        YIELD value
+        RETURN value`,
+        {
+          id,
+          role: PRole.Debtor,
+        }
+      );
+
+      if (await this.deleteNode(Nodes.Expense, id)) {
+        await session.close();
+        return true;
+      }
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+
+    return false;
+  }
+
+  async deleteNode(node: Nodes, id: string) {
+    const session = this.driver.session();
+    try {
+      const res = await session.run(
+        `MATCH (n:${node} {id: $id}) 
+         DETACH DELETE n`,
+        {
+          id,
+        }
+      );
+      await session.close();
+
+      return true;
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+
+    return false;
   }
 
   async clear() {
