@@ -4,6 +4,7 @@ import { validate } from '@chortec/common';
 import Joi from 'joi';
 import Group from '../models/group';
 import User from '../models/user';
+import mongoose from 'mongoose';
 
 
 const router = Router();
@@ -17,32 +18,35 @@ router.put('/', requireAuth, validate(addMembersToGroupSchema), async (req, res)
 
   const { members } = req.body;
 
-  const group = await Group.findById(req.group?.id);
+  const exists = await Group.findById(req.group?.id);
+  const user = mongoose.Types.ObjectId(req.user.id);
 
-  if (!group)
+  if (!exists)
     throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
   
-  if (!group.members?.includes(req.user.id))
+  if (await Group.exists({ _id: req.group?.id, members: { $nin: [user]}}))
     throw new BadRequestError('You are not a member of this group!');
   
   for (let memberId of members) {
     if (!(await User.exists({ _id: memberId })))
       throw new BadRequestError(`There is no user with id ${memberId}`);
 
-    if (group.members?.includes(memberId))
-      throw new ResourceConflictError(`User ${memberId} is already in this group!`);
-
-    group.members?.push(memberId);
-    group.expenseChecks.set(memberId, false);
+      const member = mongoose.Types.ObjectId(memberId);
+      const raw = await Group.updateOne(
+        {
+          _id: req.group?.id,
+          members: { $nin: [member] }
+        },
+        { $push: { members: member } }
+      );
+  
+      if (raw.n === 0)
+        throw new ResourceConflictError(`User ${memberId} is already in this group!`);
   }
 
-  await group.save();
+  const group = await Group.findById(req.group?.id).populate('members').populate('creator');
 
-  res.status(200).send({
-    name: group.name,
-    creator: group.creator,
-    members: group.members
-  });
+  res.status(200).json(group);
 });
 
 export { router as addMembersToGroupRouter };

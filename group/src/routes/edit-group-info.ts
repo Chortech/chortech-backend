@@ -1,7 +1,8 @@
 import { BadRequestError, NotFoundError, validate, requireAuth } from '@chortec/common';
 import { Router } from 'express';
-import Joi from 'joi';
+import Joi, { exist } from 'joi';
 import Group from '../models/group';
+import mongoose from 'mongoose';
 
 
 const router = Router();
@@ -16,16 +17,17 @@ router.patch('/', requireAuth, validate(editGroupInfoSchema), async (req, res) =
 
   const { picture, name } = req.body;
 
-  const group = await Group.findById(req.group?.id);
+  const group = await Group.findById(req.group?.id).populate('members').populate('creator');
+  const user = mongoose.Types.ObjectId(req.user.id);
 
   if (!group)
     throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
-  
-  if (!group.members?.includes(req.user.id))
+
+  if (await Group.exists({ _id: req.group?.id, members: { $nin: [user] } }))
     throw new BadRequestError('You are not a member of this group!');
 
   if (name)
-    group.name = name;
+      group.name = name;
   if (picture)
     group.picture = picture;
   

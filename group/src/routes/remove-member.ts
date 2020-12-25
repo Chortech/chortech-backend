@@ -2,6 +2,7 @@ import Router from 'express';
 import { BadRequestError, requireAuth, NotFoundError, validate } from '@chortec/common';
 import Group from '../models/group';
 import Joi from 'joi';
+import mongoose from 'mongoose';
 
 
 const router = Router();
@@ -15,29 +16,31 @@ router.put('/', requireAuth, validate(removeMemberSchema), async (req, res) => {
 
   const { member } = req.body;
 
-  const group = await Group.findById(req.group?.id);
+  const exists = await Group.exists({ _id: req.group?.id });
+  const user = mongoose.Types.ObjectId(req.user.id);
 
-  if (!group)
+
+  if (!exists)
     throw new NotFoundError(`No groups exist with the id ${req.group?.id}` );
   
-  if (!group.members?.includes(req.user.id))
+  if (await Group.exists({ _id: req.group?.id, members: { $nin: [user] } }))
     throw new BadRequestError('You are not a member of this group!');
   
-  if (group.creator == member)
+  if (await Group.exists({ _id: req.group?.id, creator: member }))
     throw new BadRequestError('You cannot remove this user because they are the owner of the group!');
     
-  if (group.expenseChecks.get(member))
+  if (await Group.exists({ _id: req.group?.id, inActiveExpenses: { $in: [user] } }))
     throw new BadRequestError('You cannot remove this member because he participates in an active expense!');
   
-  const index = group.members ? group.members?.indexOf(member, 0) : -1;
-  if (index <= -1)
-      throw new BadRequestError('You are not a member of this group!');
+  const raw = await Group.updateOne(
+    {
+       _id: req.group?.id
+    },
+    { $pull: { members: member } }
+  );
 
-  group.members?.splice(index, 1);
-  group.expenseChecks.delete(member);
-
-  await group.save();
-
+  const group = await Group.findById(req.group?.id).populate('members').populate('creator');
+  
   res.status(200).json({ group });
 });
 

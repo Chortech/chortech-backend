@@ -1,5 +1,5 @@
 import Router from 'express';
-import { BadRequestError, UnauthorizedError, requireAuth, NotFoundError } from '@chortec/common';
+import { BadRequestError, requireAuth, NotFoundError } from '@chortec/common';
 import Group from '../models/group';
 
 
@@ -12,13 +12,12 @@ router.delete('/', requireAuth, async (req, res) => {
     
   if (!group)
       throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
-    
-  if (group.creator != req.user.id)
+
+  if (group.creator.toHexString() != req.user.id)
       throw new BadRequestError('You are not the owner of this group!');
     
-  for(let member of group.members!)
-    if (group.expenseChecks.get(member))
-      throw new BadRequestError('You cannot delete this group because of existing expenses!');
+  if (group.inActiveExpenses.length != 0)
+    throw new BadRequestError('You cannot delete this group because of existing active expenses!');
 
   await Group.deleteOne(group);
 
