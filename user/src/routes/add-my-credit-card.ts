@@ -7,7 +7,6 @@ import {
     requireAuth
 } from '@chortec/common';
 import CreditCard from '../models/credit-card';
-import mongoose from 'mongoose';
 import Joi from 'joi';
 import User from '../models/user';
 
@@ -15,7 +14,7 @@ import User from '../models/user';
 const router = Router();
 
 const addMyCreditCardSchema = Joi.object({
-    number: Joi.string(),
+    number: Joi.string().length(16),
     name: Joi.string()
 });
 
