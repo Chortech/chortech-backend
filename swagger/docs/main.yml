@@ -1931,39 +1931,59 @@ paths:
               example:
                 errors:
                   - message: "Didn't found expense with given id!"
-    # delete:
-    #   security:
-    #     - bearerAuth: []
-    #   tags:
-    #     - "expense"
-    #   summary: Delete an expense
-    #   parameters:
-    #     - in: path
-    #       name: id
-    #       schema:
-    #         type: string
-    #       required: true
-    #   description: >-
-    #     Create a group
-    #   responses:
-    #     "401":
-    #       description: UNAUTHORIZED
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: "#/components/schemas/Errors"
-    #           example:
-    #             errors:
-    #               - message: "Invalid authentication credentials provided!"
-    #     "403":
-    #       description: FORBIDDEN
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: "#/components/schemas/Errors"
-    #           example:
-    #             errors:
-    #               - message: "You are not authorized to access this resource!"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - "expense"
+      summary: Delete an expense
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Create a group
+      responses:
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Didn't found expense with given id!"
     # put:
     #   security:
     #     - bearerAuth: []
