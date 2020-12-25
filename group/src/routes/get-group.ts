@@ -14,7 +14,7 @@ router.get('/', requireAuth, async (req, res) => {
     if (!exists)
         throw new NotFoundError(`No group exists with id ${req.group?.id}`);
 
-    if (!(await Group.find({ _id: req.group?.id, 
+    if (!(await Group.exists({ _id: req.group?.id, 
         members: { $in: [mongoose.Types.ObjectId(req.user.id)] } })))
         throw new BadRequestError('You are not a member of this group!');
 
