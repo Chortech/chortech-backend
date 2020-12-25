@@ -3,6 +3,7 @@ import { BadRequestError, ResourceConflictError, requireAuth } from '@chortec/co
 import { validate } from '@chortec/common';
 import Joi from 'joi';
 import Group from '../models/group';
+import mongoose from 'mongoose';
 
 
 const router = Router();
@@ -17,7 +18,7 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
 
   const { name, picture } = req.body;
 
-  const creator = req.user.id;
+  const creator = mongoose.Types.ObjectId(req.user.id);
 
   if (!creator)
     throw new BadRequestError('Invalid state!');
@@ -25,7 +26,7 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
   const members = [creator];
 
   const expenseChecks: Map<string, boolean> = new Map([
-    [creator, false]
+    [req.user.id, false]
   ]);
 
   const group = Group.build({
@@ -41,10 +42,7 @@ router.post('/', requireAuth, validate(createGroupSchema), async (req, res) => {
   res.status(201).send({
     id: _id,
     name,
-    creator,
-    members,
-    expenseChecks,
-    picture
+    creator
   });
 });
 
