@@ -62,7 +62,8 @@ class UserInvitedListener extends Listener<IUserInvited> {
 
         await redisWrapper.setEXAsync(phone || email!, id, INVITE_EXPIRATION);
         // /signup/i/base64
-        const link = `localhost/signup/i/${base64}`;
+        const host = process.env.HOST || "localhost/";
+        const link = `${host}signup/i/${base64}`;
         const text = `شمارو به اپ چرتک دعوت کرده ${data.Inviter.name}
 ${link} :لینک دعوت شما`;
         const html = `شمارو به اپ چرتک دعوت کرده ${data.Inviter.name}<br/>

@@ -1,0 +1,52 @@
+import Router from 'express';
+import { BadRequestError, ResourceConflictError, requireAuth, NotFoundError } from '@chortec/common';
+import { validate } from '@chortec/common';
+import Joi from 'joi';
+import Group from '../models/group';
+import User from '../models/user';
+import mongoose from 'mongoose';
+
+
+const router = Router();
+
+const addMembersToGroupSchema = Joi.object({
+    members: Joi.array().items(Joi.string())
+}).label('body');
+
+router.put('/', requireAuth, validate(addMembersToGroupSchema), async (req, res) => {
+  if (!req.user) throw new BadRequestError('Invalid state!');
+
+  const { members } = req.body;
+
+  const exists = await Group.findById(req.group?.id);
+  const user = mongoose.Types.ObjectId(req.user.id);
+
+  if (!exists)
+    throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
+  
+  if (await Group.exists({ _id: req.group?.id, members: { $nin: [user]}}))
+    throw new BadRequestError('You are not a member of this group!');
+  
+  for (let memberId of members) {
+    if (!(await User.exists({ _id: memberId })))
+      throw new BadRequestError(`There is no user with id ${memberId}`);
+
+      const member = mongoose.Types.ObjectId(memberId);
+      const raw = await Group.updateOne(
+        {
+          _id: req.group?.id,
+          members: { $nin: [member] }
+        },
+        { $push: { members: member } }
+      );
+  
+      if (raw.n === 0)
+        throw new ResourceConflictError(`User ${memberId} is already in this group!`);
+  }
+
+  const group = await Group.findById(req.group?.id).populate('members').populate('creator');
+
+  res.status(200).json(group);
+});
+
+export { router as addMembersToGroupRouter };

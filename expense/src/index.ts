@@ -15,7 +15,7 @@ async function start() {
   const neoUsername = process.env.NEO4J_USERNAME || "neo4j";
   const neoPassword = process.env.NEO4J_PASSWORD || "neo4j";
 
-  while(true){
+  while (true) {
     try {
       // console.log(neoUrl);
       await graph.init(neoUrl, neoUsername, neoPassword);
@@ -27,7 +27,6 @@ async function start() {
       // console.log(err);
       continue;
     }
-  
   }
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
@@ -35,7 +34,9 @@ async function start() {
   } catch (err) {
     console.error(err);
   }
-  app.listen(port, () => console.log(`Server is listening on port ${port}`));
+  app.listen(port, () =>
+    console.log(`\x1b[32mServer is listening on port ${port}\x1b[0m`)
+  );
 }
 
 start();

@@ -4,10 +4,19 @@ import { natsWrapper } from "./utils/nats-wrapper";
 import { randomBytes } from "crypto";
 import { redisWrapper } from "./utils/redis-wrapper";
 import { UserInvitedListener } from "./listeners/user-invited-listener";
+import smsSender from "./utils/smsSender";
 import fs from "fs";
+import path from "path";
 
 async function start() {
-  const secrets = JSON.parse(fs.readFileSync(process.env.SECRETS!, "utf-8"));
+  // make sure you have a folder named secrets in rootdir of the
+  // project and inside that folder there should be a file called
+  // user-service-secrets.ts with the secrets required for this service.
+
+  const secpath =
+    process.env.SECRETS ||
+    path.join(__dirname, "..", "..", "secrets", "auth-service-secrets.json");
+  const secrets = JSON.parse(fs.readFileSync(secpath, "utf-8"));
   process.env.EMAIL = secrets.EMAIL;
   process.env.EMAIL_PASS = secrets.EMAIL_PASS;
   process.env.MAIL_SERVICE = secrets.MAIL_SERVICE;
@@ -33,6 +42,12 @@ async function start() {
   const redisURL = process.env.REDIS_URL || "redis://localhost:6379";
 
   try {
+    await smsSender.init();
+  } catch (err) {
+    console.log(err);
+  }
+
+  try {
     redisWrapper.connect(redisURL);
   } catch (err) {
     console.log(err);
@@ -55,7 +70,9 @@ async function start() {
     console.error(err);
   }
 
-  app.listen(port, () => console.log(`Server is listening on port ${port}`));
+  app.listen(port, () =>
+    console.log(`\x1b[32mServer is listening on port ${port}\x1b[0m`)
+  );
 }
 
 start();

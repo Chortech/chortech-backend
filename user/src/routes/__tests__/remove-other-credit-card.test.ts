@@ -2,7 +2,7 @@ import request from "supertest";
 import { app } from "../../app";
 import { users } from "../../test/setup";
 
-it('should remove a credit card from from other cards', async () => {
+it('should remove a credit card from my other cards', async () => {
   const { id, token } = await global.signin(
     users[0].id,
     users[0].email,
@@ -10,23 +10,17 @@ it('should remove a credit card from from other cards', async () => {
   );
 
   const response = await request(app)
-    .post('/api/user/credit-card/create')
+    .post('/api/user/credit-card/other')
     .set('Authorization', `Bearer ${token}`)
     .send({ number: '1234567812345678', name: 'nima' })
-    .expect(201);
+    .expect(200);
 
-   const creditCard = response.body;
-   
-   await request(app)
-    .post('/api/user/credit-card/other/add')
-    .set('Authorization', `Bearer ${token}`)
-    .send({ cardId: creditCard.id })
-    .expect(200)
+  const user = response.body;
 
-    await request(app)
-    .post('/api/user/credit-card/other/remove')
+  await request(app)
+    .delete('/api/user/credit-card/other')
     .set('Authorization', `Bearer ${token}`)
-    .send({ cardId: creditCard.id })
+    .send({ cardId: user.otherCreditCards[0]._id })
     .expect(200)
 });
 
@@ -38,22 +32,18 @@ it('should not remove a credit card from from my other cards without an auth tok
       users[0].phone
     );
   
-    const response = await request(app)
-      .post('/api/user/credit-card/create')
-      .send({ number: '1234567812345678', name: 'nima' })
-      .expect(401);
+  const response = await request(app)
+    .post('/api/user/credit-card/other')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ number: '1234567812345678', name: 'nima' })
+    .expect(200);
   
-     const creditCard = response.body;
-     
-     await request(app)
-      .post('/api/user/credit-card/other/add')
-      .send({ cardId: creditCard.id })
-      .expect(401)
+  const user = response.body;
   
-      await request(app)
-      .post('/api/user/credit-card/other/remove')
-      .send({ cardId: creditCard.id })
-      .expect(401)
+  await request(app)
+    .delete('/api/user/credit-card/other')
+    .send({ cardId: user.otherCreditCards[0]._id })
+    .expect(401)
 });
 
 
@@ -63,25 +53,19 @@ it('should not remove a credit card from my other cards with an invalid auth tok
     users[0].email,
     users[0].phone
   );
-
+ 
   const response = await request(app)
-    .post('/api/user/credit-card/create')
-    .set('Authorization', `Bearer fdajlsfjasdf`)
+    .post('/api/user/credit-card/other')
+    .set('Authorization', `Bearer ${token}`)
     .send({ number: '1234567812345678', name: 'nima' })
-    .expect(401);
+    .expect(200);
+  
+  const user = response.body;
 
-   const creditCard = response.body;
-   
-   await request(app)
-    .post('/api/user/credit-card/other/add')
-    .set('Authorization', `Bearer fdjlasjfdas`)
-    .send({ cardId: creditCard.id })
-    .expect(401)
-
-    await request(app)
-    .post('/api/user/credit-card/my/remove')
+  await request(app)
+    .delete('/api/user/credit-card/other')
     .set('Authorization', `Bearer fjldaksjdfls`)
-    .send({ cardId: creditCard.id })
+    .send({ cardId: user.otherCreditCards[0]._id })
     .expect(401)
 });
 
@@ -94,14 +78,14 @@ it('should not remove a credit card from my other cards if the card does not exi
     )
   
     await request(app)
-      .post('/api/user/credit-card/other/remove')
+      .delete('/api/user/credit-card/other')
       .set('Authorization', `Bearer ${token}`)
       .send({ cardId: 'bullshitshit' })
       .expect(404)
 });
 
 
-it('should remove a credit card from my other cards if it is not in my other cards', async () => {
+it('should remove a credit card from my cards if it is not in my cards', async () => {
   const { id, token } = await global.signin(
     users[0].id,
     users[0].email,
@@ -109,28 +93,23 @@ it('should remove a credit card from my other cards if it is not in my other car
   );
 
   const response = await request(app)
-    .post('/api/user/credit-card/create')
+    .post('/api/user/credit-card/other')
     .set('Authorization', `Bearer ${token}`)
     .send({ number: '1234567812345678', name: 'nima' })
-    .expect(201);
+    .expect(200);
+  
+  const user = response.body;
 
-   const creditCard = response.body;
-   
-   await request(app)
-    .post('/api/user/credit-card/other/add')
+  await request(app)
+    .delete('/api/user/credit-card/other')
     .set('Authorization', `Bearer ${token}`)
-    .send({ cardId: creditCard.id })
+    .send({ cardId: user.otherCreditCards[0]._id })
     .expect(200)
-
-    await request(app)
-      .post('/api/user/credit-card/other/remove')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ cardId: creditCard.id })
-      .expect(200)
-
-    await request(app)
-      .post('/api/user/credit-card/other/remove')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ cardId: creditCard.id })
-      .expect(409)
+  
+  console.log(user.myCreditCards[0]);
+  await request(app)
+    .delete('/api/user/credit-card/other')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ cardId: user.otherCreditCards[0]._id })
+    .expect(404)
 });

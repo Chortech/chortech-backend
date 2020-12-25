@@ -18,7 +18,7 @@ const removeMyCreditCardSchema = Joi.object({
     cardId: Joi.string()
 });
 
-router.post('/', requireAuth, validate(removeMyCreditCardSchema), async(req, res) => {
+router.delete('/', requireAuth, validate(removeMyCreditCardSchema), async(req, res) => {
     if (!req.user)
         throw new BadRequestError('Invalid State!');
 
@@ -39,10 +39,20 @@ router.post('/', requireAuth, validate(removeMyCreditCardSchema), async(req, res
 
     if (raw.n === 0)
         throw new ResourceConflictError(`${cardId} does not exist in your cards list!`);
-    
-    const user = await User.findById(req.user.id);
 
-    res.status(200).json({ user });
+    await CreditCard.deleteOne({ _id: id });
+
+    const user = await User.findById(req.user.id).populate('friends').populate('myCreditCards').populate('otherCreditCards');
+
+    res.status(200).send({
+        id: user?._id,
+        name: user?.name,
+        phone: user?.phone,
+        email: user?.email,
+        myCreditCards: user?.myCreditCards,
+        otherCreditCards: user?.otherCreditCards,
+        friends: user?.friends
+    });
 });
 
 export { router as removeMyCreditCardRouter };

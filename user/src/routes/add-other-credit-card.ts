@@ -15,20 +15,29 @@ import User from '../models/user';
 const router = Router();
 
 const addOtherCreditCardSchema = Joi.object({
-    cardId: Joi.string()
+    number: Joi.string().length(16).required(),
+    name: Joi.string().required()
 });
 
 router.post('/', requireAuth, validate(addOtherCreditCardSchema), async(req, res) => {
     if (!req.user)
         throw new BadRequestError('Invalid State!');
 
-    const { cardId } = req.body;
+    const { number, name } = req.body;
+    let id;
     
-    if (!(await CreditCard.exists({ _id: cardId })))
-        throw new NotFoundError(`${cardId} does not exist!`);
-    
-    const id = mongoose.Types.ObjectId(cardId);
+    if (!(await CreditCard.exists({ number: number }))) {
+        const creditCard = CreditCard.build({
+            number,
+            name
+        });
 
+        const { _id } = await creditCard.save();
+        id = _id;
+    } else {
+        id = await CreditCard.findOne({ number: number, name: name });
+    }
+    
     const raw = await User.updateOne(
         {
             _id: req.user?.id,
@@ -38,11 +47,19 @@ router.post('/', requireAuth, validate(addOtherCreditCardSchema), async(req, res
     );
 
     if (raw.n === 0)
-        throw new ResourceConflictError(`${cardId} is already in your cards list!`);
+        throw new ResourceConflictError(`Card with number ${number} is already in your cards list!`);
     
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).populate('myCreditCards').populate('otherCreditCards').populate('friends');
 
-    res.status(200).json({ user });
+    res.status(200).send({
+        id: user?._id,
+        name: user?.name,
+        phone: user?.phone,
+        email: user?.email,
+        myCreditCards: user?.myCreditCards,
+        otherCreditCards: user?.otherCreditCards,
+        friends: user?.friends
+    });
 });
 
 export { router as addOtherCreditCardRouter };

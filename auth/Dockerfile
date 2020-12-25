@@ -4,8 +4,13 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN npm install --only=prod
+RUN npm install -g typescript\
+    && npm install --only=prod
 
 COPY . .
 
-CMD [ "npm", "start" ]
+RUN tsc
+
+RUN mv src/keys build/keys
+
+CMD [ "npm", "run","start:prod" ]
