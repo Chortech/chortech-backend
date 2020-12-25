@@ -12,7 +12,7 @@ interface IGroup {
   picture?: string;
   creator: mongoose.Types.ObjectId;
   members?: mongoose.Types.ObjectId[];
-  expenseChecks: Map<string, boolean>;
+  inActiveExpenses: mongoose.Types.ObjectId[];
 }
 
 type GroupDoc = IGroup & Document;
@@ -27,7 +27,7 @@ const groupSchema = new Schema(
     picture: String,
     creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    expenseChecks: Map,
+    inActiveExpenses: [{ type: Schema.Types.ObjectId }],
   },
   {
     toJSON: {
@@ -35,6 +35,7 @@ const groupSchema = new Schema(
         const id = ret._id;
         delete ret._id;
         delete ret.__v;
+        delete ret.inActiveExpenses
         ret.id = id;
       },
     },
