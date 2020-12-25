@@ -9,6 +9,7 @@ import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as createExpenseRouter } from "./routes/create-expense";
 import { router as getExpensesRouter } from "./routes/get-expenses";
 import { router as getExpenseRouter } from "./routes/get-expense";
+import { router as removeExpenseRouter } from "./routes/remove-expense";
 import { router as addCommentRouter } from "./routes/add-comment";
 import { router as getCommentsRouter } from "./routes/get-comments";
 
@@ -21,6 +22,7 @@ app.use(helmet());
 app.use("/api/expenses", createExpenseRouter);
 app.use("/api/expenses", getExpensesRouter);
 app.use("/api/expenses/:id", getExpenseRouter);
+app.use("/api/expenses/:id", removeExpenseRouter);
 app.use("/api/expenses/:id/comments", addCommentRouter);
 app.use("/api/expenses/:id/comments", getCommentsRouter);
 

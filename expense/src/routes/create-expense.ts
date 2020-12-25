@@ -46,11 +46,9 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
   if (participants.length != count)
     throw new BadRequestError("One of the participants doesn't exits!");
 
-  const expenseid = uuid();
+  const id = await graph.addExpense({ ...req.body, creator: req.user?.id });
 
-  await graph.addExpense({ ...req.body, id: expenseid, creator: req.user?.id });
-
-  res.status(201).json({ ...req.body, id: expenseid });
+  res.status(201).json({ id, ...req.body });
 });
 
 export { router };
