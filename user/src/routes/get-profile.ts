@@ -16,7 +16,9 @@ router.get("/", requireAuth, async (req, res) => {
     email: user.email,
     phone: user.phone,
     name: user.name,
-    picture: `${process.env.STORAGE_ENDPOINT}/${process.env.STORAGE_BUCKET}/${user.picture}`,
+    picture: user.picture
+      ? `${process.env.STORAGE_ENDPOINT}/${process.env.STORAGE_BUCKET}/${user.picture}`
+      : undefined,
   });
 });
 
