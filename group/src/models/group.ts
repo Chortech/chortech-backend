@@ -1,17 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-/**
- * @param name
- * @param creator
- * @param users
- */
-
 
 interface IGroup {
   name: string;
   picture?: string;
   creator: mongoose.Types.ObjectId;
-  members?: mongoose.Types.ObjectId[];
+  members: mongoose.Types.ObjectId[];
   inActiveExpenses: mongoose.Types.ObjectId[];
 }
 
