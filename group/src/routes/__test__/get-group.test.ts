@@ -54,7 +54,7 @@ it('should not get a group if the user is not a member in it', async () => {
 });
 
 
-it('should not get a group with an invalid id', async () => {
+it('should not get a group with an invalid group id', async () => {
   const { id, token } = await global.signin(
     users[0].id,
     users[0].email,
@@ -64,14 +64,14 @@ it('should not get a group with an invalid id', async () => {
   const res = await request(app)
     .post('/api/group')
     .set('Authorization', `Bearer ${token}`)
-    .send({ picture: 'hello.png' })
-    .expect(400);
+    .send({ name: 'hello', picture: 'hello.png' })
+    .expect(201);
 
   const group = res.body.id;
   
-  await request(app)
-    .get(`/api/group/bullshit`)
+  const resp = await request(app)
+    .get(`/api/group/${id}`)
     .set('Authorization', `Bearer ${token}`)
     .send()
-    .expect(400);
+    .expect(404);
 });
