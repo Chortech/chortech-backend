@@ -32,17 +32,22 @@ router.put('/', requireAuth, validate(addMembersToGroupSchema), async (req, res)
       throw new BadRequestError(`There is no user with id ${memberId}`);
 
       const member = mongoose.Types.ObjectId(memberId);
-      const raw = await Group.updateOne(
-        {
-          _id: req.group?.id,
-          members: { $nin: [member] }
-        },
-        { $push: { members: member } }
-      );
-  
-      if (raw.n === 0)
+      
+      if (await Group.exists({ _id: req.group?.id, members: { $in: [member] } }))
         throw new ResourceConflictError(`User ${memberId} is already in this group!`);
   }
+
+  const memberIds = members.map(mongoose.Types.ObjectId);
+
+  const raw = await Group.updateOne(
+    {
+      _id: req.group?.id,
+    },
+    { $push: { members: { $each: memberIds } } }
+  );
+
+  if (raw.n === 0)
+    throw new BadRequestError('Something went wrong when adding members');
 
   const group = await Group.findById(req.group?.id).populate('members').populate('creator');
 
