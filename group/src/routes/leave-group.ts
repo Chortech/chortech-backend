@@ -15,8 +15,10 @@ router.delete('/', requireAuth, async (req, res) => {
     if (!exists)
         throw new NotFoundError(`No groups exist with the id ${req.group?.id}`);
 
-    if (await Group.exists({ _id: req.group?.id, members: { $size: 1 } }))
+    if (await Group.exists({ _id: req.group?.id, members: { $size: 1 } })) {
         await Group.deleteOne({ _id: req.group?.id });
+        res.status(200).send('Deleted the group successfully!');
+    }
     else if (await Group.exists({ _id: req.group?.id, inActiveExpenses: { $in: [user] } }))
         throw new BadRequestError('You cannot leave the group because you are a participant in an expense!');
     else if (await Group.exists({ _id: req.group?.id, members: { $nin: [user] } }))
