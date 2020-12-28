@@ -96,9 +96,6 @@ global.signup = (
         name: name,
         email: email,
         phone: phone,
-        friends: [],
-        myCreditCards: [],
-        otherCreditCards: []
       });
 
       await user.save();
