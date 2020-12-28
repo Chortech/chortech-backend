@@ -85,6 +85,29 @@ class Graph {
 
     await session.close();
   }
+  async initSync(url: string, username: string, password: string) {
+    while (true) {
+      try {
+        this._driver = neo4j.driver(url);
+        const session = this.driver.session();
+        await session.run(
+          `CREATE CONSTRAINT U_UNIQUE IF NOT EXISTS ON (u:${Nodes.User}) ASSERT u.id IS UNIQUE`
+        );
+        await session.run(
+          `CREATE CONSTRAINT EX_UNIQUE IF NOT EXISTS ON (e:${Nodes.Expense}) ASSERT e.id IS UNIQUE`
+        );
+        await session.run(
+          `CREATE CONSTRAINT GP_UNIQUE IF NOT EXISTS ON (g:${Nodes.Group}) ASSERT g.id IS UNIQUE`
+        );
+
+        await session.close();
+        break;
+      } catch (err) {
+        await new Promise((res, rej) => setTimeout(res, 500));
+        continue;
+      }
+    }
+  }
 
   private async installUUID(label: Nodes) {
     const session = this.driver.session();
@@ -273,6 +296,49 @@ class Graph {
         participants,
         comments: await this.getComments(expense),
       };
+    } catch (err) {
+      console.log(err);
+      await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   *
+   * @param id user id
+   * @description returns details about who this user ows money
+   * or need to get money from
+   */
+  async getExpenseReltaions(id: string) {
+    const session = this.driver.session();
+
+    try {
+      const res = await session.run(
+        "MATCH (u:User {id: $id})-[r:OWE]-(u2:User) RETURN u,r,u2, (startnode(r) = u) as isStart",
+        {
+          id,
+        }
+      );
+
+      await session.close();
+
+      const relations: any[] = [];
+
+      for (const rec of res.records) {
+        const u2 = rec.get("u2").properties;
+        const r = rec.get("r").properties;
+        const isStart = rec.get("isStart");
+        relations.push({
+          to: {
+            id: u2.id,
+            name: u2.name,
+          },
+          amount: r.amount,
+          role: isStart ? PRole.Debtor : PRole.Creditor,
+        });
+      }
+      return relations;
     } catch (err) {
       console.log(err);
       await session.close();
@@ -543,6 +609,20 @@ class Graph {
     } catch (err) {
       console.log(err);
       await session.close();
+    } finally {
+      await session.close();
+    }
+  }
+  async clearExpectUsers() {
+    const session = this.driver.session();
+    try {
+      await session.run(`MATCH ()-[:PARTICIPATE]->(e) DETACH DELETE e`);
+      await session.run(`MATCH (e:Expense) DETACH DELETE e`);
+      await session.run(`MATCH ()-[r:OWE]-() DETACH DELETE r;`);
+    } catch (err) {
+      console.log(err);
+      await session.close();
+      throw err;
     } finally {
       await session.close();
     }

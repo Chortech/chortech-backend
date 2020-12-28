@@ -31,7 +31,7 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
       `user ${req.user?.id} doesn't participate in expense ${expenseid}`
     );
 
-  res.json({ message: "Comment added." });
+  res.status(201).json({ message: "Comment added." });
 });
 
 export { router };
