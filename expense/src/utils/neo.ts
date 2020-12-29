@@ -1,3 +1,4 @@
+import { BadRequestError } from "@chortec/common";
 import neo4j, { Driver, Integer, Session } from "neo4j-driver";
 import { v4 as uuid } from "uuid";
 
@@ -25,7 +26,7 @@ interface Group {
   id: string;
 }
 
-interface Expense {
+export interface Expense {
   id: string;
   creator: string;
   description: string;
@@ -41,6 +42,7 @@ interface Expense {
 
 export interface Participant {
   id: string;
+  name?: string;
   amount: number;
   role: PRole;
 }
@@ -483,7 +485,7 @@ class Graph {
       // Create the expense and attach the participants to it
       await session.run(
         `
-      CREATE (e:${Nodes.Expense}) SET e= $expense WITH e
+      MERGE (e:${Nodes.Expense} {id: $eid}) SET e= $expense WITH e
       UNWIND $participants as p
       WITH apoc.convert.toJson(p.owes) as owes , p, e
       MATCH (u:${Nodes.User} {id: p.id})
@@ -493,7 +495,6 @@ class Graph {
             id,
             creator: e.creator,
             price: e.total,
-            comments: e.comments,
             group: e.group,
             notes: e.notes,
             paid_at: e.paid_at,
@@ -502,8 +503,10 @@ class Graph {
             description: e.description,
           },
           participants: participants,
+          eid: id,
         }
       );
+
       await session.run(
         `
         UNWIND $participants AS p
@@ -538,6 +541,7 @@ class Graph {
       return id;
     } catch (err) {
       console.log(err);
+      throw err;
     }
   }
 
@@ -577,6 +581,190 @@ class Graph {
     }
 
     return false;
+  }
+
+  async updateExpense(e: Expense, hasChanged: boolean) {
+    this.checkPriceFlow(e.participants, e.total);
+
+    const session = this.driver.session();
+    try {
+      // remove old relation if participants changed
+      // and then calculate new relations and update expense
+      if (hasChanged) {
+        // remove the owe relations for this expense
+        await session.run(
+          `MATCH (u:${Nodes.User})-[r:${Relations.Participate} {role:$role}]-(e:${Nodes.Expense} {id: $id})
+          UNWIND apoc.convert.fromJsonList(r.owes) as owes
+          MATCH (u)-[o:${Relations.Owe}]-(u2:${Nodes.User} {id: owes.id})
+          SET o.amount = o.amount - owes.amount
+          WITH o,e
+          CALL apoc.do.case(
+          [
+            o.amount = 0 , "DELETE o",
+            o.amount < 0, "CALL apoc.refactor.invert(o) YIELD output as out SET out.amount = out.amount * -1"
+          ],
+          "RETURN o" , {o:o}
+          ) 
+          YIELD value
+          RETURN value`,
+          {
+            id: e.id,
+            role: PRole.Debtor,
+          }
+        );
+
+        // remove the old participant relations for this expense
+        await session.run(
+          `MATCH (u:${Nodes.User})-[r:${Relations.Participate}]-(e:${Nodes.Expense} {id: $id})
+            DELETE r;`,
+          {
+            id: e.id,
+            role: PRole.Debtor,
+          }
+        );
+
+        let total = 0;
+        const { creditors, debtors } = this.seperateParticipants(e);
+        let creditor = creditors.pop();
+        let debtor = debtors.pop();
+        const participants: ParticipantExtended[] = [];
+        let owes: { id: string; amount: number }[] = new Array();
+        let creditortemp = creditor!.amount;
+        let debtortemp = debtor!.amount;
+        while (Math.abs(total - e.total) > Number.EPSILON) {
+          let lent = creditor!.amount;
+          let borrowed = debtor!.amount;
+
+          if (Math.abs(lent - borrowed) < Number.EPSILON) {
+            // If equal cross one creditor with one debtor
+            total += creditor!.amount;
+            owes.push({ id: creditor!.id, amount: creditor!.amount });
+            participants.push({
+              id: debtor!.id,
+              role: PRole.Debtor,
+              amount: debtortemp,
+              owes,
+            });
+            participants.push({
+              id: creditor!.id,
+              role: PRole.Creditor,
+              amount: creditortemp,
+            });
+
+            creditor = creditors.pop();
+            debtor = debtors.pop();
+            if (creditor) creditortemp = creditor!.amount;
+            if (debtor) debtortemp = debtor!.amount;
+            owes = new Array();
+          } else if (lent < borrowed) {
+            // If borrowed money is bigger cross creditor and keep debtor
+            total += creditor!.amount;
+            participants.push({
+              id: creditor!.id,
+              role: PRole.Creditor,
+              amount: creditortemp,
+            });
+            owes.push({ id: creditor!.id, amount: creditor!.amount });
+
+            debtor!.amount -= creditor!.amount;
+            creditor = creditors.pop();
+            if (creditor) creditortemp = creditor!.amount;
+          } else {
+            // If borrowed money is samller cross debtor and keep debtor
+            total += debtor!.amount;
+            owes.push({ id: creditor!.id, amount: debtor!.amount });
+            participants.push({
+              id: debtor!.id,
+              role: PRole.Debtor,
+              amount: debtortemp,
+              owes,
+            });
+            owes = new Array();
+
+            creditor!.amount -= debtor!.amount;
+            debtor = debtors.pop();
+            if (debtor) debtortemp = debtor!.amount;
+          }
+        }
+        // Find the expense and attach the updated participants to it
+        console.log(participants);
+        await session.run(
+          `
+        MATCH (e:${Nodes.Expense} {id: $eid}) SET e= $expense WITH e
+        UNWIND $participants as p
+        WITH apoc.convert.toJson(p.owes) as owes , p, e
+        MATCH (u:${Nodes.User} {id: p.id})
+        MERGE (u)-[:${Relations.Participate} {role: p.role, amount: p.amount , owes: owes}]->(e)`,
+          {
+            expense: {
+              id: e.id,
+              creator: e.creator,
+              price: e.total,
+              group: e.group,
+              notes: e.notes,
+              paid_at: e.paid_at,
+              created_at: e.created_at,
+              modified_at: e.modified_at,
+              description: e.description,
+            },
+            participants: participants,
+            eid: e.id,
+          }
+        );
+        await session.run(
+          `
+          UNWIND $participants AS p
+          WITH p
+          WHERE p.role = "debtor"
+          MATCH (u1:User {id: p.id})
+          UNWIND p.owes as owes
+          MATCH (u2:User {id: owes.id})
+          MERGE (u1)-[r:OWE]-(u2)
+          ON CREATE SET r.amount = owes.amount
+          ON MATCH SET r.amount = r.amount + owes.amount
+          WITH CASE
+          WHEN startnode(r) = u1 THEN 0
+          ELSE -2 * owes.amount
+          END AS amount ,r
+          SET r.amount = r.amount + amount
+          WITH r
+          CALL apoc.do.case(
+          [
+            r.amount = 0 , "DELETE r",
+            r.amount < 0, "CALL apoc.refactor.invert(r) YIELD output as o SET o.amount = o.amount * -1"
+          ],
+          "RETURN r" , {r:r}
+          )
+          YIELD value
+          RETURN value`,
+          { participants: participants }
+        );
+
+        // await this.addExpense(e);
+      } else {
+        await session.run(
+          `
+        MATCH (e:${Nodes.Expense} {id: $eid}) SET e= $expense RETURN e`,
+          {
+            expense: {
+              id: e.id,
+              creator: e.creator,
+              price: e.total,
+              group: e.group,
+              notes: e.notes,
+              paid_at: e.paid_at,
+              created_at: e.created_at,
+              modified_at: e.modified_at,
+              description: e.description,
+            },
+            eid: e.id,
+          }
+        );
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 
   async deleteNode(node: Nodes, id: string) {
@@ -630,7 +818,7 @@ class Graph {
 
   private checkPriceFlow(participants: Participant[], expensePrice: number) {
     if (participants.length === 0)
-      throw new Error("Expense must have at least one Participant!");
+      throw new BadRequestError("Expense must have at least one Participant!");
 
     const paid = participants
       .filter((p) => p.role === PRole.Creditor)
@@ -647,7 +835,9 @@ class Graph {
       Math.abs(paid - expensePrice) > Number.EPSILON || // if paid and expense price are not equal
       Math.abs(received - expensePrice) > Number.EPSILON // if received and expense price are not equal
     ) {
-      throw new Error("Amount received must be eqaul to amount paid!");
+      throw new BadRequestError(
+        "Amount received must be eqaul to amount paid!"
+      );
     }
   }
   private seperateParticipants(e: Expense) {
@@ -658,108 +848,35 @@ class Graph {
       .filter((p) => p.role === PRole.Debtor)
       .sort((a, b) => b.amount - a.amount);
 
+    let index = 0,
+      cindex = 0;
     for (let creditor of creditors) {
       for (let debtor of debtors) {
         if (debtor.id === creditor.id) {
-          let index = debtors.indexOf(debtor);
-          e.total -= debtor.amount;
-          creditor.amount -= debtor.amount;
-          debtors.splice(index, 1);
-        }
-      }
-    }
-
-    return { creditors, debtors };
-  }
-  private async handleExpenseRelation(
-    session: Session,
-    creditorId: string,
-    debtorId: string,
-    amount: number
-  ) {
-    const result = await session.run(
-      `MATCH (:${Nodes.User} {id: $u1})-[o:OWE]-(u:${Nodes.User} {id: $u2})
-    RETURN (startNode(o) = u) as isStart , o as rel`,
-      {
-        u1: creditorId,
-        u2: debtorId,
-      }
-    );
-    if (result.records[0]) {
-      const isStart = result.records[0].get("isStart");
-      // console.log(isStart);
-      if (isStart === true) {
-        // Just add to the existing relation
-        await session.run(
-          `MATCH (c:${Nodes.User} {id: $cid})
-        MATCH (d:${Nodes.User} {id: $did})
-        WITH c,d
-        MERGE (c)<-[r:${Relations.Owe}]-(d)
-        ON CREATE SET r.amount = $amount
-        ON MATCH  SET r.amount = r.amount + $amount`,
-          {
-            cid: creditorId,
-            did: debtorId,
-            amount,
+          // if equal remove both
+          if (Math.abs(creditor.amount - debtor.amount) < Number.EPSILON) {
+            e.total -= debtor.amount;
+            index = debtors.indexOf(debtor);
+            cindex = creditors.indexOf(creditor);
+            debtors.splice(index, 1);
+            creditors.splice(cindex, 1);
+            // if creditor is bigger subtract debtor from it and remove debtor
+          } else if (creditor.amount > debtor.amount) {
+            e.total -= debtor.amount;
+            creditor.amount -= debtor.amount;
+            index = debtors.indexOf(debtor);
+            debtors.splice(index, 1);
+            // if debtor is bigger subtract creditor from it and remove creditor
+          } else {
+            e.total -= creditor.amount;
+            debtor.amount -= creditor.amount;
+            cindex = creditors.indexOf(creditor);
+            creditors.splice(cindex, 1);
           }
-        );
-      } else if (isStart === false) {
-        // Subtract From Current amount
-        const currentAmount = result.records[0].get("rel").properties.amount;
-        const diff = currentAmount - amount;
-        console.log("diff", diff);
-        // if its negative change dirrection
-        // else just subtract from existing relation
-        if (diff < 0) {
-          await session.run(
-            `MATCH (u:${Nodes.User} {id: $u1})-[o:OWE]-(:${Nodes.User} {id: $u2})
-          CALL apoc.refactor.invert(o)
-          YIELD input, output
-          SET output.amount = $diff`,
-            {
-              diff: -diff,
-              u1: creditorId,
-              u2: debtorId,
-            }
-          );
-        } else if (diff > 0) {
-          await session.run(
-            `MATCH (u:${Nodes.User} {id: $u1})-[o:OWE]-(:${Nodes.User} {id: $u2})
-             SET o.amount = $diff`,
-            {
-              diff: diff,
-              u1: creditorId,
-              u2: debtorId,
-            }
-          );
-        } else {
-          // Delete The relation
-          await session.run(
-            `MATCH (u:${Nodes.User} {id: $u1})-[o:OWE]-(:${Nodes.User} {id: $u2})
-          DELETE o`,
-            {
-              u1: creditorId,
-              u2: debtorId,
-            }
-          );
         }
       }
-    } else {
-      // if isStart is undefined create the relation
-      await session.run(
-        `MATCH (c:${Nodes.User} {id: $cid})
-      MATCH (d:${Nodes.User} {id: $did})
-      WITH c,d
-      MERGE (c)<-[r:${Relations.Owe}]-(d)
-      ON CREATE SET r.amount = $amount
-      ON MATCH  SET r.amount = r.amount + $amount`,
-        {
-          cid: creditorId,
-          did: debtorId,
-          amount,
-        }
-      );
     }
+    return { creditors, debtors };
   }
 }
 

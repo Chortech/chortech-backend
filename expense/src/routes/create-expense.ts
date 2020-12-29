@@ -11,13 +11,15 @@ const schema = Joi.object({
   description: Joi.string().required(),
   total: Joi.number().required(),
   paid_at: Joi.number(),
-  participants: Joi.array().items(
-    Joi.object({
-      id: Joi.string().required(),
-      role: Joi.string().valid(PRole.Creditor, PRole.Debtor),
-      amount: Joi.number(),
-    })
-  ),
+  participants: Joi.array()
+    .items(
+      Joi.object({
+        id: Joi.string().required(),
+        role: Joi.string().valid(PRole.Creditor, PRole.Debtor).required(),
+        amount: Joi.number().required(),
+      })
+    )
+    .min(2),
   group: Joi.string(),
   notes: Joi.string(),
 });
