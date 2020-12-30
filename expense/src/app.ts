@@ -12,6 +12,7 @@ import { router as getExpenseRouter } from "./routes/get-expense";
 import { router as removeExpenseRouter } from "./routes/remove-expense";
 import { router as addCommentRouter } from "./routes/add-comment";
 import { router as getCommentsRouter } from "./routes/get-comments";
+import { router as updateExpenseRouter } from "./routes/update-expense";
 import { router as getFriendsExpenseRouter } from "./routes/get-friends-expense";
 
 // setting up express
@@ -26,6 +27,7 @@ app.use("/api/expenses/friends", getFriendsExpenseRouter);
 // app.use("/api/expenses/groups", getExpensesRouter);
 app.use("/api/expenses/:id", getExpenseRouter);
 app.use("/api/expenses/:id", removeExpenseRouter);
+app.use("/api/expenses/:id", updateExpenseRouter);
 app.use("/api/expenses/:id/comments", addCommentRouter);
 app.use("/api/expenses/:id/comments", getCommentsRouter);
 
