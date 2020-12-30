@@ -494,7 +494,7 @@ class Graph {
           expense: {
             id,
             creator: e.creator,
-            price: e.total,
+            total: e.total,
             group: e.group,
             notes: e.notes,
             paid_at: e.paid_at,
@@ -699,7 +699,7 @@ class Graph {
             expense: {
               id: e.id,
               creator: e.creator,
-              price: e.total,
+              total: e.total,
               group: e.group,
               notes: e.notes,
               paid_at: e.paid_at,
@@ -749,7 +749,7 @@ class Graph {
             expense: {
               id: e.id,
               creator: e.creator,
-              price: e.total,
+              total: e.total,
               group: e.group,
               notes: e.notes,
               paid_at: e.paid_at,
@@ -804,9 +804,10 @@ class Graph {
   async clearExpectUsers() {
     const session = this.driver.session();
     try {
-      await session.run(`MATCH ()-[:PARTICIPATE]->(e) DETACH DELETE e`);
-      await session.run(`MATCH (e:Expense) DETACH DELETE e`);
-      await session.run(`MATCH ()-[r:OWE]-() DETACH DELETE r;`);
+      await session.run(`
+      apoc.chypher.runMany('MATCH ()-[:PARTICIPATE]->(e) DETACH DELETE e;
+      MATCH (e:Expense) DETACH DELETE e;
+      MATCH ()-[r:OWE]-() DETACH DELETE r;' , {}); `);
     } catch (err) {
       console.log(err);
       await session.close();
