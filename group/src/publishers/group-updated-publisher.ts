@@ -1,4 +1,4 @@
-import { IGroupUpdated, Publisher, Subjects } from "../../../common/src/index";
+import { IGroupUpdated, Publisher, Subjects } from "@chortec/common";
 
 export class GroupUpdatedPublisher extends Publisher<IGroupUpdated> {
   subject: Subjects.GroupUpdated = Subjects.GroupUpdated;

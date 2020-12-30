@@ -4,13 +4,13 @@ import {
   requireAuth,
   NotFoundError,
   validate,
+  GroupUpdateType,
 } from "@chortec/common";
 import Group from "../models/group";
 import Joi from "joi";
 import mongoose from "mongoose";
 import { GroupUpdatedPublisher } from "../publishers/group-updated-publisher";
 import { natsWrapper } from "../utils/nats-wrapper";
-import { GroupUpdateType } from "../../../common/src";
 
 const router = Router();
 
