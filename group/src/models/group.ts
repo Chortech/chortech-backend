@@ -1,5 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
+import mongoose, { Schema, Document } from "mongoose";
 
 interface IGroup {
   name: string;
@@ -19,8 +18,8 @@ const groupSchema = new Schema(
   {
     name: { type: String, required: true },
     picture: String,
-    creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    creator: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    members: [{ type: Schema.Types.ObjectId, ref: "User" }],
     inActiveExpenses: [{ type: Schema.Types.ObjectId }],
   },
   {
@@ -29,11 +28,11 @@ const groupSchema = new Schema(
         const id = ret._id;
         delete ret._id;
         delete ret.__v;
-        delete ret.inActiveExpenses
+        delete ret.inActiveExpenses;
         ret.id = id;
       },
     },
-    timestamps: true
+    timestamps: true,
   }
 );
 
@@ -41,6 +40,6 @@ groupSchema.statics.build = (group: IGroup) => new Group(group);
 
 const Group = mongoose.model<GroupDoc, GroupModel>("Group", groupSchema);
 
-export { Group };
+export { Group, GroupDoc };
 
 export default Group;
