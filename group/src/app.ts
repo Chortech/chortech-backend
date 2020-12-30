@@ -23,14 +23,14 @@ app.use(helmet());
 app.param("id", validateId);
 
 // adding route handlers to express
-app.use("/api/groups/", createGroupRouter);
-app.use("/api/groups/", getGroupsRouter);
-app.use("/api/groups/:id", getGroupRouter);
-app.use("/api/groups/:id", deleteGroupRouter);
-app.use("/api/groups/:id/members", addMembersToGroupRouter);
-app.use("/api/groups/:id/leave", leaveGroupRouter);
-app.use("/api/groups/:id/members", removeMemberRouter);
-app.use("/api/groups/:id", editGroupInfoRouter);
+app.use("/api/group/", createGroupRouter);
+app.use("/api/group/", getGroupsRouter);
+app.use("/api/group/:id", getGroupRouter);
+app.use("/api/group/:id", deleteGroupRouter);
+app.use("/api/group/:id", addMembersToGroupRouter);
+app.use("/api/group/:id/leave", leaveGroupRouter);
+app.use("/api/group/:id/remove", removeMemberRouter);
+app.use("/api/group/:id", editGroupInfoRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

@@ -1313,7 +1313,64 @@ paths:
   # DELETE    /api/groups/:id
   # PUT       /api/groups/:id
   # GET       /api/groups/:id
-  /api/groups:
+  /api/group:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Get Groups
+      description: >-
+        Get all Groups you are a member of
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  creator:
+                    allOf:
+                      - $ref: "#/components/schemas/Friends"
+                    example:
+                      name: "nameee"
+                      email: "example@domaim.com"
+                      picture: "image url"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+
     post:
       security:
         - bearerAuth: []
@@ -1333,6 +1390,9 @@ paths:
                 name:
                   type: string
                   example: "my group name"
+                picture:
+                  type: string
+                  example: "image key"
       responses:
         "201":
           description: CREATED
@@ -1386,7 +1446,7 @@ paths:
               example:
                 errors:
                   - message: "You are not authorized to access this resource!"
-  /api/groups/{id}:
+  /api/group/{id}:
     get:
       security:
         - bearerAuth: []
@@ -1477,6 +1537,75 @@ paths:
               example:
                 errors:
                   - message: "You are not authorized to access this resource!"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Delete Group
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Deleted the group successfully!"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                not-creator:
+                  value:
+                    errors:
+                      - message: "You are not the creator of this group!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No group exists with id gid"
     put:
       security:
         - bearerAuth: []
@@ -1500,7 +1629,7 @@ paths:
             schema:
               type: object
               properties:
-                friends:
+                members:
                   type: array
                   items:
                     type: string
@@ -1596,12 +1725,13 @@ paths:
               example:
                 errors:
                   - message: "No group exists with id gid"
+  /api/group/{id}/leave:
     delete:
       security:
         - bearerAuth: []
       tags:
         - "group"
-      summary: Delete Group
+      summary: Leave from group
       parameters:
         - in: path
           name: id
@@ -1609,8 +1739,90 @@ paths:
             type: string
           required: true
       description: >-
-        This is an example operation to show how security is applied to the
-        call.
+        Leave From Group
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "You left the group successfully."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                participant:
+                  value:
+                    errors:
+                      - message: "You cannot leave the group because you are a participant in an expense!"
+                not-a-member:
+                  value:
+                    errors:
+                      - message: "You are not a member of this group!"
+                no-user:
+                  value:
+                    errors:
+                      - message: "There is no user with the given id"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No groups with the id"
+  /api/group/{id}/remove:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Remove a member
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Removes a member from given group
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                member:
+                  type: string
       responses:
         "200":
           description: OK
@@ -1619,10 +1831,31 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  id:
                     type: string
+                  name:
+                    type: string
+                    example: "group name"
+                  creator:
+                    $ref: "#/components/schemas/Friends"
+                  members:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Friends"
+                    example: []
               example:
-                message: "Deleted the group successfully!"
+                name: "group name"
+                creator:
+                  name: "nameee"
+                  email: "example@domaim.com"
+                  picture: "image url"
+                members:
+                  - name: "nameee"
+                    email: "example@domaim.com"
+                    picture: "image url"
+                  - name: "nameee2"
+                    email: "example2@domaim.com"
+                    picture: "image url"
         "400":
           description: BAD REQUEST
           content:
@@ -1630,10 +1863,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/Errors"
               examples:
-                not-creator:
+                not-member:
                   value:
                     errors:
-                      - message: "You are not the creator of this group!"
+                      - message: "You are not a member of this group!"
+                has-expense:
+                  value:
+                    errors:
+                      - message: "You cannot remove this member because he participates in an active expense!"
+                cant-remove-owner:
+                  value:
+                    errors:
+                      - message: "You cannot remove this user because they are the owner of the group!"
+                no-user:
+                  value:
+                    errors:
+                      - message: "There is no user with the given id"
                 unknown:
                   value:
                     errors:
