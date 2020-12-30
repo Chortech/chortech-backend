@@ -842,41 +842,40 @@ class Graph {
     }
   }
   private seperateParticipants(e: Expense) {
-    const creditors = e.participants
-      .filter((p) => p.role === PRole.Creditor)
-      .sort((a, b) => b.amount - a.amount);
-    const debtors = e.participants
-      .filter((p) => p.role === PRole.Debtor)
-      .sort((a, b) => b.amount - a.amount);
+    const cmap = new Map<string, Participant>();
+    const dmap = new Map<string, Participant>();
 
-    let index = 0,
-      cindex = 0;
-    for (let creditor of creditors) {
-      for (let debtor of debtors) {
-        if (debtor.id === creditor.id) {
-          // if equal remove both
-          if (Math.abs(creditor.amount - debtor.amount) < Number.EPSILON) {
-            e.total -= debtor.amount;
-            index = debtors.indexOf(debtor);
-            cindex = creditors.indexOf(creditor);
-            debtors.splice(index, 1);
-            creditors.splice(cindex, 1);
-            // if creditor is bigger subtract debtor from it and remove debtor
-          } else if (creditor.amount > debtor.amount) {
-            e.total -= debtor.amount;
-            creditor.amount -= debtor.amount;
-            index = debtors.indexOf(debtor);
-            debtors.splice(index, 1);
-            // if debtor is bigger subtract creditor from it and remove creditor
-          } else {
-            e.total -= creditor.amount;
-            debtor.amount -= creditor.amount;
-            cindex = creditors.indexOf(creditor);
-            creditors.splice(cindex, 1);
-          }
+    for (const p of e.participants) {
+      if (p.role === PRole.Creditor) cmap.set(p.id, p);
+      else dmap.set(p.id, p);
+    }
+
+    cmap.forEach((c) => {
+      if (dmap.has(c.id)) {
+        const d = dmap.get(c.id)!;
+        if (Math.abs(c.amount - d.amount) < Number.EPSILON) {
+          e.total -= d.amount;
+          dmap.delete(d.id);
+          cmap.delete(c.id);
+          // if creditor is bigger subtract debtor from it and remove debtor
+        } else if (c.amount > d.amount) {
+          e.total -= d.amount;
+          c.amount -= d.amount;
+          dmap.delete(d.id);
+          // if debtor is bigger subtract creditor from it and remove creditor
+        } else {
+          e.total -= c.amount;
+          d.amount -= c.amount;
+          cmap.delete(c.id);
         }
       }
-    }
+    });
+    const creditors = Array.from(cmap.values()).sort(
+      (a, b) => b.amount - a.amount
+    );
+    const debtors = Array.from(dmap.values()).sort(
+      (a, b) => b.amount - a.amount
+    );
     return { creditors, debtors };
   }
 }
