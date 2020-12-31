@@ -3,12 +3,12 @@ import neo4j, { Driver, Integer, Session } from "neo4j-driver";
 import { v4 as uuid } from "uuid";
 
 export enum Nodes {
-  Group = "Gruop",
+  Group = "Group",
   User = "User",
   Expense = "Expense",
 }
 
-enum Relations {
+export enum Relations {
   Member = "MEMBER",
   Owner = "OWNER",
   Participate = "PARTICIPATE",
@@ -17,13 +17,9 @@ enum Relations {
 }
 
 interface User {
-  name: string;
   id: string;
-}
-
-interface Group {
   name: string;
-  id: string;
+  picture: string;
 }
 
 export interface Expense {
@@ -349,27 +345,6 @@ class Graph {
     }
   }
 
-  async createGroup(group: Group, owner: User) {
-    const session = this.driver.session();
-    try {
-      await session.run(
-        `CREATE (o:User {uid:$uid,uname:$uname}), (g:Group {gid:$uid, gname:$gname})
-          CREATE (o)-[r:MEMBER]->(g)<-[:OWNER]-(o)`,
-        {
-          uid: owner.id,
-          gid: group.id,
-          uname: owner.id,
-          gname: group.name,
-        }
-      );
-      await session.close();
-    } catch (err) {
-      console.log(err);
-      await session.close();
-    } finally {
-      await session.close();
-    }
-  }
   async addMember(id: string, user: User) {
     const session = this.driver.session();
     try {
