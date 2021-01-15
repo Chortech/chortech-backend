@@ -9,6 +9,16 @@ interface IUserCreated {
     name: string;
   };
 }
+interface IUserUpdated {
+  subject: Subjects.UserCreated;
+  data: {
+    id: string;
+    phone?: string;
+    email?: string;
+    name?: string;
+    picture?: string;
+  };
+}
 
 interface IInviteeCreated {
   subject: Subjects.InviteeCreated;
