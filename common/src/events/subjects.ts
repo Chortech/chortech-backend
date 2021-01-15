@@ -1,5 +1,6 @@
 export enum Subjects {
   UserCreated = "user:created",
+  UserUpdated = "user:updated",
   UserInvited = "user:invited",
   InviteeCreated = "invitee:created",
   GroupCreated = "group:created",
