@@ -11,26 +11,17 @@ interface IGroup {
 
 class Group {
   static async create(group: IGroup) {
-    const session = graph.driver.session();
-    try {
-      await session.run(
-        `MATCH (u:User {id: $owner})
-          CREATE (u)-[r:${Relations.Member} {owner: true}]->(g:Group {id:$gid, name:$name , picture: $picture})
-          RETURN g`,
-        {
-          owner: group.owner,
-          gid: group.id,
-          name: group.name,
-          picture: group.picture,
-        }
-      );
-      await session.close();
-    } catch (err) {
-      await session.close();
-      throw err;
-    } finally {
-      await session.close();
-    }
+    await graph.run(
+      `MATCH (u:User {id: $owner})
+    CREATE (u)-[r:${Relations.Member} {owner: true}]->(g:Group {id:$gid, name:$name , picture: $picture})
+    RETURN g`,
+      {
+        owner: group.owner,
+        gid: group.id,
+        name: group.name,
+        picture: group.picture,
+      }
+    );
   }
   static async addMember(groupid: string, users: string[]) {
     const session = graph.driver.session();
@@ -152,7 +143,6 @@ class Group {
 
       default:
         throw new Error("Wrong update type!");
-        break;
     }
   }
 }
