@@ -11,13 +11,15 @@ const schema = Joi.object({
   description: Joi.string().required(),
   total: Joi.number().required(),
   paid_at: Joi.number(),
-  participants: Joi.array().items(
-    Joi.object({
-      id: Joi.string().required(),
-      role: Joi.string().valid(PRole.Creditor, PRole.Debtor),
-      amount: Joi.number(),
-    })
-  ),
+  participants: Joi.array()
+    .items(
+      Joi.object({
+        id: Joi.string().required(),
+        role: Joi.string().valid(PRole.Creditor, PRole.Debtor).required(),
+        amount: Joi.number().required(),
+      })
+    )
+    .min(2),
   group: Joi.string(),
   notes: Joi.string(),
 });
@@ -47,8 +49,8 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
     throw new BadRequestError("One of the participants doesn't exits!");
 
   const id = await graph.addExpense({ ...req.body, creator: req.user?.id });
-
-  res.status(201).json({ id, ...req.body });
+  const expense = await graph.getExpense(id);
+  res.status(201).json(expense);
 });
 
 export { router };
