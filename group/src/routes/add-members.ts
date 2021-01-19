@@ -37,35 +37,33 @@ router.put(
     if (await Group.exists({ _id: req.group?.id, members: { $nin: [user] } }))
       throw new BadRequestError("You are not a member of this group!");
 
-    let newMembers: string[] = [];
     for (let memberId of members) {
       if (!(await User.exists({ _id: memberId })))
         throw new BadRequestError(`There is no user with id ${memberId}`);
 
       const member = mongoose.Types.ObjectId(memberId);
-      const raw = await Group.updateOne(
-        {
-          _id: req.group?.id,
-          members: { $nin: [member] },
-        },
-        { $push: { members: member } }
-      );
 
-      if (raw.n === 0)
-        throw new ResourceConflictError(
-          `User ${memberId} is already in this group!`
-        );
-
-      newMembers.push(memberId);
+      if (await Group.exists({ _id: req.group?.id, members: { $in: [member] } }))
+        throw new ResourceConflictError(`User ${memberId} is already in this group!`);
     }
 
-    const group = await Group.findById(req.group?.id)
-      .populate("members")
-      .populate("creator");
+    const memberIds = members.map(mongoose.Types.ObjectId);
+
+    const raw = await Group.updateOne(
+      {
+        _id: req.group?.id,
+      },
+      { $push: { members: { $each: memberIds } } }
+    );
+
+    if (raw.n === 0)
+      throw new BadRequestError('Something went wrong when adding members');
+
+    const group = await Group.findById(req.group?.id).populate('members').populate('creator');
 
     await new GroupUpdatedPublisher(natsWrapper.client).publish({
       id: group!.id,
-      members: newMembers,
+      members: members,
       type: GroupUpdateType.AddMember,
     });
 
