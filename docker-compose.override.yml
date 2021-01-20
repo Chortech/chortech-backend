@@ -71,6 +71,13 @@ services:
       - 7474:7474
     logging:
       driver: none
+  activity-db:
+    image: mongo
+    container_name: activity-db-mongo
+    expose:
+     - 27017
+    logging: 
+      driver: none
   auth:
     build: ./auth
     container_name: auth-service
@@ -126,6 +133,18 @@ services:
     depends_on:
       - expense-db
       - nats-streaming
+  activity:
+    build: ./activity
+    container_name: activity-service
+    expose:
+      - 3000
+    depends_on: 
+      - activity-db
+    environment: 
+      MONGO_URI: mongodb://activity-db:27017
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      DEBUG: "true"
   api-docs:
     build: ./swagger
     container_name: api-docs
