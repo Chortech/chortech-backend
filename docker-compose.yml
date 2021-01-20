@@ -71,6 +71,13 @@ services:
       - 7474:7474
     logging:
       driver: none
+  activity-db:
+    image: mongo
+    container_name: activity-db-mongo
+    expose:
+      - 27017
+    logging:
+      driver: none
   auth:
     image: chortech/auth:latest
     container_name: auth-service
@@ -137,6 +144,20 @@ services:
     depends_on:
       - expense-db
       - nats-streaming
+  activity:
+    image: chortech/activity:latest
+    container_name: activity-service
+    restart: always
+    expose:
+      - 3000
+    depends_on:
+      - group-db
+    environment:
+      HOST: http://5.253.25.167/
+      MONGO_URI: mongodb://activity-db:27017
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      DEBUG: "true"
   api-docs:
     image: chortech/api-docs
     container_name: api-docs
