@@ -1,5 +1,7 @@
 import { app } from "./app";
 import mongoose from "mongoose";
+import { natsWrapper } from './utils/nats-wrapper';
+import { UserCreatedListener } from './listeners/user-created-listener';
 import { randomBytes } from "crypto";
 
 async function start() {
@@ -8,12 +10,13 @@ async function start() {
     const natsClusterId = process.env.NATS_CLUSTER_ID || "chortec";
     const natsClientId =
         process.env.NATS_CLIENT_ID || randomBytes(4).toString("hex");
-    // const natsUrl = process.env.NATS_URL || "http://localhost:4222";
-    // try {
-    //     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
-    // } catch (err) {
-    //     console.error(err);
-    // }
+    const natsUrl = process.env.NATS_URL || "http://localhost:4222";
+    try {
+        await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
+        new UserCreatedListener(natsWrapper.client).listen();
+    } catch (err) {
+        console.error(err);
+    }
 
     try {
         await mongoose.connect(mongoURI, {
