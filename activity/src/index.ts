@@ -6,7 +6,7 @@ import { randomBytes } from "crypto";
 
 async function start() {
     const port = process.env.PORT || 3000;
-    const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/group';
+    const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/activity';
     const natsClusterId = process.env.NATS_CLUSTER_ID || "chortec";
     const natsClientId =
         process.env.NATS_CLIENT_ID || randomBytes(4).toString("hex");
