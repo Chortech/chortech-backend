@@ -20,4 +20,4 @@ export * from "./events/base-listener";
 export * from "./events/base-pulisher";
 export * from "./events/user-events";
 export * from "./events/group-events";
-export * from './events/action';
+export * from './events/activity-events';

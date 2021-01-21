@@ -143,3 +143,17 @@ interface IActivityExpenseDeleted {
     data?: Object;
   };
 }
+
+export { 
+  IActivityCommented,
+  IActivityGroupCreated,
+  IActivityGroupDeleted,
+  IActivityGroupAdded,
+  IActivityGroupRemoved,
+  IActivityGroupUpdated,
+  IActivityGroupLeft,
+  IActivityExpenseCreated,
+  IActivityExpensePaid,
+  IActivityExpenseUpdated,
+  IActivityExpenseDeleted
+};
