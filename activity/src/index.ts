@@ -4,6 +4,7 @@ import { natsWrapper } from './utils/nats-wrapper';
 import { UserCreatedListener } from './listeners/user-created-listener';
 import { ActivityGroupCreatedListener } from './listeners/activity-group-created-listener';
 import { ActivityGroupDeletedListener } from './listeners/activity-group-deleted-listener';
+import { ActivityGroupAddedListener } from './listeners/activity-group-added-listener';
 import { randomBytes } from "crypto";
 
 async function start() {
@@ -17,6 +18,7 @@ async function start() {
         await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
         new UserCreatedListener(natsWrapper.client).listen();
         new ActivityGroupCreatedListener(natsWrapper.client).listen();
+        new ActivityGroupDeletedListener(natsWrapper.client).listen();
         new ActivityGroupDeletedListener(natsWrapper.client).listen();
     } catch (err) {
         console.error(err);
