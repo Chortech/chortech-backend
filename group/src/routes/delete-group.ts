@@ -39,7 +39,7 @@ router.delete("/", requireAuth, async (req, res) => {
     subject: { id: user?.id, name: user?.name! },
     object: { id: group.id, name: group.name },
     parent: undefined,
-    action: Action.Created,
+    action: Action.Deleted,
     involved: involved,
     data: undefined
   });
