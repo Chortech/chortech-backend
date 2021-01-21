@@ -1,6 +1,15 @@
 import { Subjects } from './subjects';
 
 
+interface IData {
+  subject: { id: string, name: string };
+  object: { id: string, name: string };
+  parent?: { id: string, name: string };
+  action: Action;
+  involved: string[];
+  data?: Object;
+}
+
 export enum Action {
   Created = 'CREATED',
   Deleted = 'DELETED',
@@ -14,134 +23,57 @@ export enum Action {
 
 interface IActivityCommented {
   subject: Subjects.ActivityCommented;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityGroupCreated {
   subject: Subjects.ActivityGroupCreated;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityGroupDeleted {
   subject: Subjects.ActivityGroupDeleted;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityGroupAdded {
   subject: Subjects.ActivityGroupAdded;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityGroupRemoved {
   subject: Subjects.ActivityGroupRemoved;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityGroupUpdated{
   subject: Subjects.ActivityGroupUpdated;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityGroupLeft {
   subject: Subjects.ActivityGroupLeft;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityExpenseCreated {
   subject: Subjects.ActivityExpenseCreated;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityExpensePaid {
   subject: Subjects.ActivityExpensePaid;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityExpenseUpdated {
   subject: Subjects.ActivityExpenseUpdated;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 interface IActivityExpenseDeleted {
   subject: Subjects.ActivityExpenseDeleted;
-  data: {
-    subject: { id: string, name: string };
-    object: { id: string, name: string };
-    parent?: { id: string, name: string };
-    action: Action;
-    involved: string[];
-    data?: Object;
-  };
+  data: IData
 }
 
 export { 
