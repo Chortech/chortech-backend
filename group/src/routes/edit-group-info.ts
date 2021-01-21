@@ -11,7 +11,7 @@ import Joi from "joi";
 import Group from "../models/group";
 import mongoose from "mongoose";
 import { GroupUpdatedPublisher } from "../publishers/group-updated-publisher";
-import { ActivityGroupUpdatedPublisher } from '../publishers/activity-group-update-publisher';
+import { ActivityPublisher } from '../publishers/activity-publisher';
 import { natsWrapper } from "../utils/nats-wrapper";
 import User from "../models/user";
 
@@ -62,7 +62,7 @@ router.patch(
     for (let member of gp.members)
       involved.push(member.id);
 
-    await new ActivityGroupUpdatedPublisher(natsWrapper.client).publish({
+    await new ActivityPublisher(natsWrapper.client).publish({
       subject: { id: usr?.id, name: usr?.name! },
         object: { id: group.id, name: group.name },
         parent: undefined,

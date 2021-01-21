@@ -2,7 +2,7 @@ import Router from "express";
 import { BadRequestError, requireAuth, NotFoundError, Action } from "@chortec/common";
 import Group from "../models/group";
 import { GroupDeletedPublisher } from "../publishers/group-deleted-publisher";
-import { ActivityGroupDeletedPublisher } from '../publishers/activity-group-deleted-publisher';
+import { ActivityPublisher } from '../publishers/activity-publisher';
 import { natsWrapper } from "../utils/nats-wrapper";
 import User from '../models/user';
 
@@ -35,7 +35,7 @@ router.delete("/", requireAuth, async (req, res) => {
   for (let member of group.members)
     involved.push(member.toHexString());
 
-  await new ActivityGroupDeletedPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     subject: { id: user?.id, name: user?.name! },
     object: { id: group.id, name: group.name },
     parent: undefined,

@@ -10,9 +10,10 @@ import Joi from "joi";
 import Group from "../models/group";
 import mongoose from "mongoose";
 import { GroupCreatedPublisher } from "../publishers/group-created-publisher";
-import { ActivityGroupCreatedPublisher } from '../publishers/activity-group-created-publisher';
 import { natsWrapper } from "../utils/nats-wrapper";
+import { ActivityPublisher } from '../publishers/activity-publisher';
 import User from "../models/user";
+
 
 const router = Router();
 
@@ -51,7 +52,7 @@ router.post("/", requireAuth, validate(createGroupSchema), async (req, res) => {
 
   const user = await User.findById(req.user.id);
 
-  await new ActivityGroupCreatedPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     subject: { id: user?.id, name: user?.name! },
     object: { id: gp.id, name: gp.name },
     parent: undefined,

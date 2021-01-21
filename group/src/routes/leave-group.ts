@@ -12,8 +12,8 @@ import { GroupUpdatedPublisher } from "../publishers/group-updated-publisher";
 import { natsWrapper } from "../utils/nats-wrapper";
 import User from "../models/user";
 import { GroupDeletedPublisher } from '../publishers/group-deleted-publisher';
-import { ActivityGroupDeletedPublisher } from '../publishers/activity-group-deleted-publisher';
-import { ActivityGroupLeftPublisher } from "../publishers/activity-group-left-publisher";
+import { ActivityPublisher } from '../publishers/activity-publisher';
+
 
 const router = Router();
 
@@ -36,7 +36,7 @@ router.delete('/', requireAuth, async (req, res) => {
   
     const user = await User.findById(req.user.id);
   
-    await new ActivityGroupDeletedPublisher(natsWrapper.client).publish({
+    await new ActivityPublisher(natsWrapper.client).publish({
       subject: { id: user?.id, name: user?.name! },
       object: { id: group?.id!, name: group?.name! },
       parent: undefined,
@@ -88,7 +88,7 @@ router.delete('/', requireAuth, async (req, res) => {
   for (let member of gp?.members!)
     involved.push(member.toHexString());
 
-  await new ActivityGroupLeftPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     subject: { id: usr?.id, name: usr?.name! },
     object: { id: gp?.id, name: gp?.name! },
     parent: undefined,
