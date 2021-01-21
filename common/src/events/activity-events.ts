@@ -1,7 +1,7 @@
 import { Subjects } from './subjects';
 
 
-interface IData {
+export interface IData {
   subject: { id: string, name: string };
   object: { id: string, name: string };
   parent?: { id: string, name: string };
