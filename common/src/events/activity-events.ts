@@ -25,3 +25,5 @@ interface IActivity {
   subject: Subjects.Activity;
   data: IData | IData[];
 }
+
+export { IActivity };
