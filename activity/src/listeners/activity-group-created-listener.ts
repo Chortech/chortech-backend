@@ -19,6 +19,7 @@ export class ActivityGroupCreatedListener extends Listener<IActivityGroupCreated
       });
 
       await activity.save();
+      done.ack();
     } catch (error) {
       console.log(error)
     }
