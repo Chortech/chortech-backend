@@ -1,12 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { Action } from '@chortec/common';
 
 
 interface IActivity {
 	subject: { id: string, name: string };
 	object: { id: string, name: string };
 	parent?: { id: string, name: string };
-  action: Action;
+  action: string;
   involved: string[];
   data?: Object;
 }
@@ -22,7 +21,7 @@ const activitySchema = new Schema(
     subject: Object,
     object: Object,
     parent: Object,
-    action: Action,
+    action: String,
     involved: [ { type: String } ],
     data: Object
   },
