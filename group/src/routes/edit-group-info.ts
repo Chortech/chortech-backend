@@ -4,13 +4,16 @@ import {
   validate,
   requireAuth,
   GroupUpdateType,
+  Action
 } from "@chortec/common";
 import { Router } from "express";
-import Joi, { exist } from "joi";
+import Joi from "joi";
 import Group from "../models/group";
 import mongoose from "mongoose";
 import { GroupUpdatedPublisher } from "../publishers/group-updated-publisher";
+import { ActivityGroupUpdatedPublisher } from '../publishers/activity-group-update-publisher';
 import { natsWrapper } from "../utils/nats-wrapper";
+import User from "../models/user";
 
 const router = Router();
 
@@ -44,13 +47,28 @@ router.patch(
     if (name) group.name = name;
     if (picture) group.picture = picture;
 
-    await group.save();
+    const gp = await group.save();
 
     await new GroupUpdatedPublisher(natsWrapper.client).publish({
       id: group!.id,
       picture,
       name,
       type: GroupUpdateType.EditInfo,
+    });
+
+    const usr = await User.findById(user);
+    let involved: string[] = [];
+
+    for (let member of gp.members)
+      involved.push(member.id);
+
+    await new ActivityGroupUpdatedPublisher(natsWrapper.client).publish({
+      subject: { id: usr?.id, name: usr?.name! },
+        object: { id: group.id, name: group.name },
+        parent: undefined,
+        action: Action.Updated,
+        involved: involved,
+        data: undefined
     });
 
     res.status(200).json(group);
