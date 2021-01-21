@@ -2,13 +2,9 @@ import { app } from "./app";
 import mongoose from "mongoose";
 import { natsWrapper } from './utils/nats-wrapper';
 import { UserCreatedListener } from './listeners/user-created-listener';
-import { ActivityGroupCreatedListener } from './listeners/activity-group-created-listener';
-import { ActivityGroupDeletedListener } from './listeners/activity-group-deleted-listener';
-import { ActivityGroupAddedListener } from './listeners/activity-group-added-listener';
 import { randomBytes } from "crypto";
-import { ActivityGroupRemovedListener } from "./listeners/activity-group-removed-listener";
-import { ActivityGroupLeftListener } from "./listeners/activity-group-left-listener";
-import { ActivityGroupUpdatedListener } from "./listeners/activity-group-updated-listener";
+import { ActivityListener } from './listeners/activity-listener';
+
 
 async function start() {
     const port = process.env.PORT || 3000;
@@ -20,12 +16,7 @@ async function start() {
     try {
         await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
         new UserCreatedListener(natsWrapper.client).listen();
-        new ActivityGroupCreatedListener(natsWrapper.client).listen();
-        new ActivityGroupDeletedListener(natsWrapper.client).listen();
-        new ActivityGroupAddedListener(natsWrapper.client).listen();
-        new ActivityGroupRemovedListener(natsWrapper.client).listen();
-        new ActivityGroupLeftListener(natsWrapper.client).listen();
-        new ActivityGroupUpdatedListener(natsWrapper.client).listen();
+        new ActivityListener(natsWrapper.client).listen();
     } catch (err) {
         console.error(err);
     }
