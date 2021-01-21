@@ -8,6 +8,7 @@ import { ActivityGroupAddedListener } from './listeners/activity-group-added-lis
 import { randomBytes } from "crypto";
 import { ActivityGroupRemovedListener } from "./listeners/activity-group-removed-listener";
 import { ActivityGroupLeftListener } from "./listeners/activity-group-left-listener";
+import { ActivityGroupUpdatedListener } from "./listeners/activity-group-updated-listener";
 
 async function start() {
     const port = process.env.PORT || 3000;
@@ -24,6 +25,7 @@ async function start() {
         new ActivityGroupAddedListener(natsWrapper.client).listen();
         new ActivityGroupRemovedListener(natsWrapper.client).listen();
         new ActivityGroupLeftListener(natsWrapper.client).listen();
+        new ActivityGroupUpdatedListener(natsWrapper.client).listen();
     } catch (err) {
         console.error(err);
     }
