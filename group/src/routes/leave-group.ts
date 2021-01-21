@@ -35,17 +35,13 @@ router.delete('/', requireAuth, async (req, res) => {
     });
   
     const user = await User.findById(req.user.id);
-    let involved: string[] = [];
-  
-    for (let member of group?.members!)
-      involved.push(member.toHexString());
   
     await new ActivityGroupDeletedPublisher(natsWrapper.client).publish({
       subject: { id: user?.id, name: user?.name! },
       object: { id: group?.id!, name: group?.name! },
       parent: undefined,
       action: Action.Deleted,
-      involved: involved,
+      involved: [req.user.id],
       data: undefined
     });
 
