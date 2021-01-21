@@ -2,6 +2,7 @@ import { app } from "./app";
 import mongoose from "mongoose";
 import { natsWrapper } from './utils/nats-wrapper';
 import { UserCreatedListener } from './listeners/user-created-listener';
+import { ActivityGroupCreatedListener } from './listeners/activity-group-created-listener';
 import { randomBytes } from "crypto";
 
 async function start() {
@@ -14,6 +15,7 @@ async function start() {
     try {
         await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
         new UserCreatedListener(natsWrapper.client).listen();
+        new ActivityGroupCreatedListener(natsWrapper.client).listen();
     } catch (err) {
         console.error(err);
     }
