@@ -67,7 +67,7 @@ class Graph {
   async run(query: string, params: object): Promise<QueryResult> {
     const session = this.driver.session();
     try {
-      const res = session.run(query, params);
+      const res = await session.run(query, params);
       await session.close();
       return res;
     } catch (err) {

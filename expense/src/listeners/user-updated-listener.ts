@@ -1,7 +1,6 @@
-import { IUserCreated, Listener, Subjects } from "@chortec/common";
+import { Listener, Subjects, IUserUpdated } from "@chortec/common";
 import { Message } from "node-nats-streaming";
 import { User } from "../models/user";
-import { graph } from "../utils/neo";
 export class UserUpdatedListener extends Listener<IUserUpdated> {
   subject: Subjects.UserUpdated = Subjects.UserUpdated;
   queueName = "expense-service";

@@ -5,7 +5,7 @@ interface IUser {
   id: string;
   email?: string;
   phone?: string;
-  name: string;
+  name?: string;
   picture?: string;
 }
 
