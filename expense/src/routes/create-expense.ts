@@ -1,9 +1,15 @@
 import { BadRequestError, validate, requireAuth } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
-import { graph, PRole, Participant } from "../utils/neo";
+import { graph } from "../utils/neo";
 import { v4 as uuid } from "uuid";
 import { Integer } from "neo4j-driver";
+import { IParticipant, PRole } from "../models/participant";
+import {
+  validatePriceFlow,
+  validateParticipants,
+} from "../utils/expense-validations";
+import { Expense } from "../models/expense";
 
 const router = Router();
 
@@ -37,20 +43,17 @@ const schema = Joi.object({
 //   ],
 // };
 
-router.post("/", requireAuth, validate(schema), async (req, res) => {
-  // checks the id of participants inside p with the users
-  // of database and if there is a conflict it will stop
-  // the operation.
-
-  const participants: Participant[] = req.body.participants;
-  const count = await graph.countParticipants(participants);
-
-  if (participants.length != count)
-    throw new BadRequestError("One of the participants doesn't exits!");
-
-  const id = await graph.addExpense({ ...req.body, creator: req.user?.id });
-  const expense = await graph.getExpense(id);
-  res.status(201).json(expense);
-});
+router.post(
+  "/",
+  requireAuth,
+  validate(schema),
+  validateParticipants,
+  validatePriceFlow,
+  async (req, res) => {
+    const id = await Expense.create({ ...req.body, creator: req.user?.id });
+    const expense = await Expense.findById(id);
+    res.status(201).json(expense);
+  }
+);
 
 export { router };
