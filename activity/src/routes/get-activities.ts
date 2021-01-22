@@ -10,7 +10,7 @@ router.get('/', requireAuth, async (req, res) => {
 
   const activities = await Activity.find({
     involved: { $in: [req.user.id] }
-  }).explain();
+  });
 
   res.status(200).json(activities);
 });
