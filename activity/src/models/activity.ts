@@ -38,6 +38,8 @@ const activitySchema = new Schema(
   }
 );
 
+activitySchema.index({ involved: 1 });
+
 activitySchema.statics.build = (activity: IActivity) => new Activity(activity);
 
 const Activity = mongoose.model<ActivityDoc, ActivityModel>('Activity', activitySchema);
