@@ -10,7 +10,7 @@ interface IUserCreated {
   };
 }
 interface IUserUpdated {
-  subject: Subjects.UserCreated;
+  subject: Subjects.UserUpdated;
   data: {
     id: string;
     phone?: string;
