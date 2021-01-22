@@ -1,6 +1,5 @@
 import { BadRequestError } from "@chortec/common";
 import neo4j, { Driver, Integer, QueryResult, Session } from "neo4j-driver";
-import { v4 as uuid } from "uuid";
 
 export enum Nodes {
   Group = "Group",
@@ -15,6 +14,11 @@ export enum Relations {
   Owe = "OWE",
   Wrote = "WROTE",
 }
+
+/**
+ * @description Encapsulating database interaction. Stuff like
+ * creating indices, constraints, close, clear etc...
+ */
 
 class Graph {
   private _driver?: Driver;
@@ -79,15 +83,13 @@ class Graph {
     }
   }
 
+  runMultiple(): QueryMultiple {
+    return new QueryMultiple(this.driver);
+  }
+
   async close() {
     await this.driver.close();
   }
-  /**
-   *
-   * @param eid expense id
-   * @param uid writer id
-   * @param comment the actual comment
-   */
 
   async exists(node: Nodes, id: string) {
     const session = this.driver.session();
@@ -160,6 +162,31 @@ class Graph {
     } finally {
       await session.close();
     }
+  }
+}
+
+/**
+ * @description run multiple neo4j queries with one session
+ */
+
+class QueryMultiple {
+  private session: Session;
+  constructor(driver: Driver) {
+    this.session = driver.session();
+  }
+
+  async run(query: string, params: any) {
+    try {
+      const res = await this.session.run(query, params);
+      return res;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  async close() {
+    await this.session.close();
   }
 }
 
