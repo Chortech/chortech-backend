@@ -40,4 +40,4 @@ interface IUserInvited {
     Invitees: [{ name: string; phone?: string; email?: string }];
   };
 }
-export { IUserCreated, IUserInvited, IInviteeCreated };
+export { IUserCreated, IUserInvited, IInviteeCreated, IUserUpdated };
