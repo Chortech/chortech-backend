@@ -5,12 +5,13 @@ import {
   NotFoundError,
 } from "@chortec/common";
 import { Router } from "express";
-import { graph, PRole } from "../utils/neo";
+import { Expense } from "../models/expense";
+import { graph } from "../utils/neo";
 
 const router = Router({ mergeParams: true });
 
 router.get("/", requireAuth, async (req, res) => {
-  const expenses = await graph.getExpenseReltaions(req.user!.id);
+  const expenses = await Expense.findAssociatesByUserid(req.user!.id);
 
   res.json(expenses);
 });

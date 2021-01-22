@@ -23,6 +23,7 @@ class Group {
       }
     );
   }
+
   static async addMember(groupid: string, users: string[]) {
     const session = graph.driver.session();
     try {
