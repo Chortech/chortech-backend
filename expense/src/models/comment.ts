@@ -20,11 +20,11 @@ class Comment {
   static async findByExpenseId(expenseid: string): Promise<IComment[]> {
     const res = await graph.run(
       `
-    MATCH (e:${Nodes.Expense} {id: $eid})<-[c:${Relations.Wrote}]-(u:${Nodes.User})
+    MATCH (e:${Nodes.Expense} {id: $expenseid})<-[c:${Relations.Wrote}]-(u:${Nodes.User})
 		RETURN {
-			id: c.id
-			writer: u
-			text: c.text
+			id: c.id,
+			writer: properties(u),
+			text: c.text,
 			created_at: c.created_at 
 		} as comment`,
       { expenseid }
@@ -58,7 +58,7 @@ class Comment {
     const res = await graph.run(
       `
       MATCH (u:${Nodes.User} {id: $uid})-[:${Relations.Participate}]->(e:${Nodes.Expense} {id: $eid})
-      CREATE (u)-[:${Relations.Wrote}]->(e)
+      CREATE (u)-[r:${Relations.Wrote}]->(e)
       SET r = $comment
       RETURN r;
 			`,

@@ -10,6 +10,16 @@ import { Integer } from "neo4j-driver";
 // how much debtors got money and creditors paid money.
 
 const validatePriceFlow = (req: Request, res: Response, next: NextFunction) => {
+  // if participants is null it means that we're updating
+  // the expense and there is no request for change in participants/
+  if (!req.body.participants) return next();
+
+  // if participants is defined total must be defined as well.
+  if (!req.body.total)
+    throw new BadRequestError(
+      "Can't update participants without defining total!"
+    );
+
   const participants: IParticipant[] = req.body.participants;
   const expenseTotal: number = req.body.total;
 
@@ -45,11 +55,17 @@ const validateParticipants = async (
   res: Response,
   next: NextFunction
 ) => {
-  const participants = req.body.participants;
+  // if participants is null it means that we're updating
+  // the expense and there is no request for change in participants/
+  if (!req.body.participants) return next();
 
-  // if its null it means that we're updating the expense
-  // and there is no request for change in participants
-  if (!participants) next();
+  // if participants is defined total must be defined as well.
+  if (!req.body.total)
+    throw new BadRequestError(
+      "Can't update participants without defining total!"
+    );
+
+  const participants = req.body.participants;
 
   const result = await graph.run(
     `UNWIND $participants as p

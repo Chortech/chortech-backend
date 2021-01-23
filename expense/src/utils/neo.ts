@@ -1,5 +1,11 @@
 import { BadRequestError } from "@chortec/common";
-import neo4j, { Driver, Integer, QueryResult, Session } from "neo4j-driver";
+import neo4j, {
+  Driver,
+  Integer,
+  Neo4jError,
+  QueryResult,
+  Session,
+} from "neo4j-driver";
 
 export enum Nodes {
   Group = "Group",
@@ -77,6 +83,7 @@ class Graph {
     } catch (err) {
       await session.close();
       console.log(err);
+      console.log(`Query: ${query}`);
       throw err;
     } finally {
       await session.close();
@@ -152,7 +159,7 @@ class Graph {
     const session = this.driver.session();
     try {
       await session.run(`
-      apoc.chypher.runMany('MATCH ()-[:PARTICIPATE]->(e) DETACH DELETE e;
+      apoc.cypher.runMany('MATCH ()-[:PARTICIPATE]->(e) DETACH DELETE e;
       MATCH (e:Expense) DETACH DELETE e;
       MATCH ()-[r:OWE]-() DETACH DELETE r;' , {}); `);
     } catch (err) {
@@ -181,6 +188,7 @@ class QueryMultiple {
       return res;
     } catch (err) {
       console.log(err);
+      console.log(`Query: ${query}`);
       throw err;
     }
   }

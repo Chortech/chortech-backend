@@ -50,12 +50,17 @@ router.put(
     for (const p of expense.participants) {
       participants.set(p.id, p);
     }
-
     if (req.body.description) expense.description = req.body.description;
     if (req.body.paid_at) expense.paid_at = req.body.paid_at;
     if (req.body.group) expense.group = req.body.group;
     if (req.body.notes) expense.notes = req.body.notes;
-    if (req.body.total) expense.total = req.body.total;
+    if (req.body.total) {
+      if (!req.body.participants)
+        throw new BadRequestError(
+          "Can't update total without defining participants!"
+        );
+      expense.total = req.body.total;
+    }
 
     // see if there is a change in participants
     let changed = false;
@@ -79,9 +84,8 @@ router.put(
 
     if (changed) {
       expense.participants = req.body.participants;
-    }
-
-    await Expense.update(expense, changed);
+      await Expense.updateFull(expense);
+    } else await Expense.updateInfo(expense);
 
     // if (req.body.participants) newexpense.total = req.body.total;
     // await graph.removeExpense(newexpense.id);
