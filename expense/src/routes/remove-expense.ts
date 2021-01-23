@@ -6,7 +6,8 @@ import {
 } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
-import { graph, Nodes, PRole } from "../utils/neo";
+import { Expense } from "../models/expense";
+import { graph, Nodes } from "../utils/neo";
 
 const router = Router({ mergeParams: true });
 
@@ -16,7 +17,7 @@ router.delete("/", requireAuth, async (req, res) => {
   if (!(await graph.exists(Nodes.Expense, expenseid)))
     throw new NotFoundError("Didn't found expense with given id!");
 
-  if (!(await graph.removeExpense(expenseid)))
+  if (!(await Expense.remove(expenseid)))
     throw new BadRequestError("Something went wrong!");
 
   res.json({ message: "Delete successful" });
