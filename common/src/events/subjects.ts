@@ -5,4 +5,5 @@ export enum Subjects {
   GroupCreated = "group:created",
   GroupUpdated = "group:updated",
   GroupDeleted = "group:deleted",
+  Activity = 'activity:created'
 }

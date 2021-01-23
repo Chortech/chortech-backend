@@ -4,6 +4,8 @@ import {
   ResourceConflictError,
   requireAuth,
   NotFoundError,
+  Action,
+  IData
 } from "@chortec/common";
 import { validate, GroupUpdateType } from "@chortec/common";
 import Joi from "joi";
@@ -11,6 +13,7 @@ import Group from "../models/group";
 import User from "../models/user";
 import mongoose from "mongoose";
 import { GroupUpdatedPublisher } from "../publishers/group-updated-publisher";
+import { ActivityPublisher } from '../publishers/activity-publisher';
 import { natsWrapper } from "../utils/nats-wrapper";
 
 const router = Router();
@@ -28,7 +31,7 @@ router.put(
 
     const { members } = req.body;
 
-    const exists = await Group.findById(req.group?.id);
+    const exists = await Group.exists({ _id: req.group?.id });
     const user = mongoose.Types.ObjectId(req.user.id);
 
     if (!exists)
@@ -66,6 +69,31 @@ router.put(
       members: members,
       type: GroupUpdateType.AddMember,
     });
+
+    const usr = await User.findById(user);
+    const gp = await group?.save();
+    let involved: string[] = [];
+
+    for (let member of gp?.members!)
+      involved.push(member.id);
+
+    let data: IData[] = [];
+
+    for (let member of members) {
+      const added = await User.findById(member);
+      const activity: IData = {
+        subject: { id: usr?.id, name: usr?.name! },
+        object: { id: added?.id, name: added?.name! },
+        parent: { id: group?.id, name: group?.name! },
+        action: Action.Added,
+        involved: involved,
+        data: undefined
+      }
+
+      data.push(activity);
+    }
+
+    await new ActivityPublisher(natsWrapper.client).publish(data);
 
     res.status(200).json(group);
   }

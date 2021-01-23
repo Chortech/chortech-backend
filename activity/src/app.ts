@@ -6,6 +6,7 @@ import express from "express";
 import "express-async-errors";
 import helmet from "helmet";
 import { NotFoundError, errorHandler } from "@chortec/common";
+import { getActivitiesRouter } from "./routes/get-activities";
 
 // setting up express
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(helmet());
 
 // adding route handlers to express
+app.use('/api/activity', getActivitiesRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {

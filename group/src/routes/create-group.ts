@@ -3,6 +3,7 @@ import {
   BadRequestError,
   ResourceConflictError,
   requireAuth,
+  Action
 } from "@chortec/common";
 import { validate } from "@chortec/common";
 import Joi from "joi";
@@ -10,6 +11,9 @@ import Group from "../models/group";
 import mongoose from "mongoose";
 import { GroupCreatedPublisher } from "../publishers/group-created-publisher";
 import { natsWrapper } from "../utils/nats-wrapper";
+import { ActivityPublisher } from '../publishers/activity-publisher';
+import User from "../models/user";
+
 
 const router = Router();
 
@@ -44,6 +48,17 @@ router.post("/", requireAuth, validate(createGroupSchema), async (req, res) => {
     creator: gp.creator.toHexString(),
     name: gp.name,
     picture: gp.picture,
+  });
+
+  const user = await User.findById(req.user.id);
+
+  await new ActivityPublisher(natsWrapper.client).publish({
+    subject: { id: user?.id, name: user?.name! },
+    object: { id: gp.id, name: gp.name },
+    parent: undefined,
+    action: Action.Created,
+    involved: [gp.creator.toHexString()],
+    data: undefined
   });
 
   res.status(201).send({
