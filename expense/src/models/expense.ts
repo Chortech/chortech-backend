@@ -449,42 +449,180 @@ class Expense {
   }
 }
 
-// helper functions
+class ParticipantsIterator {
+  debtors: IParticipant[];
+  creditors: IParticipant[];
+  private currentDebtor?: IParticipant;
+  private currentCreditor?: IParticipant;
 
-function seperateParticipants(e: IExpense) {
-  const cmap = new Map<string, IParticipant>();
-  const dmap = new Map<string, IParticipant>();
+  // Since the value of amount for debtor and creditors can change
+  // we hold the actual value for when we might need it later.
 
-  for (const p of e.participants) {
-    if (p.role === PRole.Creditor) cmap.set(p.id, p);
-    else dmap.set(p.id, p);
+  private tempAmount: { d: number; c: number };
+  constructor(expense: IExpense) {
+    const seperated = this.seperateParticipants(expense);
+    this.debtors = seperated.debtors;
+    this.creditors = seperated.creditors;
+    this.tempAmount = { d: -1, c: -1 };
+  }
+  get creditor() {
+    return this.currentCreditor;
+  }
+  get debtor() {
+    return this.currentDebtor;
+  }
+  get pair() {
+    return { d: this.debtor, c: this.creditor };
   }
 
-  cmap.forEach((c) => {
-    if (dmap.has(c.id)) {
-      const d = dmap.get(c.id)!;
-      if (Math.abs(c.amount - d.amount) < Number.EPSILON) {
-        e.total -= d.amount;
-        dmap.delete(d.id);
-        cmap.delete(c.id);
-        // if creditor is bigger subtract debtor from it and remove debtor
-      } else if (c.amount > d.amount) {
-        e.total -= d.amount;
-        c.amount -= d.amount;
-        dmap.delete(d.id);
-        // if debtor is bigger subtract creditor from it and remove creditor
-      } else {
-        e.total -= c.amount;
-        d.amount -= c.amount;
-        cmap.delete(c.id);
-      }
+  get pairAmount() {
+    return this.tempAmount;
+  }
+
+  nextCreditor() {
+    this.currentCreditor = this.creditors.pop();
+    this.tempAmount.c = this.currentCreditor
+      ? this.currentCreditor.amount
+      : -Number.MAX_VALUE;
+  }
+  nextDebtor() {
+    this.currentDebtor = this.debtors.pop();
+    this.tempAmount.d = this.currentDebtor
+      ? this.currentDebtor.amount
+      : -Number.MAX_VALUE;
+    if (this.currentDebtor) {
     }
-  });
-  const creditors = Array.from(cmap.values()).sort(
-    (a, b) => b.amount - a.amount
-  );
-  const debtors = Array.from(dmap.values()).sort((a, b) => b.amount - a.amount);
-  return { creditors, debtors };
+  }
+
+  next() {
+    this.nextCreditor();
+    this.nextDebtor();
+  }
+
+  /**
+   * @description seperates participants into 2 groups, debtors and creditors
+   */
+
+  seperateParticipants(expense: IExpense) {
+    const cmap = new Map<string, IParticipant>();
+    const dmap = new Map<string, IParticipant>();
+
+    for (const p of expense.participants) {
+      if (p.role === PRole.Creditor) cmap.set(p.id, p);
+      else dmap.set(p.id, p);
+    }
+
+    cmap.forEach((c) => {
+      if (dmap.has(c.id)) {
+        const d = dmap.get(c.id)!;
+        if (Math.abs(c.amount - d.amount) < Number.EPSILON) {
+          expense.total -= d.amount;
+          dmap.delete(d.id);
+          cmap.delete(c.id);
+          // if creditor is bigger subtract debtor from it and remove debtor
+        } else if (c.amount > d.amount) {
+          expense.total -= d.amount;
+          c.amount -= d.amount;
+          dmap.delete(d.id);
+          // if debtor is bigger subtract creditor from it and remove creditor
+        } else {
+          expense.total -= c.amount;
+          d.amount -= c.amount;
+          cmap.delete(c.id);
+        }
+      }
+    });
+    const creditors = Array.from(cmap.values()).sort(
+      (a, b) => b.amount - a.amount
+    );
+    const debtors = Array.from(dmap.values()).sort(
+      (a, b) => b.amount - a.amount
+    );
+    return { creditors, debtors };
+  }
+}
+
+class ParticipantHandler {
+  private iterator: ParticipantsIterator;
+  private expense: IExpense;
+  private participants: ParticipantExtended[];
+  private total: number;
+  private owes: { id: string; amount: number }[];
+  constructor(expense: IExpense) {
+    this.expense = expense;
+    this.iterator = new ParticipantsIterator(expense);
+    this.iterator.next();
+    this.participants = [];
+    this.total = 0;
+    this.owes = [];
+  }
+
+  handle() {
+    let pair = this.iterator.pair;
+    let pairAmount = this.iterator.pairAmount;
+    let lent = pair.c?.amount!;
+    let borrowed = pair.d?.amount!;
+
+    // if lent money is equal borrowed money cross each one
+    if (Math.abs(lent - borrowed) < Number.EPSILON) {
+      this.total += lent;
+      this.owes.push({ id: pair.c!.id, amount: pair.c!.amount });
+      this.participants.push({
+        id: pair.d!.id,
+        role: PRole.Debtor,
+        amount: pairAmount!.d,
+        owes: this.owes,
+      });
+      this.participants.push({
+        id: pair.c!.id,
+        role: PRole.Creditor,
+        amount: pairAmount!.c,
+      });
+
+      this.iterator.next();
+      // check this see if its necessary
+      // if (creditor) creditortemp = creditor!.amount;
+      // if (debtor) debtortemp = debtor!.amount;
+      this.owes = [];
+    }
+    // if lent money is smaller that money borrowed cross
+    // creditor but keep debtor to cross it next iterations
+    // with one debtor
+    else if (lent < borrowed) {
+      this.total += pair.c!.amount;
+      this.participants.push({
+        id: pair.c!.id,
+        role: PRole.Creditor,
+        amount: pairAmount!.c,
+      });
+      this.owes.push({ id: pair.c!.id, amount: pair.c!.amount });
+
+      pair.d!.amount -= pair.c!.amount;
+      this.iterator.nextCreditor();
+      // if (creditor) creditortemp = creditor!.amount;
+    }
+    // if money lent is bigger then corss one debtor and
+    // hold creditor  to cross it with other debtors in
+    // next iteration
+    else {
+      this.total += pair.d!.amount;
+      this.owes.push({ id: pair.c!.id, amount: pair.d!.amount });
+      this.participants.push({
+        id: pair.d!.id,
+        role: PRole.Debtor,
+        amount: pairAmount.d,
+        owes: this.owes,
+      });
+      this.owes = [];
+
+      pair.c!.amount -= pair.d!.amount;
+      this.iterator.nextDebtor();
+    }
+  }
+
+  satisfied() {
+    return Math.abs(this.total - this.expense.total) > Number.EPSILON;
+  }
 }
 
 export { IExpense, Expense };
