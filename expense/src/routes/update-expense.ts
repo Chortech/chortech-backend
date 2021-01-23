@@ -7,6 +7,7 @@ import {
 import { Router } from "express";
 import Joi from "joi";
 import { Expense } from "../models/expense";
+import { Group } from "../models/group";
 import { IParticipant, Participant, PRole } from "../models/participant";
 import {
   validateParticipants,
@@ -52,9 +53,16 @@ router.put(
     }
     if (req.body.description) expense.description = req.body.description;
     if (req.body.paid_at) expense.paid_at = req.body.paid_at;
-    if (req.body.group) expense.group = req.body.group;
+    if (req.body.group) {
+      // a group that does not exists is not allowed
+      if (!(await Group.exists(req.body.group)))
+        throw new BadRequestError("Group does not exists!");
+      expense.group = req.body.group;
+    }
     if (req.body.notes) expense.notes = req.body.notes;
+
     if (req.body.total) {
+      // total without particpants is not allowed
       if (!req.body.participants)
         throw new BadRequestError(
           "Can't update total without defining participants!"

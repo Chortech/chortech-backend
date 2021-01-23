@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import { BadRequestError } from "@chortec/common";
 import { Comment, IComment } from "./comment";
 import util from "util";
+import { Group } from "./group";
 
 interface IExpense {
   id: string;
@@ -20,6 +21,10 @@ interface IExpense {
 }
 
 class Expense {
+  static async exists(expenseid: string) {
+    return await graph.exists(Nodes.Expense, expenseid);
+  }
+
   static async create(expense: IExpense) {
     const session = graph.runMultiple();
 
@@ -31,18 +36,17 @@ class Expense {
     console.log(
       util.inspect(participants, false, null, true /* enable colors */)
     );
-    const id = uuid();
-
+    expense.id = uuid();
     // Create the expense and attach the participants to it
     await session.run(
-      `MERGE (e:${Nodes.Expense} {id: $eid}) SET e= $expense WITH e
+      `MERGE (e:${Nodes.Expense} {id: $expenseid}) SET e= $expense WITH e
       UNWIND $participants as p
       WITH apoc.convert.toJson(p.owes) as owes , p, e
       MATCH (u:${Nodes.User} {id: p.id})
       MERGE (u)-[:${Relations.Participate} {role: p.role, amount: p.amount , owes: owes}]->(e)`,
       {
         expense: {
-          id,
+          id: expense.id,
           creator: expense.creator,
           total: expense.total,
           group: expense.group,
@@ -53,9 +57,12 @@ class Expense {
           description: expense.description,
         },
         participants: participants,
-        eid: id,
+        expenseid: expense.id,
       }
     );
+
+    // assign this expense to the group
+    if (expense.group) await Group.assignExpense(expense.group, expense.id);
 
     await session.run(
       `UNWIND $participants AS p
@@ -87,7 +94,7 @@ class Expense {
 
     await session.close();
 
-    return id;
+    return expense.id;
   }
 
   static async updateInfo(expense: IExpense) {
@@ -255,6 +262,8 @@ class Expense {
         expenseid,
       }
     );
+
+    if (res.records.length === 0) return null;
 
     const participants: any[] = [];
 

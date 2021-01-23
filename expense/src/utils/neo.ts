@@ -19,6 +19,7 @@ export enum Relations {
   Participate = "PARTICIPATE",
   Owe = "OWE",
   Wrote = "WROTE",
+  Assigned = "ASSIGNED",
 }
 
 /**

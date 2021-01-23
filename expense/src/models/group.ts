@@ -1,5 +1,6 @@
 import { GroupUpdateType, IGroupUpdated } from "@chortec/common";
 import { graph, Nodes, Relations } from "../utils/neo";
+import { IParticipant } from "./participant";
 
 interface IGroup {
   id: string;
@@ -13,13 +14,13 @@ class Group {
   static async create(group: IGroup) {
     await graph.run(
       `MATCH (u:User {id: $owner})
-    CREATE (u)-[r:${Relations.Member} {owner: true}]->(g:Group {id:$gid, name:$name , picture: $picture})
+    CREATE (u)-[r:${Relations.Member}]->(g:Group { id:$gid } )<-[r2:${Relations.Owner}]-(u)
+    SET g += $group
     RETURN g`,
       {
         owner: group.owner,
         gid: group.id,
-        name: group.name,
-        picture: group.picture,
+        group,
       }
     );
   }
@@ -110,6 +111,44 @@ class Group {
     } finally {
       await session.close();
     }
+  }
+
+  static async assignExpense(groupid: string, expenseid: string) {
+    await graph.run(
+      `MATCH (g:${Nodes.Group} {id: $groupid})
+      MATCH (e:${Nodes.Expense} {id: $expenseid})
+      CREATE (e)-[r:${Relations.Assigned}]->(g)
+      RETURN r;
+      `,
+      { groupid, expenseid }
+    );
+  }
+  /**
+   * @description checks id of each participant to see if it's a
+   * member of this group or not
+   * @param participants list of participants that must be a member
+   * of this group
+   */
+  static async areMembers(groupid: string, participants: IParticipant[]) {
+    // map participants to id and remove duplicates
+    const nodups = Array.from(new Set(participants.map((x) => x.id)));
+
+    const res = await graph.run(
+      `UNWIND $nodups as id
+      MATCH (u:${Nodes.User} {id: id })-[:${Relations.Member}]->(g:Group {id: $groupid})
+      RETURN COUNT(u) as count;
+      `,
+      {
+        nodups,
+        groupid,
+      }
+    );
+    console.log("count: ", res.records[0].get("count").toNumber());
+    return res.records[0].get("count").toNumber() === nodups.length;
+  }
+
+  static async exists(groupid: string) {
+    return await graph.exists(Nodes.Group, groupid);
   }
 
   static async update(group: IGroupUpdated["data"]) {
