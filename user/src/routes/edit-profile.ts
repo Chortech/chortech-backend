@@ -32,7 +32,9 @@ router.put("/", requireAuth, validate(editProfileSchema), async (req, res) => {
     email: user.email,
     phone: user.phone,
     name: user.name,
-    picture: user.picture,
+    picture: user.picture
+      ? `${process.env.STORAGE_ENDPOINT}/${process.env.STORAGE_BUCKET}/${user.picture}`
+      : undefined,
   });
   res.status(200).send({
     message: "Profile edited successfully.",

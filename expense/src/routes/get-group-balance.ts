@@ -7,7 +7,6 @@ import {
 import { Router } from "express";
 import { Expense } from "../models/expense";
 import { Group } from "../models/group";
-import { graph } from "../utils/neo";
 
 const router = Router({ mergeParams: true });
 

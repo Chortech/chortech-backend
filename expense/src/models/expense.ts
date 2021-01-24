@@ -333,18 +333,6 @@ class Expense {
     return relations;
   }
 
-  // MATCH (u:User {id: "600b9777fbe45e00191f0198"})-[:MEMBER]->(g:Group)<-[:ASSIGNED]-(e:Expense)<-[r:PARTICIPATE]-(u)
-  // RETURN properties(g) as group, sum(CASE r.role WHEN "debtor" then -r.amount else r.amount end)
-
-  // MATCH (u:User {id: "600b9777fbe45e00191f0198"})-[:MEMBER]->(g:Group)
-  // CALL {
-  //   WITH g,u
-  //   MATCH (g)<-[:ASSIGNED]-(e:Expense)<-[r:PARTICIPATE]-(u)
-  //     RETURN collect({expense: properties(e), amount: CASE r.role WHEN "debtor" then -r.amount else r.amount end}) as expenses,
-  //     sum(CASE r.role WHEN "debtor" then -r.amount else r.amount end) as balance
-  // }
-  // RETURN properties(g) as group, balance, expenses
-
   /**
    * @description find balance of user with id userid in all groups
    * @param userid user id
@@ -378,11 +366,6 @@ class Expense {
     }[] = [];
     for (const rec of res.records) {
       let group = rec.get("group");
-      console.log(rec.get("balance"));
-      console.log(typeof rec.get("balance"));
-      // let balance = (rec.get("balance") as Integer).toNumber();
-      // console.log(balance);
-
       delete group.members;
       result.push({
         group: group,
