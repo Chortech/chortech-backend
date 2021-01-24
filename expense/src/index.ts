@@ -6,6 +6,7 @@ import { graph } from "./utils/neo";
 import { GroupCreatedListener } from "./listeners/group-created-listener";
 import { GroupDeletedListener } from "./listeners/group-deleted-listener";
 import { GroupUpdatedListener } from "./listeners/group-updated-listener";
+import { UserUpdatedListener } from "./listeners/user-updated-listener";
 
 async function start() {
   const port = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ async function start() {
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
     new UserCreatedListener(natsWrapper.client).listen();
+    new UserUpdatedListener(natsWrapper.client).listen();
     new GroupCreatedListener(natsWrapper.client).listen();
     new GroupDeletedListener(natsWrapper.client).listen();
     new GroupUpdatedListener(natsWrapper.client).listen();

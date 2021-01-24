@@ -1,11 +1,4 @@
-import { BadRequestError } from "@chortec/common";
-import neo4j, {
-  Driver,
-  Integer,
-  Neo4jError,
-  QueryResult,
-  Session,
-} from "neo4j-driver";
+import neo4j, { Driver, QueryResult, Session } from "neo4j-driver";
 
 export enum Nodes {
   Group = "Group",
@@ -37,7 +30,9 @@ class Graph {
   }
 
   async init(url: string, username: string, password: string) {
-    this._driver = neo4j.driver(url);
+    this._driver = neo4j.driver(url, undefined, {
+      disableLosslessIntegers: true,
+    });
     const session = this.driver.session();
     await session.run(
       `CREATE CONSTRAINT U_UNIQUE IF NOT EXISTS ON (u:${Nodes.User}) ASSERT u.id IS UNIQUE`
@@ -113,7 +108,7 @@ class Graph {
 
       await session.close();
 
-      return (res.records[0].get("count") as Integer).toNumber() > 0;
+      return res.records[0].get("count") > 0;
     } catch (err) {
       console.log(err);
       await session.close();

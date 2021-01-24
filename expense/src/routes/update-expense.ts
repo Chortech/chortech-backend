@@ -27,7 +27,9 @@ const schema = Joi.object({
       Joi.object({
         id: Joi.string(),
         role: Joi.string().valid(PRole.Creditor, PRole.Debtor),
-        amount: Joi.number(),
+        amount: Joi.number()
+          .max(Number.MAX_SAFE_INTEGER - 1)
+          .min(0),
       })
     )
     .min(2),

@@ -1,10 +1,9 @@
 import { graph, Nodes, Relations } from "../utils/neo";
 import { IParticipant, ParticipantHandler, PRole } from "./participant";
 import { v4 as uuid } from "uuid";
-import { BadRequestError } from "@chortec/common";
 import { Comment, IComment } from "./comment";
-import util from "util";
-import { Group } from "./group";
+import { Group, IGroup } from "./group";
+import { IUser } from "./user";
 
 interface IExpense {
   id: string;
@@ -33,9 +32,6 @@ class Expense {
       handler.handle();
     }
     const participants = handler.participants;
-    console.log(
-      util.inspect(participants, false, null, true /* enable colors */)
-    );
     expense.id = uuid();
     // Create the expense and attach the participants to it
     await session.run(
@@ -335,6 +331,96 @@ class Expense {
       });
     }
     return relations;
+  }
+
+  /**
+   * @description find balance of user with id userid in all groups
+   * @param userid user id
+   */
+  static async findGroupsExpense(
+    userid: string
+  ): Promise<
+    {
+      group: IGroup;
+      balance: number;
+      expenses: { expense: IExpense; amount: number }[];
+    }[]
+  > {
+    const res = await graph.run(
+      `MATCH (u:${Nodes.User} {id: $userid})-[:${Relations.Member}]->(g:${Nodes.Group})
+      CALL {
+        WITH g,u
+        MATCH (g)<-[:${Relations.Assigned}]-(e:${Nodes.Expense})<-[r:${Relations.Participate}]-(u)
+          RETURN collect({expense: properties(e), amount: CASE r.role WHEN "debtor" then -r.amount else r.amount end}) as expenses,
+          sum(CASE r.role WHEN "debtor" then -r.amount else r.amount end) as balance
+      }
+      RETURN properties(g) as group, balance, expenses
+      `,
+      { userid }
+    );
+
+    const result: {
+      group: IGroup;
+      balance: number;
+      expenses: { expense: IExpense; amount: number }[];
+    }[] = [];
+    for (const rec of res.records) {
+      let group = rec.get("group");
+      delete group.members;
+      result.push({
+        group: group,
+        expenses: rec.get("expenses"),
+        balance: rec.get("balance"),
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * @description find all balances of group with id groupid
+   * this is used in get group balances route
+   * @param userid user id
+   */
+
+  static async findGroupBalanceByGroupid(
+    groupid: string
+  ): Promise<
+    {
+      user: IUser;
+      balances: { user: IUser; amount: number };
+    }[]
+  > {
+    const res = await graph.run(
+      `MATCH (g:${Nodes.Group} {id: $groupid})
+      WITH g
+      MATCH (u1:${Nodes.User})-[:${Relations.Member}]->(g)
+      CALL {
+        WITH u1,g
+        MATCH (g)<-[:${Relations.Member}]-(u2:${Nodes.User})-[r:${Relations.Owe}]-(u1)
+          WHERE u1 <> u2
+          RETURN collect({
+            user: properties(u2),
+            amount: CASE WHEN startnode(r) = u1 THEN -r.amount ELSE r.amount END
+        }) as balances
+      }
+      RETURN properties(u1) as user , balances`,
+      { groupid }
+    );
+
+    const balances: {
+      user: IUser;
+      balances: { user: IUser; amount: number };
+    }[] = [];
+
+    for (const rec of res.records) {
+      balances.push({
+        user: rec.get("user"),
+        balances: rec.get("balances"),
+      });
+    }
+
+    return balances;
   }
 }
 

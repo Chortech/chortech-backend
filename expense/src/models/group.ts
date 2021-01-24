@@ -131,7 +131,16 @@ class Group {
    */
   static async areMembers(groupid: string, participants: IParticipant[]) {
     // map participants to id and remove duplicates
-    const nodups = Array.from(new Set(participants.map((x) => x.id)));
+    const nodups = Array.from(new Set());
+
+    return await this.areMembersById(
+      groupid,
+      participants.map((x) => x.id)
+    );
+  }
+  static async areMembersById(groupid: string, ids: string[]) {
+    // map participants to id and remove duplicates
+    const nodups = Array.from(new Set(ids));
 
     const res = await graph.run(
       `UNWIND $nodups as id
@@ -143,8 +152,7 @@ class Group {
         groupid,
       }
     );
-    console.log("count: ", res.records[0].get("count").toNumber());
-    return res.records[0].get("count").toNumber() === nodups.length;
+    return res.records[0].get("count") === nodups.length;
   }
 
   static async exists(groupid: string) {
