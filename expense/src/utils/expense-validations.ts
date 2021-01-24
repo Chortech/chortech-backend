@@ -2,7 +2,6 @@ import { BadRequestError } from "@chortec/common";
 import { IParticipant, PRole } from "../models/participant";
 import { Request, Response, NextFunction } from "express";
 import { graph } from "./neo";
-import { Integer } from "neo4j-driver";
 
 // Check if debtors, creditors and total price of this expense is equal
 // if not its invalid and we should respond with an error. An example of
@@ -76,7 +75,7 @@ const validateParticipants = async (
     }
   );
 
-  let count = result.records[0].get("count") as Integer;
+  let count = result.records[0].get("count");
   if (participants.length != count)
     throw new BadRequestError("One of the participants doesn't exits!");
 

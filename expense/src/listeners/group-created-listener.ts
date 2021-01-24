@@ -14,7 +14,6 @@ export class GroupCreatedListener extends Listener<IGroupCreated> {
         name: data.name,
         picture: data.picture,
         owner: data.creator,
-        members: [],
       });
 
       done.ack();
