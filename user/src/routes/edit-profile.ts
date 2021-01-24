@@ -27,7 +27,13 @@ router.put("/", requireAuth, validate(editProfileSchema), async (req, res) => {
   if (picture) user.picture = picture;
 
   await user.save();
-  await new UserUpdatedPublisher(natsWrapper.client).publish(user);
+  await new UserUpdatedPublisher(natsWrapper.client).publish({
+    id: user._id,
+    email: user.email,
+    phone: user.phone,
+    name: user.name,
+    picture: user.picture,
+  });
   res.status(200).send({
     message: "Profile edited successfully.",
   });
