@@ -28,7 +28,7 @@ const signupSchema = Joi.object({
       )
     )
     .message("Invalid phone number"),
-  name: Joi.string().min(6).max(255).alphanum().required(),
+  name: Joi.string().min(3).max(255).required(),
   password: Joi.string().min(8).max(16).required(),
   id: Joi.string().uuid({ version: "uuidv4" }).optional(),
 })
