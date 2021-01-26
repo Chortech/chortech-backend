@@ -17,6 +17,7 @@ interface IExpense {
   paid_at: number;
   created_at: number;
   modified_at: number;
+  category: number;
 }
 
 class Expense {
@@ -53,6 +54,7 @@ class Expense {
           created_at: expense.created_at,
           modified_at: expense.modified_at,
           description: expense.description,
+          category: expense.category,
         },
         participants: participants,
         expenseid: expense.id,
@@ -127,6 +129,7 @@ class Expense {
           created_at: expense.created_at,
           modified_at: expense.modified_at,
           description: expense.description,
+          category: expense.category,
         },
         eid: expense.id,
       }

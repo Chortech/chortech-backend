@@ -29,6 +29,7 @@ const schema = Joi.object({
     .min(2),
   group: Joi.string(),
   notes: Joi.string(),
+  category: Joi.number().required(),
 });
 
 router.post(
