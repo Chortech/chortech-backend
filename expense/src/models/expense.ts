@@ -132,6 +132,10 @@ class Expense {
       }
     );
 
+    if (expense.group) {
+      Expense.updateGroup(expense.group, expense.id);
+    }
+
     await session.close();
   }
 
@@ -266,19 +270,15 @@ class Expense {
     }[]
   > {
     const res = await graph.run(
-      `MATCH (g:${Nodes.Group} {id: $groupid})
-      WITH g
-      MATCH (u1:${Nodes.User})-[:${Relations.Member}]->(g)
-      CALL {
-        WITH u1,g
-        MATCH (g)<-[:${Relations.Member}]-(u2:${Nodes.User})-[r:${Relations.Owe}]-(u1)
-          WHERE u1 <> u2
-          RETURN collect({
-            user: properties(u2),
-            amount: CASE WHEN startnode(r) = u1 THEN -r.amount ELSE r.amount END
-        }) as balances
+      `MATCH (u:${Nodes.User})-[:${Relations.Member}]->(g:${Nodes.Group} {id: $groupid})
+      CALL{
+        WITH u,g
+          MATCH (u)-[r:OWE]-(u2:${Nodes.User})
+          WHERE (u2)-[:${Relations.Member}]->(g)
+          RETURN sum(CASE WHEN startNode(r) = u THEN -r.amount ELSE r.amount END) as balance, u2
       }
-      RETURN properties(u1) as user , balances`,
+      RETURN properties(u) as user, collect({ user: properties(u2), balance: balance}) as balances
+      `,
       { groupid }
     );
 
@@ -305,7 +305,11 @@ class Expense {
    */
   static async findAssociatesByUserid(userid: string) {
     const res = await graph.run(
-      "MATCH (u:User {id: $userid})-[r:OWE]-(u2:User) RETURN u,r,u2, (startnode(r) = u) as isStart",
+      `MATCH (u:${Nodes.User} {id: $userid})
+        -[r:${Relations.Owe}]-(u1:${Nodes.User})
+        RETURN properties(u) as user, properties(u1) as other, 
+          sum(CASE WHEN startNode(r) = u THEN -r.amount ELSE r.amount END) as balance;
+      `,
       {
         userid,
       }
@@ -313,15 +317,10 @@ class Expense {
     const relations: any[] = [];
 
     for (const rec of res.records) {
-      const u2 = rec.get("u2").properties;
-      const r = rec.get("r").properties;
-      const isStart = rec.get("isStart");
       relations.push({
-        to: {
-          id: u2.id,
-          name: u2.name,
-        },
-        amount: isStart ? -r.amount : r.amount,
+        self: rec.get("user"),
+        other: rec.get("other"),
+        balance: rec.get("balance"),
       });
     }
     return relations;
@@ -332,16 +331,36 @@ class Expense {
    * @param userid user id
    */
 
-  static async findAssociatesExpenseByUserid(
+  static async findAssociateExpensesByUserid(
     userid: string,
     associateid: string
   ) {
     const res = await graph.run(
-      `MATCH (u:${Nodes.User} {id: $userid})-[r:${Relations.Participate}]->
-      (e:${Nodes.Expense})<-[r2:${Relations.Participate}]-(User: )
+      `MATCH (u:${Nodes.User} {id: $userid})-[:${Relations.Participate}]->
+      (e:${Nodes.Expense})<-[:${Relations.Participate}]-(u1:${Nodes.User} {id: $associateid})
+      CALL{
+        WITH e,u,u1
+          MATCH (u)-[r:${Relations.Owe} {eid: e.id}]-(u1)
+          RETURN {
+            expense: properties(e),
+            balance:sum(CASE WHEN startNode(r) = u THEN -r.amount ELSE r.amount END)
+          } as expense
+      }
+      RETURN properties(u) as user, properties(u1) as other, collect(expense) as expenses
       `,
       { userid, associateid }
     );
+
+    const expenses: any[] = [];
+
+    for (const rec of res.records) {
+      expenses.push({
+        self: rec.get("user"),
+        other: rec.get("other"),
+        expenses: rec.get("expenses"),
+      });
+    }
+    return expenses;
   }
 }
 
