@@ -4,6 +4,7 @@ export enum Nodes {
   Group = "Group",
   User = "User",
   Expense = "Expense",
+  Payment = "Payment",
 }
 
 export enum Relations {
@@ -11,6 +12,7 @@ export enum Relations {
   Owner = "OWNER",
   Participate = "PARTICIPATE",
   Owe = "OWE",
+  Paid = "Paid",
   Wrote = "WROTE",
   Assigned = "ASSIGNED",
 }
@@ -33,7 +35,9 @@ class Graph {
     this._driver = neo4j.driver(url, undefined, {
       disableLosslessIntegers: true,
     });
-    const session = this.driver.session();
+    const session = this.runMultiple();
+
+    // create constraints
     await session.run(
       `CREATE CONSTRAINT U_UNIQUE IF NOT EXISTS ON (u:${Nodes.User}) ASSERT u.id IS UNIQUE`
     );
@@ -42,6 +46,9 @@ class Graph {
     );
     await session.run(
       `CREATE CONSTRAINT GP_UNIQUE IF NOT EXISTS ON (g:${Nodes.Group}) ASSERT g.id IS UNIQUE`
+    );
+    await session.run(
+      `CREATE CONSTRAINT P_UNIQUE IF NOT EXISTS ON (p:${Nodes.Payment}) ASSERT p.id IS UNIQUE`
     );
 
     await session.close();
@@ -177,7 +184,7 @@ class QueryMultiple {
     this.session = driver.session();
   }
 
-  async run(query: string, params: any) {
+  async run(query: string, params?: any) {
     try {
       const res = await this.session.run(query, params);
       return res;

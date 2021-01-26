@@ -96,12 +96,11 @@ class Expense {
   }
 
   static async updateGroup(groupid: string, expenseid: string) {
-    const session = graph.runMultiple();
     // delete the prev group relation
     await Expense.deleteExpenseGroup(expenseid);
 
     // assign the new group to this expense
-    await session.run(
+    await graph.run(
       `
       MATCH (e:${Nodes.Expense} {id: $expenseid}),(g:${Nodes.Group} {id: $groupid})
       CREATE (e)-[:${Relations.Assigned}]->(g);
@@ -113,10 +112,9 @@ class Expense {
   }
 
   static async updateInfo(expense: IExpense) {
-    const session = graph.runMultiple();
     // remove old relation if participants changed
     // and then calculate new relations and update expense
-    await session.run(
+    await graph.run(
       `
         MATCH (e:${Nodes.Expense} {id: $eid}) SET e= $expense RETURN e`,
       {
@@ -138,8 +136,6 @@ class Expense {
     if (expense.group) {
       Expense.updateGroup(expense.group, expense.id);
     }
-
-    await session.close();
   }
 
   static async updateFull(expense: IExpense) {
@@ -148,8 +144,7 @@ class Expense {
   }
 
   static async remove(expenseid: string) {
-    const session = graph.runMultiple();
-    await session.run(
+    await graph.run(
       `MATCH ()-[r:${Relations.Owe} {eid: $expenseid}]-()
        DELETE r;`,
       {
@@ -159,7 +154,6 @@ class Expense {
 
     // delete expense node and participate relations
     await graph.deleteNodeWithRelations(Nodes.Expense, expenseid);
-    await session.close();
     return true;
   }
 
@@ -276,7 +270,7 @@ class Expense {
       `MATCH (u:${Nodes.User})-[:${Relations.Member}]->(g:${Nodes.Group} {id: $groupid})
       CALL{
         WITH u,g
-          MATCH (u)-[r:OWE]-(u2:${Nodes.User})
+          MATCH (u)-[r:${Relations.Owe}]-(u2:${Nodes.User})
           WHERE (u2)-[:${Relations.Member}]->(g)
           RETURN sum(CASE WHEN startNode(r) = u THEN -r.amount ELSE r.amount END) as balance, u2
       }

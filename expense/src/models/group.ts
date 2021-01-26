@@ -123,6 +123,9 @@ class Group {
       { groupid, expenseid }
     );
   }
+  static async assignPayment(groupid: string, paymentid: string) {
+    throw new Error("Not Implemented!");
+  }
   /**
    * @description checks id of each participant to see if it's a
    * member of this group or not
