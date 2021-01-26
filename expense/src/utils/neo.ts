@@ -116,28 +116,27 @@ class Graph {
       await session.close();
     }
   }
-
   async deleteNode(node: Nodes, id: string) {
-    const session = this.driver.session();
-    try {
-      const res = await session.run(
-        `MATCH (n:${node} {id: $id}) 
-         DETACH DELETE n`,
-        {
-          id,
-        }
-      );
-      await session.close();
+    await this.run(
+      `MATCH (n:${node} {id: $id}) 
+       DELETE n`,
+      {
+        id,
+      }
+    );
 
-      return true;
-    } catch (err) {
-      console.log(err);
-      await session.close();
-    } finally {
-      await session.close();
-    }
+    return true;
+  }
+  async deleteNodeWithRelations(node: Nodes, id: string) {
+    await this.run(
+      `MATCH (n:${node} {id: $id}) 
+       DETACH DELETE n`,
+      {
+        id,
+      }
+    );
 
-    return false;
+    return true;
   }
 
   async clear() {

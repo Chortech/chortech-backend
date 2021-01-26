@@ -13,7 +13,8 @@ import { router as removeExpenseRouter } from "./routes/remove-expense";
 import { router as addCommentRouter } from "./routes/add-comment";
 import { router as getCommentsRouter } from "./routes/get-comments";
 import { router as updateExpenseRouter } from "./routes/update-expense";
-import { router as getFriendsExpenseRouter } from "./routes/get-friends-expense";
+import { router as getFriendsExpensesRouter } from "./routes/get-friends-expense";
+import { router as getFriendExpensesRouter } from "./routes/get-friend-expense";
 import { router as getGroupBalanceRouter } from "./routes/get-group-balance";
 import { router as getGroupsExpenseRouter } from "./routes/get-groups-expense";
 
@@ -25,8 +26,9 @@ app.use(helmet());
 // adding route handlers to express
 app.use("/api/expenses", createExpenseRouter);
 app.use("/api/expenses", getExpensesRouter);
-app.use("/api/expenses/friends", getFriendsExpenseRouter);
 // new
+app.use("/api/expenses/friends", getFriendsExpensesRouter);
+app.use("/api/expenses/friends/:id", getFriendExpensesRouter);
 app.use("/api/expenses/groups", getGroupsExpenseRouter);
 app.use("/api/expenses/groups/:id", getGroupBalanceRouter);
 // end new

@@ -17,6 +17,8 @@ import { graph, Nodes } from "../utils/neo";
 
 const router = Router({ mergeParams: true });
 
+// no-group for removing group
+const NO_GROUP = "no-group";
 const schema = Joi.object({
   id: Joi.string(),
   description: Joi.string(),
@@ -56,10 +58,12 @@ router.put(
     if (req.body.description) expense.description = req.body.description;
     if (req.body.paid_at) expense.paid_at = req.body.paid_at;
     if (req.body.group) {
-      // a group that does not exists is not allowed
-      if (!(await Group.exists(req.body.group)))
-        throw new BadRequestError("Group does not exists!");
-      expense.group = req.body.group;
+      if (req.body.group !== NO_GROUP) {
+        // a group that does not exists is not allowed
+        if (!(await Group.exists(req.body.group)))
+          throw new BadRequestError("Group does not exists!");
+        expense.group = req.body.group;
+      } else await Expense.deleteExpenseGroup(expense.id);
     }
     if (req.body.notes) expense.notes = req.body.notes;
 
@@ -92,6 +96,18 @@ router.put(
       } else changed = true;
     }
 
+    // check to see if new participants is part of the group or not
+    if (
+      expense.group &&
+      !(await Group.areMembers(
+        expense.group,
+        changed ? req.body.participants : expense.participants
+      ))
+    ) {
+      throw new BadRequestError(
+        `One of the new participants is not a member of group ${req.body.group}`
+      );
+    }
     if (changed) {
       expense.participants = req.body.participants;
       await Expense.updateFull(expense);
