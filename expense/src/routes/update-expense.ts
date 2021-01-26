@@ -37,6 +37,7 @@ const schema = Joi.object({
     .min(2),
   group: Joi.string(),
   notes: Joi.string(),
+  category: Joi.number(),
 });
 
 router.put(
@@ -55,6 +56,7 @@ router.put(
     for (const p of expense.participants) {
       participants.set(p.id, p);
     }
+    if (req.body.category) expense.category = req.body.category;
     if (req.body.description) expense.description = req.body.description;
     if (req.body.paid_at) expense.paid_at = req.body.paid_at;
     if (req.body.group) {
@@ -115,7 +117,7 @@ router.put(
 
     // if (req.body.participants) newexpense.total = req.body.total;
     // await graph.removeExpense(newexpense.id);
-    res.json(changed);
+    res.json(await Expense.findById(expense.id));
   }
 );
 
