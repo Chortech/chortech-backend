@@ -6,9 +6,8 @@ import {
 } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
-import { graph, Nodes } from "../utils/neo";
-import { v4 as uuid } from "uuid";
 import { Comment } from "../models/comment";
+import { Expense } from "../models/expense";
 const router = Router({ mergeParams: true });
 
 const scheme = Joi.object({
@@ -19,7 +18,7 @@ const scheme = Joi.object({
 router.post("/", requireAuth, validate(scheme), async (req, res) => {
   const expenseid = req.params.id;
 
-  if (!(await graph.exists(Nodes.Expense, expenseid)))
+  if (!(await Expense.exists(expenseid)))
     throw new NotFoundError("Expenese doesn't exists!");
 
   const n = await Comment.create(expenseid, req.user?.id!, req.body);

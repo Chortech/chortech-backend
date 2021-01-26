@@ -15,18 +15,12 @@ class User {
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
     });
   }
 
-  static async exists(id: string) {
-    const res = await graph.run(
-      `
-      MATCH (u:${Nodes.User} {id: $id}) 
-    	RETURN count(u) as count;`,
-      { id }
-    );
-
-    return res.records[0].get("count") === 1;
+  static async exists(ids: string[]) {
+    return await graph.exists(Nodes.User, ids);
   }
 
   static async update(user: IUser) {

@@ -124,7 +124,14 @@ class Group {
     );
   }
   static async assignPayment(groupid: string, paymentid: string) {
-    throw new Error("Not Implemented!");
+    await graph.run(
+      `MATCH (g:${Nodes.Group} {id: $groupid})
+      MATCH (e:${Nodes.Payment} {id: $paymentid})
+      CREATE (e)-[r:${Relations.Assigned}]->(g)
+      RETURN r;
+      `,
+      { groupid, paymentid }
+    );
   }
   /**
    * @description checks id of each participant to see if it's a
@@ -133,9 +140,6 @@ class Group {
    * of this group
    */
   static async areMembers(groupid: string, participants: IParticipant[]) {
-    // map participants to id and remove duplicates
-    const nodups = Array.from(new Set());
-
     return await this.areMembersById(
       groupid,
       participants.map((x) => x.id)
@@ -159,7 +163,7 @@ class Group {
   }
 
   static async exists(groupid: string) {
-    return await graph.exists(Nodes.Group, groupid);
+    return await graph.exists(Nodes.Group, [groupid]);
   }
 
   static async update(group: IGroupUpdated["data"]) {

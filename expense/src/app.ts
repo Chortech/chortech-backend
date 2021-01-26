@@ -17,6 +17,9 @@ import { router as getFriendsExpensesRouter } from "./routes/get-friends-expense
 import { router as getFriendExpensesRouter } from "./routes/get-friend-expense";
 import { router as getGroupBalanceRouter } from "./routes/get-group-balance";
 import { router as getGroupsExpenseRouter } from "./routes/get-groups-expense";
+import { router as createPaymentRouter } from "./routes/create-payment";
+import { router as removePaymentRounter } from "./routes/remove-payment";
+import { router as updatePaymentRounter } from "./routes/update-payment";
 
 // setting up express
 const app = express();
@@ -27,10 +30,14 @@ app.use(helmet());
 app.use("/api/expenses", createExpenseRouter);
 app.use("/api/expenses", getExpensesRouter);
 // new
-app.use("/api/expenses/friends", getFriendsExpensesRouter);
-app.use("/api/expenses/friends/:id", getFriendExpensesRouter);
-app.use("/api/expenses/groups", getGroupsExpenseRouter);
-app.use("/api/expenses/groups/:id", getGroupBalanceRouter);
+
+app.use("/api/payments", createPaymentRouter);                  // create payment
+app.use("/api/payments/:id", removePaymentRounter);             // delete payment
+app.use("/api/payments/:id", updatePaymentRounter);             // update payment
+app.use("/api/expenses/friends", getFriendsExpensesRouter);     // get all friends balances
+app.use("/api/expenses/friends/:id", getFriendExpensesRouter);  // get all expenses for one friend
+app.use("/api/expenses/groups", getGroupsExpenseRouter);        // get all groups expenses
+app.use("/api/expenses/groups/:id", getGroupBalanceRouter);     // get group balance
 // end new
 app.use("/api/expenses/:id", getExpenseRouter);
 app.use("/api/expenses/:id", removeExpenseRouter);

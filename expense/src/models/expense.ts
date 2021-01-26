@@ -22,7 +22,7 @@ interface IExpense {
 
 class Expense {
   static async exists(expenseid: string) {
-    return await graph.exists(Nodes.Expense, expenseid);
+    return await graph.exists(Nodes.Expense, [expenseid]);
   }
 
   static async create(expense: IExpense) {

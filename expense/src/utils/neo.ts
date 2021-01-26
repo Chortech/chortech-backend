@@ -35,7 +35,7 @@ class Graph {
     this._driver = neo4j.driver(url, undefined, {
       disableLosslessIntegers: true,
     });
-    const session = this.runMultiple();
+    const session = this.driver.session();
 
     // create constraints
     await session.run(
@@ -101,27 +101,17 @@ class Graph {
     await this.driver.close();
   }
 
-  async exists(node: Nodes, id: string) {
-    const session = this.driver.session();
+  async exists(node: Nodes, ids: string[]) {
+    const res = await this.run(
+      `UNWIND $ids as id
+      MATCH (n:${node} {id: id})
+      RETURN count(n) as count`,
+      {
+        ids,
+      }
+    );
 
-    try {
-      const res = await session.run(
-        `MATCH (n:${node} {id: $id})
-        RETURN count(n) as count`,
-        {
-          id,
-        }
-      );
-
-      await session.close();
-
-      return res.records[0].get("count") > 0;
-    } catch (err) {
-      console.log(err);
-      await session.close();
-    } finally {
-      await session.close();
-    }
+    return res.records[0].get("count") === ids.length;
   }
   async deleteNode(node: Nodes, id: string) {
     await this.run(

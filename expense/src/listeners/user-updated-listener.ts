@@ -6,7 +6,7 @@ export class UserUpdatedListener extends Listener<IUserUpdated> {
   queueName = "expense-service";
   async onMessage(data: IUserUpdated["data"], done: Message) {
     try {
-      if (!User.exists(data.id))
+      if (!User.exists([data.id]))
         throw new Error("Can't update a user who does not exist.");
       await User.update(data);
       done.ack();
