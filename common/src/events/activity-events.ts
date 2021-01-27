@@ -9,6 +9,7 @@ export interface IData {
   involved: string[];
   data?: Object;
   type: Type;
+  request: { type: string, id: string };
 }
 
 export enum Action {
@@ -24,7 +25,8 @@ export enum Action {
 
 export enum Type {
   Expense = 'expense',
-  Group = 'group'
+  Group = 'group',
+  Payment = 'payment'
 }
 
 interface IActivity {
