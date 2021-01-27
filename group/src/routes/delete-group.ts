@@ -1,5 +1,5 @@
 import Router from "express";
-import { BadRequestError, requireAuth, NotFoundError, Action } from "@chortec/common";
+import { BadRequestError, requireAuth, NotFoundError, Action, Type } from "@chortec/common";
 import Group from "../models/group";
 import { GroupDeletedPublisher } from "../publishers/group-deleted-publisher";
 import { ActivityPublisher } from '../publishers/activity-publisher';
@@ -41,7 +41,8 @@ router.delete("/", requireAuth, async (req, res) => {
     parent: undefined,
     action: Action.Deleted,
     involved: involved,
-    data: undefined
+    data: undefined,
+    type: Type.Group
   });
 
   await Group.deleteOne(group);

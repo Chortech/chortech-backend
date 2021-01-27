@@ -5,7 +5,8 @@ import {
   requireAuth,
   NotFoundError,
   Action,
-  IData
+  IData,
+  Type
 } from "@chortec/common";
 import { validate, GroupUpdateType } from "@chortec/common";
 import Joi from "joi";
@@ -87,7 +88,8 @@ router.put(
         parent: { id: group?.id, name: group?.name! },
         action: Action.Added,
         involved: involved,
-        data: undefined
+        data: undefined,
+        type: Type.Group
       }
 
       data.push(activity);
