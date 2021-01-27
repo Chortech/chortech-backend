@@ -8,17 +8,23 @@ export interface IData {
   action: Action;
   involved: string[];
   data?: Object;
+  type: Type;
 }
 
 export enum Action {
-  Created = 'CREATED',
-  Deleted = 'DELETED',
-  Updated = 'UPDATED',
-  Added = 'ADDED',
-  Removed = 'REMOVED',
-  Left = 'LEFT',
-  Paid = 'PAID',
-  Commented = 'COMMENTED'
+  Created = 'created',
+  Deleted = 'deleted',
+  Updated = 'updated',
+  Added = 'added',
+  Removed = 'removed',
+  Left = 'left',
+  Paid = 'paid',
+  Commented = 'commented'
+}
+
+export enum Type {
+  Expense = 'expense',
+  Group = 'group'
 }
 
 interface IActivity {
