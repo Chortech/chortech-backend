@@ -9,6 +9,8 @@ interface IComment {
   created_at: number; // the time when comment was created
 }
 
+type CommentableNodes = Nodes.Expense | Nodes.Payment;
+
 class Comment {
   // TODO handle the case that user does not belong in this expense
   /**
@@ -17,17 +19,20 @@ class Comment {
    *
    * @returns a list of IComment
    */
-  static async findByExpenseId(expenseid: string): Promise<IComment[]> {
+  static async findByTargetId(
+    target: CommentableNodes,
+    targetid: string
+  ): Promise<IComment[]> {
     const res = await graph.run(
       `
-    MATCH (e:${Nodes.Expense} {id: $expenseid})<-[c:${Relations.Wrote}]-(u:${Nodes.User})
+    MATCH (e:${target} {id: $targetid})<-[c:${Relations.Wrote}]-(u:${Nodes.User})
 		RETURN {
 			id: c.id,
 			writer: properties(u),
 			text: c.text,
 			created_at: c.created_at 
 		} as comment`,
-      { expenseid }
+      { targetid }
     );
     const comments: IComment[] = [];
     for (const rec of res.records) {
@@ -51,20 +56,47 @@ class Comment {
    */
 
   static async create(
-    expenseid: string,
+    node: CommentableNodes,
+    id: string,
     writerid: string,
     comment: { text: string; created_at: number }
   ) {
     const res = await graph.run(
       `
-      MATCH (u:${Nodes.User} {id: $uid})-[:${Relations.Participate}]->(e:${Nodes.Expense} {id: $eid})
+      MATCH (u:${Nodes.User} {id: $uid})-[:${Relations.Participate}]->(e:${node} {id: $id})
       CREATE (u)-[r:${Relations.Wrote}]->(e)
       SET r = $comment
       RETURN r;
 			`,
       {
         uid: writerid,
-        eid: expenseid,
+        id: id,
+        comment: {
+          ...comment,
+          id: uuid(),
+        },
+      }
+    );
+
+    return res.records.length;
+  }
+
+  static async createWithOutParticipation(
+    node: CommentableNodes,
+    id: string,
+    writerid: string,
+    comment: { text: string; created_at: number }
+  ) {
+    const res = await graph.run(
+      `
+      MATCH (u:${Nodes.User} {id: $uid}),(e:${node} {id: $id})
+      CREATE (u)-[r:${Relations.Wrote}]->(e)
+      SET r = $comment
+      RETURN r;
+			`,
+      {
+        uid: writerid,
+        id: id,
         comment: {
           ...comment,
           id: uuid(),
@@ -76,4 +108,4 @@ class Comment {
   }
 }
 
-export { IComment, Comment };
+export { IComment, Comment, CommentableNodes };

@@ -18,7 +18,7 @@ router.get("/", requireAuth, async (req, res) => {
   if (!(await Expense.exists(expenseid)))
     throw new NotFoundError("Expenese doesn't exists!");
 
-  const comments = await Comment.findByExpenseId(expenseid);
+  const comments = await Comment.findByTargetId(Nodes.Expense, expenseid);
 
   res.json(comments);
 });

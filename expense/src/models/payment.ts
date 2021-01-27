@@ -1,5 +1,5 @@
 import { graph, Nodes, Relations } from "../utils/neo";
-import { IComment } from "./comment";
+import { Comment, IComment } from "./comment";
 import { v4 as uuid } from "uuid";
 import { Group } from "./group";
 import { IUser } from "./user";
@@ -167,6 +167,7 @@ class Payment {
           ...res.records[0].get("payment"),
           from: res.records[0].get("from"),
           to: res.records[0].get("to"),
+          comments: await Comment.findByTargetId(Nodes.Payment, paymentid),
         }
       : undefined;
   }

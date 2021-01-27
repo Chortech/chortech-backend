@@ -181,7 +181,7 @@ class Expense {
     return {
       ...res.records[0].get("e").properties,
       participants,
-      comments: await Comment.findByExpenseId(expenseid),
+      comments: await Comment.findByTargetId(Nodes.Expense, expenseid),
     };
   }
 
