@@ -4,7 +4,8 @@ import {
   requireAuth,
   NotFoundError,
   GroupUpdateType,
-  Action
+  Action,
+  Type
 } from "@chortec/common";
 import { Group, GroupDoc } from "../models/group";
 import mongoose from "mongoose";
@@ -42,7 +43,8 @@ router.delete('/', requireAuth, async (req, res) => {
       parent: undefined,
       action: Action.Deleted,
       involved: [req.user.id],
-      data: undefined
+      data: undefined,
+      type: Type.Group
     });
 
     await Group.deleteOne({ _id: req.group?.id });
@@ -94,7 +96,9 @@ router.delete('/', requireAuth, async (req, res) => {
     parent: undefined,
     action: Action.Left,
     involved: involved,
-    data: undefined
+    data: undefined,
+    type: Type.Group,
+    request: { type: Type.Group, id: gp?.id }
   });
 
   res.status(200).send("You left the group successfully.");

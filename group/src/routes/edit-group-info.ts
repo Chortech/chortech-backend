@@ -4,7 +4,8 @@ import {
   validate,
   requireAuth,
   GroupUpdateType,
-  Action
+  Action,
+  Type
 } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
@@ -68,7 +69,9 @@ router.patch(
         parent: undefined,
         action: Action.Updated,
         involved: involved,
-        data: undefined
+        data: undefined,
+        type: Type.Group,
+        request: { type: Type.Group, id: group?.id }
     });
 
     res.status(200).json(group);

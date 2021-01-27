@@ -6,6 +6,7 @@ import {
   validate,
   GroupUpdateType,
   Action,
+  Type
 } from "@chortec/common";
 import Group from "../models/group";
 import Joi from "joi";
@@ -81,7 +82,9 @@ router.put("/", requireAuth, validate(removeMemberSchema), async (req, res) => {
     parent: { id: group?.id, name: group?.name! },
     action: Action.Removed,
     involved: involved,
-    data: undefined
+    data: undefined,
+    type: Type.Group,
+    request: { type: Type.Group, id: group?.id }
   });
 
   res.status(200).json({ group });

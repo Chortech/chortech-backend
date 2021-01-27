@@ -3,7 +3,8 @@ import {
   BadRequestError,
   ResourceConflictError,
   requireAuth,
-  Action
+  Action,
+  Type
 } from "@chortec/common";
 import { validate } from "@chortec/common";
 import Joi from "joi";
@@ -58,7 +59,9 @@ router.post("/", requireAuth, validate(createGroupSchema), async (req, res) => {
     parent: undefined,
     action: Action.Created,
     involved: [gp.creator.toHexString()],
-    data: undefined
+    data: undefined,
+    type: Type.Group,
+    request: { type: Type.Group, id: group?.id }
   });
 
   res.status(201).send({

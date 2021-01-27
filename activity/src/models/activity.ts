@@ -8,6 +8,8 @@ interface IActivity {
   action: string;
   involved: string[];
   data?: Object;
+  type: string;
+  request?: Object;
 }
 
 type ActivityDoc = IActivity & Document;
@@ -23,7 +25,9 @@ const activitySchema = new Schema(
     parent: Object,
     action: String,
     involved: [ { type: String } ],
-    data: Object
+    data: Object,
+    type: String,
+    request: Object
   },
   { 
     timestamps: true,
