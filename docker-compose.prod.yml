@@ -20,6 +20,11 @@ services:
       - 3000
     environment:
       PRODUCTION: "true"
+  notification:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: "true"
   nginx:
     image: nginx
     container_name: nginx
