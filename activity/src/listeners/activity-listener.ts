@@ -17,7 +17,8 @@ export class ActivityListener extends Listener<IActivity> {
             parent: activity.parent,
             action: activity.action,
             involved: activity.involved,
-            data: activity.data
+            data: activity.data,
+            type: activity.type
           });
 
           await act.save();
@@ -29,7 +30,8 @@ export class ActivityListener extends Listener<IActivity> {
           parent: data.parent,
           action: data.action,
           involved: data.involved,
-          data: data.data
+          data: data.data,
+          type: data.type
         });
 
         await act.save();
