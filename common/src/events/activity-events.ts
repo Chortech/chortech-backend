@@ -9,7 +9,7 @@ export interface IData {
   involved: string[];
   data?: Object;
   type: Type;
-  request: { type: string, id: string };
+  request?: { type: string, id: string };
 }
 
 export enum Action {
