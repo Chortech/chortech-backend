@@ -16,9 +16,12 @@ app.use(helmet());
 // adding route handlers to express
 app.use("/api/notifications", setFCMTokenRouter);
 
+<<<<<<< HEAD
 // TODO IMPLEMENT THIS
 // app.use("/api/notifications/remind/:id", sendReminderRouter);
 
+=======
+>>>>>>> added basic FCM functionality
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
   throw new NotFoundError();
