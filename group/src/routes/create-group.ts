@@ -60,7 +60,8 @@ router.post("/", requireAuth, validate(createGroupSchema), async (req, res) => {
     action: Action.Created,
     involved: [gp.creator.toHexString()],
     data: undefined,
-    type: Type.Group
+    type: Type.Group,
+    request: { type: Type.Group, id: group?.id }
   });
 
   res.status(201).send({

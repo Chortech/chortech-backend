@@ -97,7 +97,8 @@ router.delete('/', requireAuth, async (req, res) => {
     action: Action.Left,
     involved: involved,
     data: undefined,
-    type: Type.Group
+    type: Type.Group,
+    request: { type: Type.Group, id: gp?.id }
   });
 
   res.status(200).send("You left the group successfully.");

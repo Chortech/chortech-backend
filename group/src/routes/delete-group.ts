@@ -42,7 +42,8 @@ router.delete("/", requireAuth, async (req, res) => {
     action: Action.Deleted,
     involved: involved,
     data: undefined,
-    type: Type.Group
+    type: Type.Group,
+    request: undefined
   });
 
   await Group.deleteOne(group);

@@ -89,7 +89,8 @@ router.put(
         action: Action.Added,
         involved: involved,
         data: undefined,
-        type: Type.Group
+        type: Type.Group,
+        request: { type: Type.Group, id: group?.id }
       }
 
       data.push(activity);

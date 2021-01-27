@@ -70,7 +70,8 @@ router.patch(
         action: Action.Updated,
         involved: involved,
         data: undefined,
-        type: Type.Group
+        type: Type.Group,
+        request: { type: Type.Group, id: group?.id }
     });
 
     res.status(200).json(group);
