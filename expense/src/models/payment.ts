@@ -2,7 +2,7 @@ import { graph, Nodes, Relations } from "../utils/neo";
 import { Comment, IComment } from "./comment";
 import { v4 as uuid } from "uuid";
 import { Group } from "./group";
-import { IUser } from "./user";
+import { IUser, User } from "./user";
 
 const NO_GROUP = "no-group";
 
@@ -29,30 +29,32 @@ class Payment {
 
     // create payment node and participate relations
     await session.run(
-      `CREATE (p:Payment {id: $paymentid}) SET p+= $payment
+      `CREATE (p:Payment {id: $paymentid, created_at: timestamp()}) SET p+= $payment
       WITH p
-      MATCH (from:User {id: p.from}), (to:User {id: p.to})
-      CREATE (from)-[r1:PARTICIPATE {amount: p.amount}]->(p)<-[r2:PARTICIPATE {amount: -p.amount}]-(to)
+      MATCH (from:User {id: $from}), (to:User {id: $to})
+      CREATE (from)-[r1:PARTICIPATE {amount: -p.amount}]->(p)<-[r2:PARTICIPATE {amount: p.amount}]-(to)
       RETURN r1,r2
 			`,
       {
         payment: {
-          from: payment.from,
-          to: payment.to,
           amount: payment.amount,
           paid_at: payment.paid_at,
           notes: payment.notes,
-          creator: payment.creator,
         },
+        from: payment.from,
+        to: payment.to,
         paymentid: payment.id,
       }
     );
+
+    // create created relation
+    await User.assginCreator(Nodes.Payment, payment.id, payment.creator);
 
     // create paid relations
     await session.run(
       `WITH $payment as p
 			MATCH (from:User {id: p.from}), (to:User {id: p.to})
-			CREATE (from)-[r:PAID {pid: p.id, amount: p.amount}]->(to)
+			CREATE (from)-[r:PAID {id: p.id, amount: p.amount}]->(to)
 			RETURN r;
 			`,
       { payment }
@@ -66,9 +68,7 @@ class Payment {
   static async remove(paymentid: string) {
     // remove paid relations
     await graph.run(
-      `MATCH (p:Payment {id: $paymentid})
-			WITH p
-			MATCH (:User {id: p.from})-[r:PAID]->(:User {id: p.to})
+      `MATCH ()-[r:${Relations.Paid} {id: $paymentid}]->()
 			DELETE r;
 			`,
       { paymentid }
@@ -108,7 +108,7 @@ class Payment {
     if (payment.amount) {
       // update amount for paid relations
       await session.run(
-        `MATCH ()-[r:PAID {pid: $paymentid}]->()
+        `MATCH ()-[r:PAID {id: $paymentid}]->()
         SET r.amount = $amount
         RETURN r;
         `,
@@ -153,8 +153,11 @@ class Payment {
     comments?: IComment[];
   }> {
     const res = await graph.run(
-      `MATCH (u:User)-[p1:PARTICIPATE]->(p:Payment {id: $paymentid})<-[p2:PARTICIPATE]-(u1:User)
-      RETURN properties(p) as payment, 
+      `MATCH (u:${Nodes.User})-[p1:${Relations.Participate}]->
+      (p:Payment {id: $paymentid})
+      <-[p2:${Relations.Participate}]-(u1:${Nodes.User}),
+      (creator:${Nodes.User})-[:${Relations.Created}]->(p)
+      RETURN properties(p) as payment,properties(creator) as creator, 
       CASE WHEN p1.amount > 0 THEN properties(u) ELSE properties(u1) END AS from,
       CASE WHEN p1.amount > 0 THEN properties(u1) ELSE properties(u) END AS to
       LIMIT 1
@@ -165,6 +168,7 @@ class Payment {
     return res.records.length !== 0
       ? {
           ...res.records[0].get("payment"),
+          creator: res.records[0].get("creator"),
           from: res.records[0].get("from"),
           to: res.records[0].get("to"),
           comments: await Comment.findByTargetId(Nodes.Payment, paymentid),

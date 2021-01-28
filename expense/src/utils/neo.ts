@@ -12,9 +12,10 @@ export enum Relations {
   Owner = "OWNER",
   Participate = "PARTICIPATE",
   Owe = "OWE",
-  Paid = "Paid",
+  Paid = "PAID",
   Wrote = "WROTE",
   Assigned = "ASSIGNED",
+  Created = "CREATED",
 }
 
 /**
@@ -66,6 +67,9 @@ class Graph {
         );
         await session.run(
           `CREATE CONSTRAINT GP_UNIQUE IF NOT EXISTS ON (g:${Nodes.Group}) ASSERT g.id IS UNIQUE`
+        );
+        await session.run(
+          `CREATE CONSTRAINT P_UNIQUE IF NOT EXISTS ON (p:${Nodes.Payment}) ASSERT p.id IS UNIQUE`
         );
 
         await session.close();
