@@ -11,11 +11,9 @@ interface IUser {
 
 class User {
   static async create(user: IUser) {
-    await graph.run("CREATE (:User {id: $id , name: $name })", {
+    await graph.run("CREATE (u:User {id: $id}) SET u += $user ", {
       id: user.id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
+      user,
     });
   }
 
