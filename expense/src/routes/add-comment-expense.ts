@@ -6,23 +6,28 @@ import {
 } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
-import { graph, Nodes } from "../utils/neo";
-import { v4 as uuid } from "uuid";
 import { Comment } from "../models/comment";
+import { Expense } from "../models/expense";
+import { Nodes } from "../utils/neo";
 const router = Router({ mergeParams: true });
 
 const scheme = Joi.object({
-  text: Joi.string().max(255),
-  created_at: Joi.number(),
+  text: Joi.string().max(255).required(),
+  created_at: Joi.number().required(),
 });
 
 router.post("/", requireAuth, validate(scheme), async (req, res) => {
   const expenseid = req.params.id;
 
-  if (!(await graph.exists(Nodes.Expense, expenseid)))
+  if (!(await Expense.exists(expenseid)))
     throw new NotFoundError("Expenese doesn't exists!");
 
-  const n = await Comment.create(expenseid, req.user?.id!, req.body);
+  const n = await Comment.create(
+    Nodes.Expense,
+    expenseid,
+    req.user?.id!,
+    req.body
+  );
 
   if (!n || n === 0)
     throw new BadRequestError(

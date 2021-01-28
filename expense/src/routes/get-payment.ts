@@ -5,14 +5,17 @@ import {
   NotFoundError,
 } from "@chortec/common";
 import { Router } from "express";
-import { Expense } from "../models/expense";
+import { Payment } from "../models/payment";
 
 const router = Router({ mergeParams: true });
 
 router.get("/", requireAuth, async (req, res) => {
-  const expenses = await Expense.findGroupsExpense(req.user!.id);
+  const paymentid = req.params.id;
+  const expense = await Payment.findById(paymentid);
 
-  res.json(expenses);
+  if (!expense) throw new NotFoundError("Didn't found payment with given id!");
+
+  res.json(expense);
 });
 
 export { router };

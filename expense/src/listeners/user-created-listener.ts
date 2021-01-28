@@ -7,7 +7,7 @@ export class UserCreatedListener extends Listener<IUserCreated> {
   queueName = "expense-service";
   async onMessage(data: IUserCreated["data"], done: Message) {
     try {
-      if (await User.exists(data.id))
+      if (await User.exists([data.id]))
         throw new Error("User Already exists. This shouldn't happen!");
 
       await User.create(data);

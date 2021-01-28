@@ -2,6 +2,7 @@ import { BadRequestError } from "@chortec/common";
 import { IParticipant, PRole } from "../models/participant";
 import { Request, Response, NextFunction } from "express";
 import { graph } from "./neo";
+import { User } from "../models/user";
 
 // Check if debtors, creditors and total price of this expense is equal
 // if not its invalid and we should respond with an error. An example of
@@ -64,19 +65,9 @@ const validateParticipants = async (
       "Can't update participants without defining total!"
     );
 
-  const participants = req.body.participants;
+  const participants = req.body.participants.map((x: IParticipant) => x.id);
 
-  const result = await graph.run(
-    `UNWIND $participants as p
-    MATCH (u:User {id: p.id})
-    RETURN COUNT(u) as count`,
-    {
-      participants,
-    }
-  );
-
-  let count = result.records[0].get("count");
-  if (participants.length != count)
+  if (!(await User.exists(participants)))
     throw new BadRequestError("One of the participants doesn't exits!");
 
   next();

@@ -4,6 +4,7 @@ export enum Nodes {
   Group = "Group",
   User = "User",
   Expense = "Expense",
+  Payment = "Payment",
 }
 
 export enum Relations {
@@ -11,8 +12,10 @@ export enum Relations {
   Owner = "OWNER",
   Participate = "PARTICIPATE",
   Owe = "OWE",
+  Paid = "PAID",
   Wrote = "WROTE",
   Assigned = "ASSIGNED",
+  Created = "CREATED",
 }
 
 /**
@@ -34,6 +37,8 @@ class Graph {
       disableLosslessIntegers: true,
     });
     const session = this.driver.session();
+
+    // create constraints
     await session.run(
       `CREATE CONSTRAINT U_UNIQUE IF NOT EXISTS ON (u:${Nodes.User}) ASSERT u.id IS UNIQUE`
     );
@@ -42,6 +47,9 @@ class Graph {
     );
     await session.run(
       `CREATE CONSTRAINT GP_UNIQUE IF NOT EXISTS ON (g:${Nodes.Group}) ASSERT g.id IS UNIQUE`
+    );
+    await session.run(
+      `CREATE CONSTRAINT P_UNIQUE IF NOT EXISTS ON (p:${Nodes.Payment}) ASSERT p.id IS UNIQUE`
     );
 
     await session.close();
@@ -59,6 +67,9 @@ class Graph {
         );
         await session.run(
           `CREATE CONSTRAINT GP_UNIQUE IF NOT EXISTS ON (g:${Nodes.Group}) ASSERT g.id IS UNIQUE`
+        );
+        await session.run(
+          `CREATE CONSTRAINT P_UNIQUE IF NOT EXISTS ON (p:${Nodes.Payment}) ASSERT p.id IS UNIQUE`
         );
 
         await session.close();
@@ -94,27 +105,17 @@ class Graph {
     await this.driver.close();
   }
 
-  async exists(node: Nodes, id: string) {
-    const session = this.driver.session();
+  async exists(node: Nodes, ids: string[]) {
+    const res = await this.run(
+      `UNWIND $ids as id
+      MATCH (n:${node} {id: id})
+      RETURN count(n) as count`,
+      {
+        ids,
+      }
+    );
 
-    try {
-      const res = await session.run(
-        `MATCH (n:${node} {id: $id})
-        RETURN count(n) as count`,
-        {
-          id,
-        }
-      );
-
-      await session.close();
-
-      return res.records[0].get("count") > 0;
-    } catch (err) {
-      console.log(err);
-      await session.close();
-    } finally {
-      await session.close();
-    }
+    return res.records[0].get("count") === ids.length;
   }
   async deleteNode(node: Nodes, id: string) {
     await this.run(
@@ -177,7 +178,7 @@ class QueryMultiple {
     this.session = driver.session();
   }
 
-  async run(query: string, params: any) {
+  async run(query: string, params?: any) {
     try {
       const res = await this.session.run(query, params);
       return res;

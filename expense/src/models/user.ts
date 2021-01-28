@@ -1,5 +1,5 @@
 import { UserCreatedListener } from "../listeners/user-created-listener";
-import { graph, Nodes } from "../utils/neo";
+import { graph, Nodes, Relations } from "../utils/neo";
 
 interface IUser {
   id: string;
@@ -15,18 +15,12 @@ class User {
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
     });
   }
 
-  static async exists(id: string) {
-    const res = await graph.run(
-      `
-      MATCH (u:${Nodes.User} {id: $id}) 
-    	RETURN count(u) as count;`,
-      { id }
-    );
-
-    return res.records[0].get("count") === 1;
+  static async exists(ids: string[]) {
+    return await graph.exists(Nodes.User, ids);
   }
 
   static async update(user: IUser) {
@@ -48,6 +42,15 @@ class User {
 			DETACH DELETE u;
 		`,
       { id }
+    );
+  }
+
+  static async assginCreator(target: Nodes, targetid: string, creator: string) {
+    // assign the created relation
+    await graph.run(
+      `MATCH (u:${Nodes.User} {id: $creator}), (t: ${target} {id: $targetid})
+       CREATE (u)-[:${Relations.Created}]->(t)`,
+      { creator, targetid }
     );
   }
 }
