@@ -18,7 +18,6 @@ export class ActivityListener extends Listener<IActivity> {
             action: activity.action,
             involved: activity.involved,
             data: activity.data,
-            type: activity.type,
             request: activity.request
           });
 
@@ -32,7 +31,6 @@ export class ActivityListener extends Listener<IActivity> {
           action: data.action,
           involved: data.involved,
           data: data.data,
-          type: data.type,
           request: data.request
         });
 
