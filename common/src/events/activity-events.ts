@@ -2,14 +2,13 @@ import { Subjects } from './subjects';
 
 
 export interface IData {
-  subject: { id: string, name: string };
-  object: { id: string, name: string };
-  parent?: { id: string, name: string };
+  subject: { id: string, name: string, type: Type };
+  object: { id: string, name: string, type: Type };
+  parent?: { id: string, name: string, type: Type };
   action: Action;
   involved: string[];
   data?: Object;
-  type: Type;
-  request?: { type: string, id: string };
+  request?: { type: Type, id: string };
 }
 
 export enum Action {
@@ -26,7 +25,8 @@ export enum Action {
 export enum Type {
   Expense = 'expense',
   Group = 'group',
-  Payment = 'payment'
+  Payment = 'payment',
+  User = 'user'
 }
 
 interface IActivity {
