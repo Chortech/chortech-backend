@@ -33,6 +33,7 @@ class Payment {
       WITH p
       MATCH (from:User {id: $from}), (to:User {id: $to})
       CREATE (from)-[r1:PARTICIPATE {amount: -p.amount}]->(p)<-[r2:PARTICIPATE {amount: p.amount}]-(to)
+      SET p.from = from.name, p.to = to.name
       RETURN r1,r2
 			`,
       {

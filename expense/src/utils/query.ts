@@ -12,7 +12,7 @@ class Query {
     const res = await graph.run(
       `MATCH (u:${Nodes.User} {id: $userid})
         -[r:${Relations.Owe}|${Relations.Paid}]-(u1:${Nodes.User})
-        RETURN properties(u) as user, properties(u1) as other, 
+        RETURN properties(u) as user, u1.id as other, 
 				sum(
           	CASE type(r)  
           	WHEN "OWE" THEN (CASE WHEN startNode(r) = u THEN -r.amount ELSE r.amount END)
@@ -28,7 +28,6 @@ class Query {
 
     for (const rec of res.records) {
       relations.push({
-        self: rec.get("user"),
         other: rec.get("other"),
         balance: rec.get("balance"),
       });
@@ -65,10 +64,7 @@ class Query {
     );
 
     if (res.records.length === 0) return null;
-    return {
-      other: res.records[0].get("other"),
-      expenses: res.records[0].get("expenses"),
-    };
+    return res.records[0].get("expenses");
   }
 
   /**
@@ -128,12 +124,13 @@ class Query {
    */
   async findGroupExpenses(userid: string, groupid: string) {
     const res = await graph.run(
-      `MATCH (g:${Nodes.Group} {id: $groupid})<-[:${Relations.Assigned}]-(e)
+      `MATCH (g:Group {id: $groupid})<-[:ASSIGNED]-(e)
+      WITH e,g
+      ORDER BY e.created_at DESC
       CALL{
         WITH e
-        MATCH (:${Nodes.User} {id: $userid})-[r:${Relations.Participate}]->(e)
+        OPTIONAL MATCH (u:User {id: $userid})-[r:PARTICIPATE]->(e)
         RETURN CASE WHEN count(r) = 0 THEN 0 ELSE r.amount END as balance 
-
       }
       RETURN properties(g) as  group, 
       collect(
@@ -142,9 +139,8 @@ class Query {
           { 
               type: toLower(labels(e)[0]),
               balance: balance
-          }
-        )
-      )as expenses;
+          })
+      ) as expenses
       `,
       { userid, groupid }
     );
