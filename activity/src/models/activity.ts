@@ -2,13 +2,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 
 interface IActivity {
-	subject: { id: string, name: string };
-	object: { id: string, name: string };
-	parent?: { id: string, name: string };
+	subject: { id: string, name: string, type: string };
+	object: { id: string, name: string, type: string };
+	parent?: { id: string, name: string, type: string };
   action: string;
   involved: string[];
   data?: Object;
-  type: string;
   request?: Object;
 }
 
@@ -26,7 +25,6 @@ const activitySchema = new Schema(
     action: String,
     involved: [ { type: String } ],
     data: Object,
-    type: String,
     request: Object
   },
   { 

@@ -38,13 +38,12 @@ router.delete('/', requireAuth, async (req, res) => {
     const user = await User.findById(req.user.id);
   
     await new ActivityPublisher(natsWrapper.client).publish({
-      subject: { id: user?.id, name: user?.name! },
-      object: { id: group?.id!, name: group?.name! },
+      subject: { id: user?.id, name: user?.name!, type: Type.User },
+      object: { id: group?.id!, name: group?.name!, type: Type.Group },
       parent: undefined,
       action: Action.Deleted,
       involved: [req.user.id],
       data: undefined,
-      type: Type.Group
     });
 
     await Group.deleteOne({ _id: req.group?.id });
@@ -91,13 +90,12 @@ router.delete('/', requireAuth, async (req, res) => {
     involved.push(member.toHexString());
 
   await new ActivityPublisher(natsWrapper.client).publish({
-    subject: { id: usr?.id, name: usr?.name! },
-    object: { id: gp?.id, name: gp?.name! },
+    subject: { id: usr?.id, name: usr?.name!, type: Type.User },
+    object: { id: gp?.id, name: gp?.name!, type: Type.Group },
     parent: undefined,
     action: Action.Left,
     involved: involved,
     data: undefined,
-    type: Type.Group,
     request: { type: Type.Group, id: gp?.id }
   });
 

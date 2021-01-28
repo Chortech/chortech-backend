@@ -77,13 +77,12 @@ router.put("/", requireAuth, validate(removeMemberSchema), async (req, res) => {
     involved.push(member.id);
 
   await new ActivityPublisher(natsWrapper.client).publish({
-    subject: { id: usr?.id, name: usr?.name! },
-    object: { id: removed?.id, name: removed?.name! },
-    parent: { id: group?.id, name: group?.name! },
+    subject: { id: usr?.id, name: usr?.name!, type: Type.User },
+    object: { id: removed?.id, name: removed?.name!, type: Type.User },
+    parent: { id: group?.id, name: group?.name!, type: Type.Group },
     action: Action.Removed,
     involved: involved,
     data: undefined,
-    type: Type.Group,
     request: { type: Type.Group, id: group?.id }
   });
 

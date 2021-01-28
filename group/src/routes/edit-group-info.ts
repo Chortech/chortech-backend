@@ -64,14 +64,13 @@ router.patch(
       involved.push(member.id);
 
     await new ActivityPublisher(natsWrapper.client).publish({
-      subject: { id: usr?.id, name: usr?.name! },
-        object: { id: group.id, name: group.name },
-        parent: undefined,
-        action: Action.Updated,
-        involved: involved,
-        data: undefined,
-        type: Type.Group,
-        request: { type: Type.Group, id: group?.id }
+      subject: { id: usr?.id, name: usr?.name!, type: Type.User },
+      object: { id: group.id, name: group.name, type: Type.Group },
+      parent: undefined,
+      action: Action.Updated,
+      involved: involved,
+      data: undefined,
+      request: { type: Type.Group, id: group?.id }
     });
 
     res.status(200).json(group);

@@ -83,13 +83,12 @@ router.put(
     for (let member of members) {
       const added = await User.findById(member);
       const activity: IData = {
-        subject: { id: usr?.id, name: usr?.name! },
-        object: { id: added?.id, name: added?.name! },
-        parent: { id: group?.id, name: group?.name! },
+        subject: { id: usr?.id, name: usr?.name!, type: Type.User },
+        object: { id: added?.id, name: added?.name!, type: Type.User },
+        parent: { id: group?.id, name: group?.name!, type: Type.Group },
         action: Action.Added,
         involved: involved,
         data: undefined,
-        type: Type.Group,
         request: { type: Type.Group, id: group?.id }
       }
 

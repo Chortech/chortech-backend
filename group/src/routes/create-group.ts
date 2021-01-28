@@ -54,13 +54,12 @@ router.post("/", requireAuth, validate(createGroupSchema), async (req, res) => {
   const user = await User.findById(req.user.id);
 
   await new ActivityPublisher(natsWrapper.client).publish({
-    subject: { id: user?.id, name: user?.name! },
-    object: { id: gp.id, name: gp.name },
+    subject: { id: user?.id, name: user?.name!, type: Type.User },
+    object: { id: gp.id, name: gp.name, type: Type.Group },
     parent: undefined,
     action: Action.Created,
     involved: [gp.creator.toHexString()],
     data: undefined,
-    type: Type.Group,
     request: { type: Type.Group, id: group?.id }
   });
 
