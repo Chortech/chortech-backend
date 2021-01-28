@@ -36,13 +36,12 @@ router.delete("/", requireAuth, async (req, res) => {
     involved.push(member.toHexString());
 
   await new ActivityPublisher(natsWrapper.client).publish({
-    subject: { id: user?.id, name: user?.name! },
-    object: { id: group.id, name: group.name },
+    subject: { id: user?.id, name: user?.name!, type: Type.User },
+    object: { id: group.id, name: group.name, type: Type.Group },
     parent: undefined,
     action: Action.Deleted,
     involved: involved,
     data: undefined,
-    type: Type.Group,
     request: undefined
   });
 
