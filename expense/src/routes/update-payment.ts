@@ -1,7 +1,9 @@
 import {
+  Action,
   BadRequestError,
   NotFoundError,
   requireAuth,
+  Type,
   validate,
   ValidationError,
 } from "@chortec/common";
@@ -9,6 +11,8 @@ import { Router } from "express";
 import Joi from "joi";
 import { Group } from "../models/group";
 import { Payment, IPayment } from "../models/payment";
+import { ActivityPublisher } from "../publishers/activity-publisher";
+import { natsWrapper } from "../utils/nats-wrapper";
 
 const router = Router({ mergeParams: true });
 
@@ -45,7 +49,37 @@ router.put("/", requireAuth, validate(schema), async (req, res) => {
     to: payment.to.id,
     id: req.params.id,
   });
-  res.json(await Payment.findById(req.params.id));
+
+  const newPayment = await Payment.findById(req.params.id);
+  const involved: string[] = [];
+  if (payment.from.id !== req.user!.id) involved.push(payment.from.id);
+  if (payment.to.id !== req.user!.id) involved.push(payment.to.id);
+
+  new ActivityPublisher(natsWrapper.client).publish({
+    action: Action.Updated,
+    request: {
+      id: newPayment.id,
+      type: Type.Payment,
+    },
+    subject: {
+      id: newPayment.from.id,
+      name: newPayment.to.id,
+      type: Type.User,
+    },
+    object: {
+      id: newPayment.to.id,
+      name: newPayment.to.id,
+      type: Type.User,
+    },
+    parent: {
+      id: newPayment.id,
+      name: "",
+      type: Type.Payment,
+    },
+    involved,
+  });
+
+  res.json();
 });
 
 export { router };

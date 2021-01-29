@@ -5,7 +5,7 @@ interface IUser {
   id: string;
   email?: string;
   phone?: string;
-  name?: string;
+  name: string;
   picture?: string;
 }
 
@@ -50,6 +50,17 @@ class User {
        CREATE (u)-[:${Relations.Created}]->(t)`,
       { creator, targetid }
     );
+  }
+
+  static async findById(userid: string): Promise<IUser> {
+    const res = await graph.run(
+      `MATCH (u:User {id: $userid})
+      RETURN properties(u) as user
+      `,
+      { userid }
+    );
+
+    return res.records.length !== 0 ? res.records[0].get("user") : null;
   }
 }
 

@@ -1,4 +1,10 @@
-import { BadRequestError, validate, requireAuth } from "@chortec/common";
+import {
+  BadRequestError,
+  validate,
+  requireAuth,
+  Action,
+  Type,
+} from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
 import { IParticipant, PRole } from "../models/participant";
@@ -8,6 +14,9 @@ import {
 } from "../utils/expense-validations";
 import { Expense } from "../models/expense";
 import { Group } from "../models/group";
+import { ActivityPublisher } from "../publishers/activity-publisher";
+import { natsWrapper } from "../utils/nats-wrapper";
+import { User } from "../models/user";
 
 const router = Router();
 
@@ -51,6 +60,29 @@ router.post(
 
     const id = await Expense.create({ ...req.body, creator: req.user?.id });
     const expense = await Expense.findById(id);
+    const participants: IParticipant[] = expense.particpants;
+    const user = await User.findById(req.user!.id);
+    new ActivityPublisher(natsWrapper.client).publish({
+      action: Action.Created,
+      request: {
+        id,
+        type: Type.Expense,
+      },
+      subject: {
+        id: user.id,
+        name: user.name,
+        type: Type.User,
+      },
+      object: {
+        id,
+        name: expense.description,
+        type: Type.Expense,
+      },
+      involved: participants
+        .map((x) => x.id)
+        .filter((id) => id != req.user?.id),
+    });
+
     res.status(201).json(expense);
   }
 );
