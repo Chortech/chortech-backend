@@ -8,7 +8,7 @@ export class UserUpdatedListener extends Listener<IUserUpdated> {
     try {
       if (!User.exists([data.id]))
         throw new Error("Can't update a user who does not exist.");
-      await User.update(data);
+      await User.update({ ...data, name: data.name! });
       done.ack();
     } catch (error) {
       console.log(error);

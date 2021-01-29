@@ -3,16 +3,21 @@ import {
   validate,
   requireAuth,
   NotFoundError,
+  Action,
+  Type,
 } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
 import { Expense } from "../models/expense";
 import { Group } from "../models/group";
 import { IParticipant, Participant, PRole } from "../models/participant";
+import { User } from "../models/user";
+import { ActivityPublisher } from "../publishers/activity-publisher";
 import {
   validateParticipants,
   validatePriceFlow,
 } from "../utils/expense-validations";
+import { natsWrapper } from "../utils/nats-wrapper";
 import { graph, Nodes } from "../utils/neo";
 
 const router = Router({ mergeParams: true });
@@ -114,10 +119,33 @@ router.put(
       expense.participants = req.body.participants;
       await Expense.updateFull(expense);
     } else await Expense.updateInfo(expense);
-
+    Set;
     // if (req.body.participants) newexpense.total = req.body.total;
     // await graph.removeExpense(newexpense.id);
-    res.json(await Expense.findById(expense.id));
+    const newExepnes = await Expense.findById(expense.id);
+    const newParticipates = newExepnes.participants as IParticipant[];
+    const user = await User.findById(req.user!.id);
+    new ActivityPublisher(natsWrapper.client).publish({
+      action: Action.Updated,
+      request: {
+        id: expense.id,
+        type: Type.Expense,
+      },
+      subject: {
+        id: user.id,
+        name: user.name,
+        type: Type.User,
+      },
+      object: {
+        id: newExepnes.id,
+        name: newExepnes.description,
+        type: Type.Expense,
+      },
+      involved: newParticipates
+        .map((x) => x.id)
+        .filter((id) => id != req.user?.id),
+    });
+    res.json(newExepnes);
   }
 );
 

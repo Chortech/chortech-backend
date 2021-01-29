@@ -146,7 +146,7 @@ class Payment {
     id: string;
     from: IUser;
     to: IUser;
-    creator: string;
+    creator: IUser;
     amount: number;
     paid_at: number;
     group?: string;
