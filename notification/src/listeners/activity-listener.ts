@@ -11,17 +11,27 @@ export class ActivityListener extends Listener<IActivity> {
 
   async onMessage(data: IActivity["data"], done: Message) {
     try {
-      if (Array.isArray(data)) throw new Error("Ask nima about this.");
-      const involved = data.involved.map((x) => new Schema.Types.ObjectId(x));
-      const users = await User.find({ _id: { $in: involved } });
-      const tokens = users.map((x: any) => x.token);
-      const message = handler.handle(data);
-      done.ack();
+      if (Array.isArray(data)) {
+        for (const d of data) {
+          await this.send(d);
+        }
+        return done.ack();
+      }
 
-      await notification.sendMessageMulticast(message, tokens);
+      await this.send(data);
+
+      done.ack();
     } catch (error) {
       console.log(error);
     }
+  }
+
+  private async send(data: IData) {
+    const involved = data.involved.map((x) => new Schema.Types.ObjectId(x));
+    const users = await User.find({ _id: { $in: involved } });
+    const tokens = users.map((x: any) => x.token);
+    const message = handler.handle(data);
+    await notification.sendMessageMulticast(message, tokens);
   }
 }
 

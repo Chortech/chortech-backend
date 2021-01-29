@@ -39,11 +39,11 @@ class GroupHandler extends Handler {
 
     switch (data.action) {
       case Action.Removed:
-        return `${data.subject.name} شمارو از گروه "${data.parent?.name}" حذف کرد.`;
+        return `${data.subject.name} ${data.object.name} از گروه "${data.parent?.name}" حذف کرد.`;
       case Action.Left:
         return `${data.subject.name} گروه "${data.object.name}" رو ترک کرد.`;
       case Action.Added:
-        return `${data.subject.name} شمارو به گروه "${data.parent?.name}" افزود`;
+        return `${data.subject.name} ${data.object.name} به گروه "${data.parent?.name}" افزود`;
       case Action.Updated:
         return `${data.subject.name} گروه "${data.object.name}" رو تغییر داد.`;
       case Action.Deleted:
@@ -78,7 +78,7 @@ class PaymentHandler extends Handler {
 
     switch (data.action) {
       case Action.Paid:
-        return `${data.subject.name} ${data.data} تومان به شما پرداخت کرد.`;
+        return `${data.subject.name} ${data.data} تومان به ${data.object.name} پرداخت کرد.`;
       case Action.Updated:
         return `${data.subject.name} پرداخت رو تغییر داد.`;
       case Action.Deleted:
@@ -121,13 +121,13 @@ class ExpenseHandler extends Handler {
       case Action.Updated:
         return `${data.subject.name} هزینه‌ی "${data.object.name}" رو تغییر داد.`;
       case Action.Added:
-        return `${data.subject.name} شمارو به هزینه‌ی "${data.parent?.name}" افزود.`;
+        return `${data.subject.name} ${data.object.name} رو به هزینه‌ی "${data.parent?.name}" افزود.`;
       case Action.Deleted:
-        return `${data.subject.name} شمارو از هزینه‌ی "${data.object.name}" حذف کرد.`;
+        return `${data.subject.name} هزینه‌ی "${data.object.name}" حذف کرد.`;
       case Action.Commented:
         return `${data.subject.name} برای هزینه‌ی "${data.object.name}" کامنت گذاشت.`;
       case Action.Removed:
-        return `${data.subject.name} شمارو از هزینه‌ی "${data.parent?.name}" حذف کرد.`;
+        return `${data.subject.name} ${data.object.name} رو از هزینه‌ی "${data.parent?.name}" حذف کرد.`;
       default:
         return this.handler.handle(data);
     }
@@ -153,7 +153,7 @@ handler.setNext(new ExpenseHandler()).setNext(new PaymentHandler());
 
 //   object: {
 //     id: "2",
-//     name: "موز",
+//     name: "hazhar",
 //     type: Type.User,
 //   },
 //   parent: {
