@@ -34,9 +34,8 @@ router.patch(
 
     const { picture, name } = req.body;
 
-    const group = await Group.findById(req.group?.id)
-      .populate("members")
-      .populate("creator");
+    const group = await Group.findById(req.group?.id);
+
     const user = mongoose.Types.ObjectId(req.user.id);
 
     if (!group)
@@ -48,7 +47,6 @@ router.patch(
     if (name) group.name = name;
     if (picture) group.picture = picture;
 
-    const gp = await group.save();
 
     await new GroupUpdatedPublisher(natsWrapper.client).publish({
       id: group!.id,
@@ -60,8 +58,8 @@ router.patch(
     const usr = await User.findById(user);
     let involved: string[] = [];
 
-    for (let member of gp.members)
-      involved.push(member.id);
+    for (let member of group.members)
+      involved.push(member.toHexString());
 
     await new ActivityPublisher(natsWrapper.client).publish({
       subject: { id: usr?.id, name: usr?.name!, type: Type.User },
@@ -73,7 +71,11 @@ router.patch(
       request: { type: Type.Group, id: group?.id }
     });
 
-    res.status(200).json(group);
+    const gp = await Group.findById(req.group?.id)
+      .populate("members")
+      .populate("creator");
+
+    res.status(200).json(gp);
   }
 );
 

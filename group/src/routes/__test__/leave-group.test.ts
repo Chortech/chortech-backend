@@ -64,7 +64,7 @@ it('should leave from the group and the group and the creator should be updated'
   expect(response.status).toBe(200);
     
   const group = await Group.findById(res.body.id);
-  expect(group.creator.toHexString() != id).toBe(true);
+  expect(group?.creator.toHexString() != id).toBe(true);
 });
 
 
@@ -91,23 +91,17 @@ it('should leave from the group', async () => {
         users[3].id
       ]
     });
-  
-  const user = await global.signin(
-    users[1].id,
-    users[1].email,
-    users[1].phone
-  );
     
   const response = await request(app)
     .delete(`/api/group/${res.body.id}/leave`)
-    .set('Authorization', `Bearer ${user.token}`)
+    .set('Authorization', `Bearer ${token}`)
     .send();
     
     
   expect(response.status).toBe(200);
     
   const group = await Group.findById(res.body.id);
-  expect(group.members.includes(mongoose.Types.ObjectId(user.id))).toBe(false);
+  expect(group?.members.includes(mongoose.Types.ObjectId(id))).toBe(false);
 });
 
 

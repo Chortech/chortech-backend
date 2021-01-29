@@ -63,20 +63,19 @@ router.put(
     if (raw.n === 0)
       throw new BadRequestError('Something went wrong when adding members');
 
-    const group = await Group.findById(req.group?.id).populate('members').populate('creator');
+    const gp = await Group.findById(req.group?.id);
 
     await new GroupUpdatedPublisher(natsWrapper.client).publish({
-      id: group!.id,
+      id: gp!.id,
       members: members,
       type: GroupUpdateType.AddMember,
     });
 
     const usr = await User.findById(user);
-    const gp = await group?.save();
     let involved: string[] = [];
 
     for (let member of gp?.members!)
-      involved.push(member.id);
+      involved.push(member.toHexString());
 
     let data: IData[] = [];
 
@@ -85,17 +84,19 @@ router.put(
       const activity: IData = {
         subject: { id: usr?.id, name: usr?.name!, type: Type.User },
         object: { id: added?.id, name: added?.name!, type: Type.User },
-        parent: { id: group?.id, name: group?.name!, type: Type.Group },
+        parent: { id: gp?.id, name: gp?.name!, type: Type.Group },
         action: Action.Added,
         involved: involved,
         data: undefined,
-        request: { type: Type.Group, id: group?.id }
+        request: { type: Type.Group, id: gp?.id }
       }
 
       data.push(activity);
     }
 
     await new ActivityPublisher(natsWrapper.client).publish(data);
+
+    const group = await Group.findById(req.group?.id).populate('members').populate('creator');
 
     res.status(200).json(group);
   }

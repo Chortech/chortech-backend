@@ -58,35 +58,36 @@ router.put("/", requireAuth, validate(removeMemberSchema), async (req, res) => {
     { $pull: { members: member } }
   );
 
-  const group = await Group.findById(req.group?.id)
-    .populate("members")
-    .populate("creator");
+  const gp = await Group.findById(req.group?.id);
 
   await new GroupUpdatedPublisher(natsWrapper.client).publish({
-    id: group!.id,
+    id: gp!.id,
     removed: member,
     type: GroupUpdateType.RemoveMember,
   });
 
   const usr = await User.findById(user);
   const removed = await User.findById(member);
-  const gp = await group?.save();
   let involved: string[] = [];
 
   for (let member of gp?.members!)
-    involved.push(member.id);
+    involved.push(member.toHexString());
 
   await new ActivityPublisher(natsWrapper.client).publish({
     subject: { id: usr?.id, name: usr?.name!, type: Type.User },
     object: { id: removed?.id, name: removed?.name!, type: Type.User },
-    parent: { id: group?.id, name: group?.name!, type: Type.Group },
+    parent: { id: gp?.id, name: gp?.name!, type: Type.Group },
     action: Action.Removed,
     involved: involved,
     data: undefined,
-    request: { type: Type.Group, id: group?.id }
+    request: { type: Type.Group, id: gp?.id }
   });
 
-  res.status(200).json({ group });
+  const group = await Group.findById(req.group?.id)
+    .populate("members")
+    .populate("creator");
+
+  res.status(200).json(group);
 });
 
 export { router as removeMemberRouter };
