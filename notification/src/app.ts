@@ -16,6 +16,9 @@ app.use(helmet());
 // adding route handlers to express
 app.use("/api/notifications", setFCMTokenRouter);
 
+// TODO IMPLEMENT THIS
+// app.use("/api/notifications/remind/:id", sendReminderRouter);
+
 // if any of the above route handlers failed to run we need to show a 404 status code
 app.get("*", (req, res) => {
   throw new NotFoundError();

@@ -6,6 +6,24 @@ class Notification {
       credential: admin.credential.cert(path),
     });
   }
+
+  async sendMessageMulticast(data: any, tokens: string[]) {
+    const res = await admin.messaging().sendMulticast({ tokens, data });
+    const faildTokens: string[] = [];
+    if (res.failureCount > 0) {
+      res.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          faildTokens.push(tokens[idx]);
+        }
+      });
+    }
+
+    console.log("Failed Tokens: ", faildTokens);
+  }
+  async sendMessage(data: any, token: string) {
+    const res = await admin.messaging().send({ token, data });
+    console.log("sent", res);
+  }
 }
 
 export const notification = new Notification();
