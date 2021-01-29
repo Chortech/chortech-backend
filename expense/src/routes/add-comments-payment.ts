@@ -49,15 +49,10 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
     },
     subject: {
       id: payment.from.id,
-      name: payment.to.id,
+      name: payment.from.name,
       type: Type.User,
     },
     object: {
-      id: payment.to.id,
-      name: payment.to.id,
-      type: Type.User,
-    },
-    parent: {
       id: paymentid,
       name: "",
       type: Type.Payment,

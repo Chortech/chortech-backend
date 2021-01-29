@@ -63,12 +63,12 @@ router.put("/", requireAuth, validate(schema), async (req, res) => {
     },
     subject: {
       id: newPayment.from.id,
-      name: newPayment.to.id,
+      name: newPayment.from.name,
       type: Type.User,
     },
     object: {
       id: newPayment.to.id,
-      name: newPayment.to.id,
+      name: newPayment.to.name,
       type: Type.User,
     },
     parent: {
