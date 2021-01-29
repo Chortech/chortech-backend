@@ -6,7 +6,6 @@ class Notification {
       credential: admin.credential.cert(path),
     });
   }
-<<<<<<< HEAD
 
   async sendMessageMulticast(data: any, tokens: string[]) {
     const res = await admin.messaging().sendMulticast({ tokens, data });
@@ -25,8 +24,6 @@ class Notification {
     const res = await admin.messaging().send({ token, data });
     console.log("sent", res);
   }
-=======
->>>>>>> added basic FCM functionality
 }
 
 export const notification = new Notification();

@@ -4,10 +4,7 @@ import { randomBytes } from "crypto";
 import path from "path";
 import fs from "fs";
 import { notification } from "./utils/notif-wrapper";
-<<<<<<< HEAD
 import { ActivityListener } from "./listeners/activity-listener";
-=======
->>>>>>> added basic FCM functionality
 
 async function start() {
   const secpath =
@@ -23,30 +20,6 @@ async function start() {
   // Initialize Firebase wrapper
   notification.init(secpath);
 
-<<<<<<< HEAD
-=======
-  //   const secrets = JSON.parse(fs.readFileSync(secpath, "utf-8"));
-  //   const keys = Object.keys(secrets);
-  //   for (const key of keys) {
-  //     process.env[key] = secrets[key];
-  //   }
-
-  //   if (!process.env.type) throw new Error("type must be defined!");
-  //   if (!process.env.project_id) throw new Error("project_id must be defined!");
-  //   if (!process.env.private_key_id)
-  //     throw new Error("private_key_id must be defined!");
-  //   if (!process.env.private_key) throw new Error("private_key must be defined!");
-  //   if (!process.env.client_email)
-  //     throw new Error("client_email must be defined!");
-  //   if (!process.env.client_id) throw new Error("client_id must be defined!");
-  //   if (!process.env.auth_uri) throw new Error("auth_uri must be defined!");
-  //   if (!process.env.token_uri) throw new Error("token_uri must be defined!");
-  //   if (!process.env.auth_provider_x509_cert_url)
-  //     throw new Error("auth_provider_x509_cert_url must be defined!");
-  //   if (!process.env.client_x509_cert_url)
-  //     throw new Error("client_x509_cert_url must be defined!");
-
->>>>>>> added basic FCM functionality
   const port = process.env.PORT || 3000;
   const natsClusterId = process.env.NATS_CLUSTER_ID || "chortec";
   const natsClientId =
@@ -54,10 +27,7 @@ async function start() {
   const natsUrl = process.env.NATS_URL || "http://localhost:4222";
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
-<<<<<<< HEAD
     new ActivityListener(natsWrapper.client).listen();
-=======
->>>>>>> added basic FCM functionality
   } catch (err) {
     console.error(err);
   }
