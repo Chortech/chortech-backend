@@ -24,8 +24,7 @@
   "license": "ISC",
   "config": {
     "mongodbMemoryServer": {
-      "version": "latest",
-      "disablePostinstall": "1"
+      "version": "latest"
     }
   },
   "devDependencies": {
