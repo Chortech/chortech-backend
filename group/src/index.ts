@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { natsWrapper } from "./utils/nats-wrapper";
 import { UserCreatedListener } from './listeners/user-created-listener';
 import { UserUpdatedListener } from './listeners/user-updated-listener';
+import { fileManager } from './utils/file-manager';
 import { randomBytes } from "crypto";
 import fs from "fs";
 import path from "path";
@@ -38,6 +39,24 @@ async function start() {
     const natsClientId =
         process.env.NATS_CLIENT_ID || randomBytes(4).toString("hex");
     const natsUrl = process.env.NATS_URL || "http://localhost:4222";
+
+    try {
+        fileManager.init({
+          S3: {
+            region: process.env.STORAGE_REGION!,
+            endpoint: process.env.STORAGE_ENDPOINT!,
+            credentials: {
+              accessKeyId: process.env.STORAGE_ACCESSKEYID!,
+              secretAccessKey: process.env.STORAGE_SECRET!,
+            },
+          },
+          urlExpire: 60 * 60,
+          bucket: process.env.STORAGE_BUCKET!,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+
     try {
         await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
         new UserCreatedListener(natsWrapper.client).listen();
