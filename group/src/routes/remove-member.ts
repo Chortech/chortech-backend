@@ -1,31 +1,26 @@
-import Router from "express";
+import { Router } from "express";
 import {
   BadRequestError,
   requireAuth,
   NotFoundError,
-  validate,
   GroupUpdateType,
   Action,
   Type
 } from "@chortec/common";
 import Group from "../models/group";
-import Joi from "joi";
 import mongoose from "mongoose";
 import { GroupUpdatedPublisher } from "../publishers/group-updated-publisher";
 import { natsWrapper } from "../utils/nats-wrapper";
 import { ActivityPublisher } from "../publishers/activity-publisher";
 import User from "../models/user";
 
-const router = Router();
 
-const removeMemberSchema = Joi.object({
-  member: Joi.string(),
-}).label("body");
+const router = Router({ mergeParams: true });
 
-router.put("/", requireAuth, validate(removeMemberSchema), async (req, res) => {
+router.put("/", requireAuth, async (req, res) => {
   if (!req.user) throw new BadRequestError("Invalid state!");
 
-  const { member } = req.body;
+  const member = req.params.mid;
 
   const exists = await Group.exists({ _id: req.group?.id });
   const user = mongoose.Types.ObjectId(req.user.id);
@@ -55,7 +50,7 @@ router.put("/", requireAuth, validate(removeMemberSchema), async (req, res) => {
     {
       _id: req.group?.id,
     },
-    { $pull: { members: member } }
+    { $pull: { members: mongoose.Types.ObjectId(member) } }
   );
 
   const gp = await Group.findById(req.group?.id);

@@ -27,9 +27,9 @@ app.use("/api/group/", createGroupRouter);
 app.use("/api/group/", getGroupsRouter);
 app.use("/api/group/:id", getGroupRouter);
 app.use("/api/group/:id", deleteGroupRouter);
-app.use("/api/group/:id", addMembersToGroupRouter);
-app.use("/api/group/:id/leave", leaveGroupRouter);
-app.use("/api/group/:id/remove", removeMemberRouter);
+app.use("/api/group/:id/members", addMembersToGroupRouter);
+app.use("/api/group/:id/members", leaveGroupRouter);
+app.use("/api/group/:id/members/:mid", removeMemberRouter);
 app.use("/api/group/:id", editGroupInfoRouter);
 
 // if any of the above route handlers failed to run we need to show a 404 status code
