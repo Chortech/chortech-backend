@@ -18,7 +18,7 @@ it('should add members to the group', async () => {
     .expect(201);
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -49,7 +49,7 @@ it('should not add members to a group that does not exist', async () => {
     .expect(201);
   
   const response = await request(app)
-    .put(`/api/group/${id}`)
+    .post(`/api/group/${id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -86,7 +86,7 @@ it('should not add members to the group if you are not a member in the said grou
   );
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${user.token}`)
     .send({
       members: [
@@ -122,7 +122,7 @@ it('should not add members to the group with wrong member ids', async () => {
   );
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${user.token}`)
     .send({
       members: [
@@ -212,7 +212,7 @@ it('should not add members to the group with an invalid auth token', async () =>
     .expect(201);
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', 'bullshit')
     .send({
       members: [
@@ -243,7 +243,7 @@ it('should not add members to the group with wrong request body', async () => {
     .expect(201);
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -274,7 +274,7 @@ it('should not add members to the group without the request body', async () => {
     .expect(201);
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send();
   
