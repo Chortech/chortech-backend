@@ -23,7 +23,7 @@ const addMembersToGroupSchema = Joi.object({
   members: Joi.array().items(Joi.string()),
 }).label("body");
 
-router.put(
+router.post(
   "/",
   requireAuth,
   validate(addMembersToGroupSchema),
