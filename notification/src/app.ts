@@ -7,6 +7,7 @@ import "express-async-errors";
 import helmet from "helmet";
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as setFCMTokenRouter } from "./routes/set-fcm-token";
+import { router as testRouter } from "./routes/test";
 
 // setting up express
 const app = express();
@@ -15,14 +16,7 @@ app.use(helmet());
 
 // adding route handlers to express
 app.use("/api/notifications", setFCMTokenRouter);
-
-// TODO IMPLEMENT THIS
-// app.use("/api/notifications/remind/:id", sendReminderRouter);
-
-// if any of the above route handlers failed to run we need to show a 404 status code
-app.get("*", (req, res) => {
-  throw new NotFoundError();
-});
+app.post("/api/notifications/test", testRouter);
 
 // adding the error handling middleware
 app.use(errorHandler);

@@ -79,7 +79,7 @@ router.put("/", requireAuth, validate(schema), async (req, res) => {
     involved,
   });
 
-  res.json();
+  res.json(newPayment);
 });
 
 export { router };
