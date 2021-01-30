@@ -130,6 +130,8 @@ services:
       NATS_CLUSTER_ID: chortec
       SECRETS: /run/secrets/group-service-secrets
       DEBUG: "true"
+    secrets:
+      - group-service-secrets
   expense:
     image: chortech/expense:latest
     container_name: expense-service
