@@ -33,6 +33,10 @@ const userSchema = new Schema(
         const id = ret._id;
         delete ret._id;
         delete ret.__v;
+        const picture = ret.picture
+        ? `${process.env.STORAGE_ENDPOINT}/${process.env.STORAGE_BUCKET}/${ret.picture}`
+        : undefined;
+        ret.picture = picture;
         ret.id = id;
       }
     }
