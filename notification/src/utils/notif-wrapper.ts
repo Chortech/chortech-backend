@@ -6,7 +6,9 @@ class Notification {
       credential: admin.credential.cert(path),
     });
   }
-
+  get admin() {
+    return admin;
+  }
   async sendMessageMulticast(data: any, tokens: string[]) {
     const res = await admin.messaging().sendMulticast({ tokens, data });
     const faildTokens: string[] = [];

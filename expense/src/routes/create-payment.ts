@@ -67,12 +67,12 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
     },
     subject: {
       id: payment.from.id,
-      name: payment.to.id,
+      name: payment.from.name,
       type: Type.User,
     },
     object: {
       id: payment.to.id,
-      name: payment.to.id,
+      name: payment.to.name,
       type: Type.User,
     },
     parent: {
@@ -83,7 +83,7 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
     involved,
   });
 
-  res.json(payment);
+  res.status(201).json(payment);
 });
 
 export { router };

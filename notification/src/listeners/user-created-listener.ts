@@ -9,12 +9,13 @@ export class UserCreatedListener extends Listener<IUserCreated> {
     try {
       const user = User.build({
         id: data.id,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        friends: [],
-        myCreditCards: [],
-        otherCreditCards: [],
+        token: "",
+        // name: data.name,
+        // email: data.email,
+        // phone: data.phone,
+        // friends: [],
+        // myCreditCards: [],
+        // otherCreditCards: [],
       });
 
       await user.save();

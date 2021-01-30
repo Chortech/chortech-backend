@@ -9,7 +9,14 @@ const schema = Joi.object({
 });
 
 router.post("/", requireAuth, validate(schema), async (req, res) => {
-  const user = User.build({
+  let user = await User.findById(req.user?.id);
+
+  if (user) {
+    await User.updateOne({ _id: user.id }, { token: req.body.token });
+    return res.status(204);
+  }
+
+  user = User.build({
     id: req.user!.id,
     token: req.body.token,
   });
