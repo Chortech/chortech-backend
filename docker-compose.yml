@@ -128,6 +128,7 @@ services:
       MONGO_URI: mongodb://group-db:27017
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
+      SECRETS: /run/secrets/group-service-secrets
       DEBUG: "true"
   expense:
     image: chortech/expense:latest
@@ -183,3 +184,5 @@ secrets:
     file: ./secrets/user-service-secrets.json
   auth-service-secrets:
     file: ./secrets/auth-service-secrets.json
+  group-service-secrets:
+    file: ./secrets/group-service-secrets.json
