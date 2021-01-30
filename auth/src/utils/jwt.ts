@@ -4,7 +4,9 @@ import fs from "fs";
 import path from "path";
 
 const joinedPath = path.join(__dirname, "..", "keys", "chortec.key");
-const private_key = process.env.JWT_KEY || fs.readFileSync(joinedPath, "utf-8");
+const private_key = fs.existsSync(joinedPath)
+  ? fs.readFileSync(joinedPath, "utf-8")
+  : undefined;
 
 const issuer = "Chortec";
 const audience = "chortect.com";
