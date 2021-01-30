@@ -22,11 +22,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "config": {
-    "mongodbMemoryServer": {
-      "version": "latest"
-    }
-  },
   "devDependencies": {
     "@types/jest": "^26.0.14",
     "@types/redis-mock": "^0.17.0",
