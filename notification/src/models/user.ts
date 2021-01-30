@@ -19,7 +19,7 @@ interface UserModel extends mongoose.Model<UserDoc> {
 }
 
 const userSchema = new Schema({
-  password: { type: String, required: true },
+  token: { type: String, required: true },
 });
 
 userSchema.statics.build = (user: IUser) => new User({ ...user, _id: user.id });

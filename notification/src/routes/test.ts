@@ -12,7 +12,7 @@ const schema = Joi.object({
 });
 
 router.post("/", validate(schema), async (req, res) => {
-  const { token, message } = req.body.token;
+  const { token, message } = req.body;
 
   const result = await notification.admin.messaging().send({
     token,
@@ -41,6 +41,8 @@ router.post("/", validate(schema), async (req, res) => {
     },
   });
   console.log(result);
+
+  res.status(204).send();
 });
 
 export { router };

@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { notification } from "./utils/notif-wrapper";
 import { ActivityListener } from "./listeners/activity-listener";
+import mongoose from "mongoose";
 
 async function start() {
   const secpath =
@@ -28,6 +29,16 @@ async function start() {
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
     new ActivityListener(natsWrapper.client).listen();
+  } catch (err) {
+    console.error(err);
+  }
+  const mongoURI = process.env.MONGO_URL || "mongodb://localhost:27017/user";
+  try {
+    await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to mongo!");
   } catch (err) {
     console.error(err);
   }

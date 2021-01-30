@@ -1,5 +1,5 @@
 import { IData, IActivity, Listener, Subjects } from "@chortec/common";
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { Message } from "node-nats-streaming";
 import User from "../models/user";
 import { handler } from "../utils/activity-parser";
@@ -27,7 +27,7 @@ export class ActivityListener extends Listener<IActivity> {
   }
 
   private async send(data: IData) {
-    const involved = data.involved.map((x) => new Schema.Types.ObjectId(x));
+    const involved = data.involved.map((x) => new mongoose.Types.ObjectId(x));
     const users = await User.find({ _id: { $in: involved } });
     const tokens = users.map((x: any) => x.token);
     const message = handler.handle(data);

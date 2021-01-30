@@ -41,6 +41,13 @@ services:
       - 27017
     logging:
       driver: none
+  notif-db:
+    image: mongo
+    container_name: notif-db-mongo
+    expose:
+      - 27017
+    logging:
+      driver: none
   user-db:
     image: mongo
     container_name: user-db-mongo
@@ -121,7 +128,10 @@ services:
     restart: always
     expose:
       - 3000
+    depends_on:
+      - notif-db
     environment:
+      MONGO_URL: mongodb://notif-db:27017
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
       SECRETS: /run/secrets/notification-service-secrets
