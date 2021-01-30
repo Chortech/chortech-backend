@@ -32,6 +32,9 @@ router.put(
 
     const { members } = req.body;
 
+    if (!members)
+      throw new BadRequestError('There are no members to add!');
+
     const exists = await Group.exists({ _id: req.group?.id });
     const user = mongoose.Types.ObjectId(req.user.id);
 
