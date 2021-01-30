@@ -75,13 +75,14 @@ router.delete('/', requireAuth, async (req, res) => {
   if (raw.n === 0)
     throw new BadRequestError("Something went wrong when you tried to leave!");
 
+  const gp = await Group.findById(req.group?.id);
+
   await new GroupUpdatedPublisher(natsWrapper.client).publish({
-    id: group!.id,
+    id: gp!.id,
     left: req.user.id,
     type: GroupUpdateType.LeaveGroup,
   });
 
-  const gp = await Group.findById(req.group?.id);
   const usr = await User.findById(user);
 
   let involved: string[] = [];
