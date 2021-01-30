@@ -7,23 +7,16 @@
     "start": "ts-node-dev src/index.ts",
     "start:prod": "node build/index.js",
     "test": "jest --watch-all --no-cache ",
-    "common": "npm update @chortec/common"
+    "common": "npm update @chortec/common",
+    "test:ci": "jest"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/src/test/config.ts"
-    ],
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
-    "testTimeout": 10000
-  },
-  "config": {
-    "mongodbMemoryServer": {
-      "version": "latest"
-    }
+    "testTimeout": 20000
   },
   "keywords": [],
   "author": "",

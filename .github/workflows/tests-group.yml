@@ -1,0 +1,13 @@
+name: tests-group
+
+on:
+  pull_request:
+    paths:
+      - 'group/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd group && npm install && npm run test:ci

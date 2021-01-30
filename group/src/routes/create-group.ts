@@ -28,6 +28,9 @@ router.post("/", requireAuth, validate(createGroupSchema), async (req, res) => {
 
   const { name, picture } = req.body;
 
+  if (!name)
+    throw new BadRequestError('You cannot create a group without a name!');
+
   const creator = mongoose.Types.ObjectId(req.user.id);
 
   const members = [creator];
