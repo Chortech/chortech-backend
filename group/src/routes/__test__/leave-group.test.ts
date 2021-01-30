@@ -45,7 +45,7 @@ it('should leave from the group and the group and the creator should be updated'
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -82,7 +82,7 @@ it('should leave from the group', async () => {
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -119,7 +119,7 @@ it('should not leave from the group if the user is a participant in an expense',
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -165,7 +165,7 @@ it('should not leave from the group if the user is not a member of the group', a
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -204,7 +204,7 @@ it('should not leave from the group if the group does not exist', async () => {
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -242,7 +242,7 @@ it('should not leave from the group if the group does not exist', async () => {
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -280,7 +280,7 @@ it('should not leave from the group without an auth token', async () => {
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -317,7 +317,7 @@ it('should not leave from the group with an invalid auth token', async () => {
     .expect(201);
   
   await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [

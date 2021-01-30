@@ -152,7 +152,7 @@ it('should not add members to the group with wrong member ids', async () => {
     .expect(201);
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .set('Authorization', `Bearer ${token}`)
     .send({
       members: [
@@ -182,7 +182,7 @@ it('should not add members to the group without an auth token', async () => {
     .expect(201);
   
   const response = await request(app)
-    .put(`/api/group/${res.body.id}`)
+    .post(`/api/group/${res.body.id}/members`)
     .send({
       members: [
         users[1].id,
