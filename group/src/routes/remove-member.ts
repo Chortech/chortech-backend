@@ -67,6 +67,8 @@ router.put("/", requireAuth, async (req, res) => {
 
   for (let member of gp?.members!)
     involved.push(member.toHexString());
+  
+  involved.push(member);
 
   await new ActivityPublisher(natsWrapper.client).publish({
     subject: { id: usr?.id, name: usr?.name!, type: Type.User },
