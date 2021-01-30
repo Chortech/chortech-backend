@@ -17,15 +17,14 @@
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
-    "testTimeout": 10000
+    "testTimeout": 20000
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "config": {
     "mongodbMemoryServer": {
-      "version": "latest",
-      "disablePostinstall": "1"
+      "version": "latest"
     }
   },
   "devDependencies": {

@@ -17,7 +17,7 @@
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
-    "testTimeout": 10000
+    "testTimeout": 20000
   },
   "keywords": [],
   "author": "",

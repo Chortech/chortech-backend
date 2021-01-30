@@ -7,8 +7,7 @@
     "start": "ts-node-dev src/index.ts",
     "start:prod": "node build/index.js",
     "test": "jest --watch-all --no-cache ",
-    "common": "npm update @chortec/common",
-    "test:ci": "jest"
+    "common": "npm update @chortec/common"
   },
   "jest": {
     "preset": "ts-jest",
