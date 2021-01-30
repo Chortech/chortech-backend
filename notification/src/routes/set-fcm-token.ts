@@ -13,17 +13,18 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
 
   if (user) {
     await User.updateOne({ _id: user.id }, { token: req.body.token });
-    return res.status(204);
+    return res.status(204).send();
   }
 
   user = User.build({
     id: req.user!.id,
     token: req.body.token,
   });
-
+  console.log("hello");
   await user.save();
+  console.log("BYEE");
 
-  return res.status(204);
+  return res.status(204).send();
 });
 
 export { router };

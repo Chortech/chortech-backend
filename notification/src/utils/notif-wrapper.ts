@@ -22,9 +22,35 @@ class Notification {
 
     console.log("Failed Tokens: ", faildTokens);
   }
-  async sendMessage(data: any, token: string) {
-    const res = await admin.messaging().send({ token, data });
-    console.log("sent", res);
+  async send(message: string, token: string) {
+    const result = await notification.admin.messaging().send({
+      token,
+      notification: {
+        body: message
+          ? message
+          : "This is an FCM notification that displays an image!",
+        title: "FCM Notification",
+      },
+      apns: {
+        payload: {
+          aps: {
+            "mutable-content": 1,
+          },
+        },
+        fcmOptions: {
+          imageUrl:
+            "https://chortech.s3.ir-thr-at1.arvanstorage.com/chortech.jpg",
+        },
+      },
+      android: {
+        notification: {
+          imageUrl:
+            "https://chortech.s3.ir-thr-at1.arvanstorage.com/chortech.jpg",
+        },
+      },
+    });
+
+    console.log("sent", result);
   }
 }
 
