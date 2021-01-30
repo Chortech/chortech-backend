@@ -26,7 +26,7 @@ it('should not get activities without an auth token', async () => {
 
   await request(app)
     .get('/api/activity')
-    .expect(200);
+    .expect(401);
 });
 
 it('should not get activities with an invalid auth token', async () => {
@@ -39,5 +39,5 @@ it('should not get activities with an invalid auth token', async () => {
   await request(app)
     .get('/api/activity')
     .set('Authorization', `fdlaksjfdlajfdalshfksaj`)
-    .expect(200);
+    .expect(401);
 });
