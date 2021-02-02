@@ -51,9 +51,7 @@ router.put("/", requireAuth, validate(schema), async (req, res) => {
   });
 
   const newPayment = await Payment.findById(req.params.id);
-  const involved: string[] = [];
-  if (payment.from.id !== req.user!.id) involved.push(payment.from.id);
-  if (payment.to.id !== req.user!.id) involved.push(payment.to.id);
+  const involved: string[] = [payment.from.id, payment.to.id];
 
   new ActivityPublisher(natsWrapper.client).publish({
     action: Action.Updated,

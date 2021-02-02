@@ -41,13 +41,13 @@ class GroupHandler extends Handler {
       case Action.Removed:
         return `${data.subject.name} ${data.object.name} از گروه "${data.parent?.name}" حذف کرد.`;
       case Action.Left:
-        return `${data.subject.name} گروه "${data.object.name}" رو ترک کرد.`;
+        return `${data.subject.name} گروه "${data.object.name}" را ترک کرد.`;
       case Action.Added:
         return `${data.subject.name} ${data.object.name} به گروه "${data.parent?.name}" افزود`;
       case Action.Updated:
-        return `${data.subject.name} گروه "${data.object.name}" رو تغییر داد.`;
+        return `${data.subject.name} گروه "${data.object.name}" را تغییر داد.`;
       case Action.Deleted:
-        return `${data.subject.name} گروه "${data.object.name}" رو حذف کرد.`;
+        return `${data.subject.name} گروه "${data.object.name}" را حذف کرد.`;
       default:
         return this.handler.handle(data);
     }
@@ -80,9 +80,9 @@ class PaymentHandler extends Handler {
       case Action.Paid:
         return `${data.subject.name} ${data.data} تومان به ${data.object.name} پرداخت کرد.`;
       case Action.Updated:
-        return `${data.subject.name} پرداخت رو تغییر داد.`;
+        return `${data.subject.name} پرداخت را تغییر داد.`;
       case Action.Deleted:
-        return `${data.subject.name} پرداخت رو حذف کرد.`;
+        return `${data.subject.name} پرداخت را حذف کرد.`;
       case Action.Commented:
         return `${data.subject.name} روی پرداخت کامنت گذاشت`;
       default:
@@ -117,17 +117,17 @@ class ExpenseHandler extends Handler {
 
     switch (data.action) {
       case Action.Created:
-        return `${data.subject.name} هزینه‌ی "${data.object.name}" رو ساخت.`;
+        return `${data.subject.name} هزینه‌ی "${data.object.name}" را ساخت.`;
       case Action.Updated:
-        return `${data.subject.name} هزینه‌ی "${data.object.name}" رو تغییر داد.`;
+        return `${data.subject.name} هزینه‌ی "${data.object.name}" را تغییر داد.`;
       case Action.Added:
-        return `${data.subject.name} ${data.object.name} رو به هزینه‌ی "${data.parent?.name}" افزود.`;
+        return `${data.subject.name} ${data.object.name} را به هزینه‌ی "${data.parent?.name}" افزود.`;
       case Action.Deleted:
         return `${data.subject.name} هزینه‌ی "${data.object.name}" حذف کرد.`;
       case Action.Commented:
         return `${data.subject.name} برای هزینه‌ی "${data.object.name}" کامنت گذاشت.`;
       case Action.Removed:
-        return `${data.subject.name} ${data.object.name} رو از هزینه‌ی "${data.parent?.name}" حذف کرد.`;
+        return `${data.subject.name} ${data.object.name} را از هزینه‌ی "${data.parent?.name}" حذف کرد.`;
       default:
         return this.handler.handle(data);
     }
@@ -144,26 +144,27 @@ class ExpenseHandler extends Handler {
 export const handler = new GroupHandler();
 handler.setNext(new ExpenseHandler()).setNext(new PaymentHandler());
 
-// const data: IData = {
-//   subject: {
-//     id: "1",
-//     name: "سینا",
-//     type: Type.User,
-//   },
+const data: IData = {
+  subject: {
+    id: "1",
+    name: "سینا",
+    type: Type.User,
+  },
 
-//   object: {
-//     id: "2",
-//     name: "hazhar",
-//     type: Type.User,
-//   },
-//   parent: {
-//     id: "3",
-//     name: "موز",
-//     type: Type.Payment,
-//   },
-//   data: 10000,
-//   action: Action.Paid,
-//   involved: [],
-// };
+  object: {
+    id: "2",
+    name: "hazhar",
+    type: Type.User,
+  },
+  parent: {
+    id: "3",
+    name: "موز",
+    type: Type.Expense,
+  },
+  data: 10000,
+  action: Action.Created,
+  involved: [],
+};
 
-// console.log(handler.handle(data));
+console.log(handler.handle(data));
+console.log(process.env.myvar);

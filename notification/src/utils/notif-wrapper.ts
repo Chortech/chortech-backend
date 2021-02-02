@@ -9,27 +9,42 @@ class Notification {
   get admin() {
     return admin;
   }
-  async sendMessageMulticast(data: any, tokens: string[]) {
-    const res = await admin.messaging().sendMulticast({ tokens, data });
-    const faildTokens: string[] = [];
-    if (res.failureCount > 0) {
-      res.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          faildTokens.push(tokens[idx]);
-        }
-      });
-    }
+  async sendMessageMulticast(message: string, tokens: string[]) {
+    const result = await notification.admin.messaging().sendMulticast({
+      tokens,
+      notification: {
+        body: message,
+        title: "Chortech Notification",
+      },
+      apns: {
+        payload: {
+          aps: {
+            "mutable-content": 1,
+          },
+        },
+        fcmOptions: {
+          imageUrl:
+            "https://chortech.s3.ir-thr-at1.arvanstorage.com/chortech.jpg",
+        },
+      },
+      android: {
+        notification: {
+          imageUrl:
+            "https://chortech.s3.ir-thr-at1.arvanstorage.com/chortech.jpg",
+        },
+      },
+    });
 
-    console.log("Failed Tokens: ", faildTokens);
+    console.log("Failed Tokens:", result);
   }
   async send(message: string, token: string) {
     const result = await notification.admin.messaging().send({
       token,
       notification: {
-        body: message
-          ? message
-          : "This is an FCM notification that displays an image!",
-        title: "FCM Notification",
+        body: message,
+        title: "Chortech Notification",
+        imageUrl:
+          "https://chortech.s3.ir-thr-at1.arvanstorage.com/chortech.jpg",
       },
       apns: {
         payload: {
