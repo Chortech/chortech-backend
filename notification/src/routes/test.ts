@@ -1,46 +1,22 @@
 import { requireAuth, validate } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
+import { ActivityListener } from "../listeners/activity-listener";
 import User from "../models/user";
+import { natsWrapper } from "../utils/nats-wrapper";
 import { notification } from "../utils/notif-wrapper";
 
 const router = Router();
 
-const schema = Joi.object({
-  token: Joi.string().required(),
-  message: Joi.string(),
-});
+// const schema = Joi.object({
+//   token: Joi.string().required(),
+//   message: Joi.string(),
+// });
 
-router.post("/", validate(schema), async (req, res) => {
-  const { token, message } = req.body;
+router.post("/", async (req, res) => {
+  //   const { data } = req.body;
 
-  const result = await notification.admin.messaging().send({
-    token,
-    notification: {
-      body: message
-        ? message
-        : "This is an FCM notification that displays an image!",
-      title: "FCM Notification",
-    },
-    apns: {
-      payload: {
-        aps: {
-          "mutable-content": 1,
-        },
-      },
-      fcmOptions: {
-        imageUrl:
-          "https://chortech.s3.ir-thr-at1.arvanstorage.com/chortech.jpg",
-      },
-    },
-    android: {
-      notification: {
-        imageUrl:
-          "https://chortech.s3.ir-thr-at1.arvanstorage.com/chortech.jpg",
-      },
-    },
-  });
-  console.log(result);
+  await new ActivityListener(natsWrapper.client).send(req.body);
 
   res.status(204).send();
 });

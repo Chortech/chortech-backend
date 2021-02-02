@@ -78,9 +78,7 @@ router.post(
         name: expense.description,
         type: Type.Expense,
       },
-      involved: participants
-        .map((x) => x.id)
-        .filter((id) => id != req.user?.id),
+      involved: participants.map((x) => x.id),
     });
 
     res.status(201).json(expense);

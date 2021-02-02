@@ -42,7 +42,7 @@ router.delete("/", requireAuth, async (req, res) => {
       name: expense.description,
       type: Type.Expense,
     },
-    involved: participants.map((x) => x.id).filter((id) => id != req.user?.id),
+    involved: participants.map((x) => x.id),
   });
 
   res.json({ message: "Delete successful" });

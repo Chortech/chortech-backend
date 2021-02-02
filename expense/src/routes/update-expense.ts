@@ -141,9 +141,7 @@ router.put(
         name: newExepnes.description,
         type: Type.Expense,
       },
-      involved: newParticipates
-        .map((x) => x.id)
-        .filter((id) => id != req.user?.id),
+      involved: newParticipates.map((x) => x.id),
     });
     res.json(newExepnes);
   }
