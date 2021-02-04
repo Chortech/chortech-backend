@@ -8,7 +8,7 @@ export class UserCreatedListener extends Listener<IUserCreated> {
     try {
       const user = User.build({
         id: data.id,
-        token: "",
+        token: "token",
       });
 
       await user.save();
