@@ -19,10 +19,9 @@ export class ActivityListener extends Listener<IActivity> {
       }
 
       await this.send(data);
-
-      done.ack();
     } catch (error) {
       console.log(error);
+      done.ack();
     }
   }
 
@@ -30,14 +29,13 @@ export class ActivityListener extends Listener<IActivity> {
     const involved = data.involved
       .filter((x) => x != data.subject.id)
       .map((x) => new mongoose.Types.ObjectId(x));
-    console.log(involved);
 
     const users = await User.find({ _id: { $in: involved } });
     console.log(users);
     const tokens = users.map((x: any) => x.token);
     try {
       const message = handler.handle(data);
-      if (tokens.length === 1) await notification.send(message, tokens);
+      if (tokens.length === 1) await notification.send(message, tokens[0]);
       else await notification.sendMessageMulticast(message, tokens);
     } catch (err) {
       throw err;

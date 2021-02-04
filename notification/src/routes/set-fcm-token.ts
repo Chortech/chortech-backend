@@ -20,9 +20,7 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
     id: req.user!.id,
     token: req.body.token,
   });
-  console.log("hello");
   await user.save();
-  console.log("BYEE");
 
   return res.status(204).send();
 });

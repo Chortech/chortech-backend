@@ -144,27 +144,25 @@ class ExpenseHandler extends Handler {
 export const handler = new GroupHandler();
 handler.setNext(new ExpenseHandler()).setNext(new PaymentHandler());
 
-const data: IData = {
-  subject: {
-    id: "1",
-    name: "سینا",
-    type: Type.User,
-  },
+// const data: IData = {
+//   subject: {
+//     id: "1",
+//     name: "سینا",
+//     type: Type.User,
+//   },
 
-  object: {
-    id: "2",
-    name: "hazhar",
-    type: Type.User,
-  },
-  parent: {
-    id: "3",
-    name: "موز",
-    type: Type.Expense,
-  },
-  data: 10000,
-  action: Action.Created,
-  involved: [],
-};
-
-console.log(handler.handle(data));
-console.log(process.env.myvar);
+//   object: {
+//     id: "2",
+//     name: "hazhar",
+//     type: Type.User,
+//   },
+//   parent: {
+//     id: "3",
+//     name: "موز",
+//     type: Type.Expense,
+//   },
+//   data: 10000,
+//   action: Action.Created,
+//   involved: [],
+// };
+// console.log(process.env.myvar);
