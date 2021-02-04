@@ -6,6 +6,7 @@ import fs from "fs";
 import { notification } from "./utils/notif-wrapper";
 import { ActivityListener } from "./listeners/activity-listener";
 import mongoose from "mongoose";
+import { UserCreatedListener } from "./listeners/user-created-listener";
 
 async function start() {
   const secpath =
@@ -29,6 +30,7 @@ async function start() {
   try {
     await natsWrapper.connect(natsClusterId, natsClientId, natsUrl);
     new ActivityListener(natsWrapper.client).listen();
+    new UserCreatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.error(err);
   }
