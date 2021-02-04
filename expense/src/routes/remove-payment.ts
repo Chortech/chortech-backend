@@ -27,7 +27,7 @@ router.delete("/", requireAuth, async (req, res) => {
   const user = await User.findById(req.user!.id);
 
   await new ActivityPublisher(natsWrapper.client).publish({
-    action: Action.Removed,
+    action: Action.Deleted,
     request: {
       id: paymentid,
       type: Type.Payment,
