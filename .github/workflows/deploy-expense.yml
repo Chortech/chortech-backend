@@ -1,6 +1,7 @@
 name: deploy-expense
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -24,5 +25,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
+            cd chortec-backend
             docker-compose pull
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d expense
