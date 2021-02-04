@@ -12,37 +12,25 @@ router.delete("/", requireAuth, async (req, res) => {
   const raw = await User.updateOne(
     {
       $and: [
-        {
-          _id: {
-            $in: [
-              new mongoose.Types.ObjectId(req.user?.id),
-              new mongoose.Types.ObjectId(req.friend?.id),
-            ],
-          },
-        },
-        {
-          friends: {
-            $in: [
-              new mongoose.Types.ObjectId(req.user?.id),
-              new mongoose.Types.ObjectId(req.friend?.id),
-            ],
-          },
-        },
+        { _id: req.user?.id },
+        { friends: { $in: [new mongoose.Types.ObjectId(req.friend?.id)] } },
       ],
     },
+    { $pullAll: { friends: [new mongoose.Types.ObjectId(req.friend?.id)] } }
+  );
+  const raw2 = await User.updateOne(
     {
-      $pullAll: {
-        friends: [
-          new mongoose.Types.ObjectId(req.user?.id),
-          new mongoose.Types.ObjectId(req.friend?.id),
-        ],
-      },
-    }
+      $and: [
+        { _id: req.friend?.id },
+        { friends: { $in: [new mongoose.Types.ObjectId(req.user?.id)] } },
+      ],
+    },
+    { $pullAll: { friends: [new mongoose.Types.ObjectId(req.user?.id)] } }
   );
 
   // console.log(raw);
 
-  if (raw.nModified === 0)
+  if (raw.nModified === 0 || raw2.nModified === 0)
     throw new NotFoundError(`${req.friend?.id} is not your friend!`);
 
   const user = await User.findById(req.user?.id);
