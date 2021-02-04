@@ -60,9 +60,9 @@ router.post(
 
     const id = await Expense.create({ ...req.body, creator: req.user?.id });
     const expense = await Expense.findById(id);
-    const participants: IParticipant[] = expense.particpants;
+    const participants: IParticipant[] = expense.participants;
     const user = await User.findById(req.user!.id);
-    new ActivityPublisher(natsWrapper.client).publish({
+    await new ActivityPublisher(natsWrapper.client).publish({
       action: Action.Created,
       request: {
         id,
@@ -78,9 +78,7 @@ router.post(
         name: expense.description,
         type: Type.Expense,
       },
-      involved: participants
-        .map((x) => x.id)
-        .filter((id) => id != req.user?.id),
+      involved: participants.map((x) => x.id),
     });
 
     res.status(201).json(expense);

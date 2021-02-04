@@ -55,11 +55,9 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
   });
 
   const payment = await Payment.findById(paymentid);
-  const involved: string[] = [];
-  if (payment.from.id !== req.user!.id) involved.push(payment.from.id);
-  if (payment.to.id !== req.user!.id) involved.push(payment.to.id);
+  const involved: string[] = [payment.from.id, payment.to.id];
 
-  new ActivityPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     action: Action.Paid,
     request: {
       id: paymentid,
@@ -67,12 +65,12 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
     },
     subject: {
       id: payment.from.id,
-      name: payment.to.id,
+      name: payment.from.name,
       type: Type.User,
     },
     object: {
       id: payment.to.id,
-      name: payment.to.id,
+      name: payment.to.name,
       type: Type.User,
     },
     parent: {
@@ -80,10 +78,10 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
       name: "",
       type: Type.Payment,
     },
-    involved,
+    involved: [payment.from.id, payment.to.id],,
   });
 
-  res.json(payment);
+  res.status(201).json(payment);
 });
 
 export { router };

@@ -125,7 +125,7 @@ router.put(
     const newExepnes = await Expense.findById(expense.id);
     const newParticipates = newExepnes.participants as IParticipant[];
     const user = await User.findById(req.user!.id);
-    new ActivityPublisher(natsWrapper.client).publish({
+    await new ActivityPublisher(natsWrapper.client).publish({
       action: Action.Updated,
       request: {
         id: expense.id,
@@ -141,9 +141,7 @@ router.put(
         name: newExepnes.description,
         type: Type.Expense,
       },
-      involved: newParticipates
-        .map((x) => x.id)
-        .filter((id) => id != req.user?.id),
+      involved: newParticipates.map((x) => x.id),
     });
     res.json(newExepnes);
   }

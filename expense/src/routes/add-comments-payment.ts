@@ -37,11 +37,9 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
       `user ${req.user?.id} doesn't participate in expense ${paymentid}`
     );
 
-  const involved: string[] = [];
-  if (payment.from.id !== req.user!.id) involved.push(payment.from.id);
-  if (payment.to.id !== req.user!.id) involved.push(payment.to.id);
+  const involved: string[] = [payment.from.id, payment.to.id];
 
-  new ActivityPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     action: Action.Commented,
     request: {
       id: paymentid,
@@ -57,7 +55,7 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
       name: "",
       type: Type.Payment,
     },
-    involved,
+    involved: [payment.from.id, payment.to.id],,
     data: req.body.text,
   });
 
