@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expense-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expense
+  template:
+    metadata:
+      labels:
+        app: expense
+    spec:
+      containers:
+        - name: expense
+          image: chortech/expense
+          env: 
+            - name: NEO4J_URL
+              value: 'bolt://expense-neo4j-srv:7687'
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: chortec
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef: 
+                  fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expense-srv
+spec:
+  selector:
+    app: expense
+  ports:
+    - name: expense
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
