@@ -11,6 +11,6 @@ COPY . .
 
 RUN tsc
 
-RUN mv src/keys build/keys 2>/dev/null
+RUN mv src/keys build/keys 2>/dev/null || true
 
 CMD [ "npm", "run","start:prod" ]
