@@ -26,5 +26,5 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             cd chortec-backend
-            docker-compose pull
+            docker-compose pull expense
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d expense

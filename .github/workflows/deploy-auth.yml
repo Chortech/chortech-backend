@@ -28,5 +28,5 @@ jobs:
           envs: JWT_KEY
           script: |
             cd chortec-backend
-            docker-compose pull
+            docker-compose pull auth
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d auth

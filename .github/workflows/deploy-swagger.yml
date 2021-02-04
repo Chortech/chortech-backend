@@ -1,4 +1,4 @@
-name: deploy-activity
+name: deploy-swagger
 
 on:
   workflow_dispatch:
@@ -6,19 +6,19 @@ on:
     branches:
       - master
     paths:
-      - 'activity/**'
+      - 'swagger/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: cd activity && docker build -t chortech/activity .
+      - run: cd swagger && docker build -t chortech/api-docs .
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      - run: docker push chortech/activity
+      - run: docker push chortech/api-docs
       - uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -26,5 +26,5 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             cd chortec-backend
-            docker-compose pull activity
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d activity
+            docker-compose pull api-docs
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d api-docs
