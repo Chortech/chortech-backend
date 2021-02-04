@@ -32,14 +32,14 @@ router.put("/", requireAuth, validate(schema), async (req, res) => {
 
   if (req.body.group && req.body.group !== NO_GROUP) {
     if (!(await Group.exists(req.body.group)))
-      throw new BadRequestError("Group does not exists!");
+      throw new NotFoundError("Group does not exists!");
     if (
       !(await Group.areMembersById(req.body.group, [
         payment.to.id,
         payment.from.id,
       ]))
     )
-      throw new BadRequestError(
+      throw new NotFoundError(
         "One of if not both 'from' or 'to' don't exist in group!"
       );
   }

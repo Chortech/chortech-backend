@@ -68,7 +68,7 @@ router.put(
       if (req.body.group !== NO_GROUP) {
         // a group that does not exists is not allowed
         if (!(await Group.exists(req.body.group)))
-          throw new BadRequestError("Group does not exists!");
+          throw new NotFoundError("Group does not exists!");
         expense.group = req.body.group;
       } else await Expense.deleteExpenseGroup(expense.id);
     }
@@ -111,7 +111,7 @@ router.put(
         changed ? req.body.participants : expense.participants
       ))
     ) {
-      throw new BadRequestError(
+      throw new NotFoundError(
         `One of the new participants is not a member of group ${req.body.group}`
       );
     }

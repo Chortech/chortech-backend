@@ -4,6 +4,7 @@ import {
   requireAuth,
   Action,
   Type,
+  NotFoundError,
 } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
@@ -51,11 +52,11 @@ router.post(
     // a group that does not exist is not allowed
     if (req.body.group) {
       if (!(await Group.exists(req.body.group)))
-        throw new BadRequestError("Group does not exists!");
+        throw new NotFoundError("Group does not exists!");
 
       // check to make sure that all participants are in the group
       if (!(await Group.areMembers(req.body.group, req.body.participants)))
-        throw new BadRequestError("pariticipant doesn't belong to this group!");
+        throw new NotFoundError("pariticipant doesn't belong to this group!");
     }
 
     const id = await Expense.create({ ...req.body, creator: req.user?.id });

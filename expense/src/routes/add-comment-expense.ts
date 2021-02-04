@@ -35,7 +35,7 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
   );
 
   if (!n || n === 0)
-    throw new BadRequestError(
+    throw new NotFoundError(
       `user ${req.user?.id} doesn't participate in expense ${expenseid}`
     );
   const user = await User.findById(req.user!.id);
