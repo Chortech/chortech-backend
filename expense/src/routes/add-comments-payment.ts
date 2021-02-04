@@ -39,7 +39,7 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
 
   const involved: string[] = [payment.from.id, payment.to.id];
 
-  new ActivityPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     action: Action.Commented,
     request: {
       id: paymentid,

@@ -40,7 +40,7 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
     );
   const user = await User.findById(req.user!.id);
   const participants = expense.participants as IParticipant[];
-  new ActivityPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     action: Action.Commented,
     request: {
       id: expenseid,

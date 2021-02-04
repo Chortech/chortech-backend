@@ -57,7 +57,7 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
   const payment = await Payment.findById(paymentid);
   const involved: string[] = [payment.from.id, payment.to.id];
 
-  new ActivityPublisher(natsWrapper.client).publish({
+  await new ActivityPublisher(natsWrapper.client).publish({
     action: Action.Paid,
     request: {
       id: paymentid,
