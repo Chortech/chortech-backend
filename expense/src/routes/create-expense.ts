@@ -60,7 +60,7 @@ router.post(
 
     const id = await Expense.create({ ...req.body, creator: req.user?.id });
     const expense = await Expense.findById(id);
-    const participants: IParticipant[] = expense.particpants;
+    const participants: IParticipant[] = expense.participants;
     const user = await User.findById(req.user!.id);
     await new ActivityPublisher(natsWrapper.client).publish({
       action: Action.Created,

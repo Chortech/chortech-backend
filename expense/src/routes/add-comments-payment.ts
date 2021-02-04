@@ -55,7 +55,7 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
       name: "",
       type: Type.Payment,
     },
-    involved,
+    involved: [payment.from.id, payment.to.id],,
     data: req.body.text,
   });
 

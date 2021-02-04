@@ -24,7 +24,7 @@ router.delete("/", requireAuth, async (req, res) => {
 
   if (!(await Expense.remove(expenseid)))
     throw new BadRequestError("Something went wrong!");
-  const participants: IParticipant[] = expense.particpants;
+  const participants: IParticipant[] = expense.participants;
   const user = await User.findById(req.user!.id);
   await new ActivityPublisher(natsWrapper.client).publish({
     action: Action.Removed,

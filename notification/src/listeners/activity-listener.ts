@@ -7,7 +7,7 @@ import { notification } from "../utils/notif-wrapper";
 
 export class ActivityListener extends Listener<IActivity> {
   subject: Subjects.Activity = Subjects.Activity;
-  queueName = "activity-service";
+  queueName = "notif-service";
 
   async onMessage(data: IActivity["data"], done: Message) {
     try {
@@ -19,6 +19,7 @@ export class ActivityListener extends Listener<IActivity> {
       }
 
       await this.send(data);
+      done.ack();
     } catch (error) {
       console.log(error);
       done.ack();

@@ -24,7 +24,6 @@ router.delete("/", requireAuth, async (req, res) => {
 
   if (!(await Payment.remove(paymentid)))
     throw new BadRequestError("Something went wrong!");
-  const involved: string[] = [payment.from.id, payment.to.id];
   const user = await User.findById(req.user!.id);
 
   await new ActivityPublisher(natsWrapper.client).publish({
@@ -43,7 +42,7 @@ router.delete("/", requireAuth, async (req, res) => {
       name: "",
       type: Type.Payment,
     },
-    involved,
+    involved: [payment.from.id, payment.to.id],
   });
 
   res.json({ message: "Delete successful" });
