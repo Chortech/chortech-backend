@@ -12,11 +12,32 @@ router.delete("/", requireAuth, async (req, res) => {
   const raw = await User.updateOne(
     {
       $and: [
-        { _id: req.user?.id },
-        { friends: { $in: [new mongoose.Types.ObjectId(req.friend?.id)] } },
+        {
+          _id: {
+            $in: [
+              new mongoose.Types.ObjectId(req.user?.id),
+              new mongoose.Types.ObjectId(req.friend?.id),
+            ],
+          },
+        },
+        {
+          friends: {
+            $in: [
+              new mongoose.Types.ObjectId(req.user?.id),
+              new mongoose.Types.ObjectId(req.friend?.id),
+            ],
+          },
+        },
       ],
     },
-    { $pullAll: { friends: [new mongoose.Types.ObjectId(req.friend?.id)] } }
+    {
+      $pullAll: {
+        friends: [
+          new mongoose.Types.ObjectId(req.user?.id),
+          new mongoose.Types.ObjectId(req.friend?.id),
+        ],
+      },
+    }
   );
 
   // console.log(raw);
