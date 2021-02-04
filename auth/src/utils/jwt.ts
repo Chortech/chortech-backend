@@ -31,8 +31,11 @@ const generateToken = async (
   return new Promise<Token>((resolve, reject) => {
     const iat = Math.floor(Date.now() / 1000);
     const exp = iat + expire;
-    const algorithm = process.env.JWT_KEY ? "HS256" : "RS256";
-    const secret = process.env.JWT_KEY || private_key;
+    const algorithm =
+      process.env.JWT_PRIVATE_KEY || private_key ? "RS256" : "HS256";
+
+    const secret =
+      process.env.JWT_KEY || private_key || process.env.JWT_PRIVATE_KEY;
     if (!secret) throw new Error("JWT Secret must be defined!!");
     jwt.sign(
       { ...payload, exp },
