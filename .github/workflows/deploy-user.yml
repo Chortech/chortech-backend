@@ -25,4 +25,4 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             docker-compose pull
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps user
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d user
