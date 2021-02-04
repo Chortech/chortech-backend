@@ -33,8 +33,8 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
   );
 
   if (!n || n === 0)
-    throw new BadRequestError(
-      `user ${req.user?.id} doesn't participate in expense ${paymentid}`
+    throw new NotFoundError(
+      `User ${req.user?.id} doesn't participate in payment ${paymentid}`
     );
 
   const involved: string[] = [payment.from.id, payment.to.id];
@@ -55,7 +55,7 @@ router.post("/", requireAuth, validate(scheme), async (req, res) => {
       name: "",
       type: Type.Payment,
     },
-    involved: [payment.from.id, payment.to.id],,
+    involved: [payment.from.id, payment.to.id],
     data: req.body.text,
   });
 

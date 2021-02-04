@@ -12,7 +12,7 @@ const router = Router({ mergeParams: true });
 
 router.get("/", requireAuth, async (req, res) => {
   if (!(await Group.areMembersById(req.params.id, [req.user!.id])))
-    throw new BadRequestError("user doesn't belong to this group!");
+    throw new NotFoundError("user doesn't belong to this group!");
 
   const expenses = await query.findGroupExpenses(req.user!.id, req.params.id);
 

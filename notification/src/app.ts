@@ -7,7 +7,7 @@ import "express-async-errors";
 import helmet from "helmet";
 import { NotFoundError, errorHandler } from "@chortec/common";
 import { router as setFCMTokenRouter } from "./routes/set-fcm-token";
-import { router as testRouter } from "./routes/test";
+import { router as sendReminderRouter } from "./routes/send-reminder";
 import morgan from "morgan";
 
 // setting up express
@@ -18,7 +18,7 @@ app.use(morgan("combined"));
 
 // adding route handlers to express
 app.use("/api/notifications", setFCMTokenRouter);
-app.use("/api/notifications/test", testRouter);
+app.use("/api/notifications/remind", sendReminderRouter);
 
 // adding the error handling middleware
 app.use(errorHandler);

@@ -4,6 +4,7 @@ import {
   requireAuth,
   Action,
   Type,
+  NotFoundError,
 } from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
@@ -33,7 +34,7 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
   // a group that does not exist is not allowed
   if (req.body.group) {
     if (!(await Group.exists(req.body.group)))
-      throw new BadRequestError("Group does not exists!");
+      throw new NotFoundError("Group does not exists!");
 
     // check to make sure that all participants are in the group
     if (
@@ -42,12 +43,12 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
         req.body.to,
       ]))
     )
-      throw new BadRequestError("pariticipant doesn't belong to this group!");
+      throw new NotFoundError("pariticipant doesn't belong to this group!");
   }
 
   // users should exists as well
   if (!(await User.exists([req.body.from, req.body.to])))
-    throw new BadRequestError("One of 'from' or 'to' doesn't exist!");
+    throw new NotFoundError("One of 'from' or 'to' doesn't exist!");
 
   const paymentid = await Payment.create({
     ...req.body,
@@ -78,7 +79,7 @@ router.post("/", requireAuth, validate(schema), async (req, res) => {
       name: "",
       type: Type.Payment,
     },
-    involved: [payment.from.id, payment.to.id],,
+    involved: [payment.from.id, payment.to.id],
   });
 
   res.status(201).json(payment);
