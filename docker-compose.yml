@@ -96,7 +96,7 @@ services:
       - auth-db
     environment:
       STAGE: "true"
-      HOST: http://5.253.25.167/
+      HOST: http://185.239.107.34/
       REDIS_URL: redis://auth-cache:6379
       MONGO_URL: mongodb://auth-db:27017
       NATS_URL: http://nats-streaming:4222
