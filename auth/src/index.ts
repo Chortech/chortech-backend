@@ -23,6 +23,7 @@ async function start() {
   process.env.LINE_NUMBER = secrets.LINE_NUMBER;
   process.env.SMS_SECRET = secrets.SMS_SECRET;
   process.env.SMS_API_KEY = secrets.SMS_API_KEY;
+  process.env.JWT_KEY = secrets.JWT_KEY;
 
   if (!process.env.EMAIL) throw new Error("EMAIL is not defined!");
   if (!process.env.EMAIL_PASS) throw new Error("EMAIL_PASS is not defined!");
@@ -31,6 +32,7 @@ async function start() {
   if (!process.env.LINE_NUMBER) throw new Error("LINE_NUMBER is not defined!");
   if (!process.env.SMS_SECRET) throw new Error("SMS_SECRET is not defined!");
   if (!process.env.SMS_API_KEY) throw new Error("SMS_API_KEY is not defined!");
+  if (!process.env.JWT_KEY) throw new Error("JWT_KEY is not defined!");
 
   const port = process.env.PORT || 3000;
   const mongoURI = process.env.MONGO_URL || "mongodb://localhost:27017/auth";
