@@ -1,11 +1,11 @@
 version: "3.8"
 services:
-  auth:
+  activity:
     expose:
       - 3000
     environment:
       PRODUCTION: "true"
-  user:
+  auth:
     expose:
       - 3000
     environment:
@@ -15,18 +15,37 @@ services:
       - 3000
     environment:
       PRODUCTION: "true"
-  api-docs:
+  group:
+    expose:
+      - 3000
+    environment: 
+      PRODUCTION: "true"
+  notification:
     expose:
       - 3000
     environment:
       PRODUCTION: "true"
+  user:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: "true"
+  api-docs:
+    expose:
+      - 3000
+    environment:
+      PRODUCTION: "true"  
   nginx:
     image: nginx
     container_name: nginx
     depends_on:
+      - activity
       - auth
       - expense
+      - group
+      - notification
       - user
+      - api-docs
     ports:
       - 80:80
     environment:

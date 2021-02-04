@@ -9,6 +9,16 @@ interface IUserCreated {
     name: string;
   };
 }
+interface IUserUpdated {
+  subject: Subjects.UserUpdated;
+  data: {
+    id: string;
+    phone?: string;
+    email?: string;
+    name?: string;
+    picture?: string;
+  };
+}
 
 interface IInviteeCreated {
   subject: Subjects.InviteeCreated;
@@ -30,4 +40,4 @@ interface IUserInvited {
     Invitees: [{ name: string; phone?: string; email?: string }];
   };
 }
-export { IUserCreated, IUserInvited, IInviteeCreated };
+export { IUserCreated, IUserInvited, IInviteeCreated, IUserUpdated };

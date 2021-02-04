@@ -1,0 +1,28 @@
+name: deploy-activity
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'activity/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: action/checkout@v2
+      - run: cd activity && docker build -t chortech/activity .
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker push chortech/activity
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          script: |
+            docker-compose pull
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d activity

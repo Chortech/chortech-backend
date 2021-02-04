@@ -19,6 +19,12 @@ tags:
     description: "Group Section"
   - name: "expense"
     description: "Expense Section"
+  - name: "payment"
+    description: "Payment Section"
+  - name: "balance"
+    description: "Balance Section"
+  - name: "notification"
+    description: "Notification Section"
 paths:
   /api/auth/signup:
     post:
@@ -1313,7 +1319,64 @@ paths:
   # DELETE    /api/groups/:id
   # PUT       /api/groups/:id
   # GET       /api/groups/:id
-  /api/groups:
+  /api/group:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Get Groups
+      description: >-
+        Get all Groups you are a member of
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  creator:
+                    allOf:
+                      - $ref: "#/components/schemas/Friends"
+                    example:
+                      name: "nameee"
+                      email: "example@domaim.com"
+                      picture: "image url"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+
     post:
       security:
         - bearerAuth: []
@@ -1333,6 +1396,9 @@ paths:
                 name:
                   type: string
                   example: "my group name"
+                picture:
+                  type: string
+                  example: "image key"
       responses:
         "201":
           description: CREATED
@@ -1386,7 +1452,7 @@ paths:
               example:
                 errors:
                   - message: "You are not authorized to access this resource!"
-  /api/groups/{id}:
+  /api/group/{id}:
     get:
       security:
         - bearerAuth: []
@@ -1477,7 +1543,77 @@ paths:
               example:
                 errors:
                   - message: "You are not authorized to access this resource!"
-    put:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Delete Group
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        This is an example operation to show how security is applied to the
+        call.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Deleted the group successfully!"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                not-creator:
+                  value:
+                    errors:
+                      - message: "You are not the creator of this group!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No group exists with id gid"
+  /api/group/{id}/members:
+    post:
       security:
         - bearerAuth: []
       tags:
@@ -1500,7 +1636,7 @@ paths:
             schema:
               type: object
               properties:
-                friends:
+                members:
                   type: array
                   items:
                     type: string
@@ -1596,12 +1732,12 @@ paths:
               example:
                 errors:
                   - message: "No group exists with id gid"
-    delete:
+    patch:
       security:
         - bearerAuth: []
       tags:
         - "group"
-      summary: Delete Group
+      summary: Edit Group Info
       parameters:
         - in: path
           name: id
@@ -1611,6 +1747,18 @@ paths:
       description: >-
         This is an example operation to show how security is applied to the
         call.
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                picture:
+                  type: string
       responses:
         "200":
           description: OK
@@ -1619,10 +1767,34 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  id:
                     type: string
+                  name:
+                    type: string
+                    example: "group name"
+                  creator:
+                    $ref: "#/components/schemas/Friends"
+                  members:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Friends"
+                    example: []
               example:
-                message: "Deleted the group successfully!"
+                name: "group name"
+                creator:
+                  name: "nameee"
+                  email: "example@domaim.com"
+                  picture: "image url"
+                members:
+                  - name: "nameee"
+                    email: "example@domaim.com"
+                    picture: "image url"
+                  - name: "nameee2"
+                    email: "example2@domaim.com"
+                    picture: "image url"
+                  - name: "newusername"
+                    email: "newuseremail@domaim.com"
+                    picture: "image url"
         "400":
           description: BAD REQUEST
           content:
@@ -1630,10 +1802,191 @@ paths:
               schema:
                 $ref: "#/components/schemas/Errors"
               examples:
-                not-creator:
+                not-member:
                   value:
                     errors:
-                      - message: "You are not the creator of this group!"
+                      - message: "You are not a member of this group!"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No group exists with id gid"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Leave from group
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Leave From Group
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "You left the group successfully."
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                participant:
+                  value:
+                    errors:
+                      - message: "You cannot leave the group because you are a participant in an expense!"
+                not-a-member:
+                  value:
+                    errors:
+                      - message: "You are not a member of this group!"
+                no-user:
+                  value:
+                    errors:
+                      - message: "There is no user with the given id"
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "401":
+          description: UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Invalid authentication credentials provided!"
+        "403":
+          description: FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "You are not authorized to access this resource!"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "No groups with the id"
+  /api/group/{id}/members/{mid}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "group"
+      summary: Remove a member
+      parameters:
+        - in: path
+          name: id
+          description: group id
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: mid
+          description: member id that you want to remove
+          schema:
+            type: string
+          required: true
+      description: >-
+        Removes a member from given group
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                    example: "group name"
+                  creator:
+                    $ref: "#/components/schemas/Friends"
+                  members:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Friends"
+                    example: []
+              example:
+                name: "group name"
+                creator:
+                  name: "nameee"
+                  email: "example@domaim.com"
+                  picture: "image url"
+                members:
+                  - name: "nameee"
+                    email: "example@domaim.com"
+                    picture: "image url"
+                  - name: "nameee2"
+                    email: "example2@domaim.com"
+                    picture: "image url"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                not-member:
+                  value:
+                    errors:
+                      - message: "You are not a member of this group!"
+                has-expense:
+                  value:
+                    errors:
+                      - message: "You cannot remove this member because he participates in an active expense!"
+                cant-remove-owner:
+                  value:
+                    errors:
+                      - message: "You cannot remove this user because they are the owner of the group!"
+                no-user:
+                  value:
+                    errors:
+                      - message: "There is no user with the given id"
                 unknown:
                   value:
                     errors:
@@ -2151,6 +2504,466 @@ paths:
               example:
                 errors:
                   - message: "Expenese doesn't exists!"
+
+  /api/payments:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "payment"
+      summary: Create Payment
+      description: >-
+        Create a payment between two uses
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - from
+                - to
+                - amount
+              properties:
+                from:
+                  type: string
+                to:
+                  type: string
+                amount:
+                  type: number
+                paid_at:
+                  type: number
+                group:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "from is required!"
+                        fields: ["from"]
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Group does not exists!"
+
+  /api/payments/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "payment"
+      summary: Payment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Get a payment
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Didn't found payment with given id!"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - "payment"
+      summary: Delete Payment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Delete a payment between two uses
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Delete successful"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "Group does not exists!"
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - "payment"
+      summary: Update Payment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Update a payment between two uses note that you can't change neither from nor to
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                paid_at:
+                  type: number
+                group:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              examples:
+                validation:
+                  value:
+                    errors:
+                      - message: "darivari is not allowed!"
+                        fields: ["darivari"]
+                unknown:
+                  value:
+                    errors:
+                      - message: "Something went wrong"
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "user doesn't participate in payment"
+
+  /api/payments/{id}/comments:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "payment"
+      summary: Add comment on Payment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Add a comment on Payment
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+                - created_at
+              properties:
+                text:
+                  type: string
+                created_at:
+                  type: string
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Comment added."
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "User doesn't participate in payment"
+
+  /api/balances/friends:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "balance"
+      summary: Get balances between you and your friends
+      description: >-
+        Get balances between you and your friends
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    other:
+                      $ref: "#/components/schemas/User"
+                    balance:
+                      type: number
+
+  /api/balances/friends/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "balance"
+      summary: Get all the expenses and payments between you and one of your friends
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Get all the expenses and payments between you and one of your friends
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  oneOf:
+                    - allOf:
+                        - $ref: "#/components/schemas/Expense"
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum: [payment, expense]
+                        balance:
+                          type: number
+  /api/balances/groups:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "balance"
+      summary: Get your balances in all your group
+      description: >-
+        Get your balances in all your group
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  allOf:
+                    - $ref: "#/components/schemas/Group"
+                    - type: object
+                      properties:
+                        balance:
+                          type: number
+  /api/balances/groups/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "balance"
+      summary: Get all the balancesbetween you and members of a group
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Get a payment
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    balances:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/User"
+                    id:
+                      type: string
+
+  /api/expenses/groups/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - "balance"
+      summary: Get all the expenses and payments between for a specific group
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      description: >-
+        Get all the expenses and payments between for a specific group
+      responses:
+        "200":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                properties:
+                  group:
+                    $ref: "#/components/schemas/Group"
+                  expenses:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: "#/components/schemas/Expense"
+                        - $ref: "#/components/schemas/Payment"
+  /api/notifications:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "notification"
+      summary: Send the FCM client token
+      description: >-
+        Send the FCM client token
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+                - created_at
+              properties:
+                token:
+                  type: string
+      responses:
+        "204":
+          description: NO-CONTENT
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "User does not exist!"
+  /api/notifications/remind:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - "notification"
+      summary: Send a remider to one of your friends
+      description: >-
+        Add a comment on Payment
+      requestBody:
+        description: this is the request body
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+                - contact
+              properties:
+                message:
+                  type: string
+                contact:
+                  type: string
+      responses:
+        "204":
+          description: NO-CONTENT
+        "404":
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - message: "User does not exist!"
+
 components:
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
@@ -2328,6 +3141,103 @@ components:
           type: string
         name:
           type: string
+    Payment:
+      properties:
+        id:
+          type: string
+        from:
+          $ref: "#/components/schemas/User"
+        to:
+          $ref: "#/components/schemas/User"
+        group:
+          $ref: "#/components/schemas/Group"
+        amount:
+          type: number
+        paid_at:
+          type: string
+        notes:
+          type: string
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+    Participant:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        amount:
+          type: number
+        role:
+          type: string
+          enum: [debtor, creditor]
+    Expense:
+      properties:
+        id:
+          type: string
+        creator:
+          type: string
+        description:
+          type: string
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/Participant"
+        total:
+          type: number
+        comments:
+          $ref: "#/components/schemas/Comment"
+        group:
+          $ref: "#/components/schemas/Group"
+        notes:
+          type: string
+        paid_at:
+          type: number
+        created_at:
+          type: number
+        modified_at:
+          type: number
+        category:
+          type: number
+    Comment:
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        created_at:
+          type: number
+        writer:
+          $ref: "#/components/schemas/User"
+    Group:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        picture:
+          type: string
+        creator:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+
+    User:
+      properties:
+        id:
+          type: string
+        picture:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+
     Errors:
       type: object
       properties:

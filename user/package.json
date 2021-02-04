@@ -7,23 +7,16 @@
     "start": "ts-node-dev src/index.ts",
     "start:prod": "node build/index.js",
     "test": "jest --watch-all --no-cache ",
-    "common": "npm update @chortec/common"
+    "common": "npm update @chortec/common",
+    "test:ci": "jest"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/src/test/config.ts"
-    ],
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
-    "testTimeout": 10000
-  },
-  "config": {
-    "mongodbMemoryServer": {
-      "version": "latest"
-    }
+    "testTimeout": 20000
   },
   "keywords": [],
   "author": "",
@@ -46,9 +39,10 @@
     "@aws-sdk/types": "^1.0.0-rc.7",
     "@aws-sdk/util-create-request": "^1.0.0-rc.7",
     "@aws-sdk/util-format-url": "^1.0.0-rc.7",
-    "@chortec/common": "^1.0.47",
+    "@chortec/common": "^1.0.59",
     "@types/express": "^4.17.8",
     "@types/jsonwebtoken": "^8.5.0",
+    "@types/mime": "^2.0.3",
     "@types/mongoose": "^5.7.36",
     "@types/uuid": "^8.3.0",
     "axois": "0.0.1-security",

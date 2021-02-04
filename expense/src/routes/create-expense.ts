@@ -1,9 +1,23 @@
-import { BadRequestError, validate, requireAuth } from "@chortec/common";
+import {
+  BadRequestError,
+  validate,
+  requireAuth,
+  Action,
+  Type,
+  NotFoundError,
+} from "@chortec/common";
 import { Router } from "express";
 import Joi from "joi";
-import { graph, PRole, Participant } from "../utils/neo";
-import { v4 as uuid } from "uuid";
-import { Integer } from "neo4j-driver";
+import { IParticipant, PRole } from "../models/participant";
+import {
+  validatePriceFlow,
+  validateParticipants,
+} from "../utils/expense-validations";
+import { Expense } from "../models/expense";
+import { Group } from "../models/group";
+import { ActivityPublisher } from "../publishers/activity-publisher";
+import { natsWrapper } from "../utils/nats-wrapper";
+import { User } from "../models/user";
 
 const router = Router();
 
@@ -11,44 +25,65 @@ const schema = Joi.object({
   description: Joi.string().required(),
   total: Joi.number().required(),
   paid_at: Joi.number(),
-  participants: Joi.array().items(
-    Joi.object({
-      id: Joi.string().required(),
-      role: Joi.string().valid(PRole.Creditor, PRole.Debtor),
-      amount: Joi.number(),
-    })
-  ),
+  participants: Joi.array()
+    .items(
+      Joi.object({
+        id: Joi.string().required(),
+        role: Joi.string().valid(PRole.Creditor, PRole.Debtor).required(),
+        amount: Joi.number()
+          .required()
+          .max(Number.MAX_SAFE_INTEGER - 1)
+          .min(0),
+      })
+    )
+    .min(2),
   group: Joi.string(),
   notes: Joi.string(),
+  category: Joi.number().required(),
 });
 
-// const data = {
-//   "description": "this is an expense",
-//   "total": 10,
-//   "paid_at": 1608673567,
-//   "participants": [
-//     {
-//       "id": "",
-//       "role": "",
-//       "amount": 1,
-//     },
-//   ],
-// };
+router.post(
+  "/",
+  requireAuth,
+  validate(schema),
+  validateParticipants,
+  validatePriceFlow,
+  async (req, res) => {
+    // a group that does not exist is not allowed
+    if (req.body.group) {
+      if (!(await Group.exists(req.body.group)))
+        throw new NotFoundError("Group does not exists!");
 
-router.post("/", requireAuth, validate(schema), async (req, res) => {
-  // checks the id of participants inside p with the users
-  // of database and if there is a conflict it will stop
-  // the operation.
+      // check to make sure that all participants are in the group
+      if (!(await Group.areMembers(req.body.group, req.body.participants)))
+        throw new NotFoundError("pariticipant doesn't belong to this group!");
+    }
 
-  const participants: Participant[] = req.body.participants;
-  const count = await graph.countParticipants(participants);
+    const id = await Expense.create({ ...req.body, creator: req.user?.id });
+    const expense = await Expense.findById(id);
+    const participants: IParticipant[] = expense.participants;
+    const user = await User.findById(req.user!.id);
+    await new ActivityPublisher(natsWrapper.client).publish({
+      action: Action.Created,
+      request: {
+        id,
+        type: Type.Expense,
+      },
+      subject: {
+        id: user.id,
+        name: user.name,
+        type: Type.User,
+      },
+      object: {
+        id,
+        name: expense.description,
+        type: Type.Expense,
+      },
+      involved: participants.map((x) => x.id),
+    });
 
-  if (participants.length != count)
-    throw new BadRequestError("One of the participants doesn't exits!");
-
-  const id = await graph.addExpense({ ...req.body, creator: req.user?.id });
-
-  res.status(201).json({ id, ...req.body });
-});
+    res.status(201).json(expense);
+  }
+);
 
 export { router };

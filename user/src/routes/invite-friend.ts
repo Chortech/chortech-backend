@@ -22,7 +22,7 @@ const schema = Joi.object({
           )
         )
         .message("Invalid phone number"),
-      name: Joi.string().min(6).max(255).alphanum().required(),
+      name: Joi.string().min(3).max(255).required(),
     })
       .xor("email", "phone")
       .label("invitee")

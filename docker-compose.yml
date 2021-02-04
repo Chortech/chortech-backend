@@ -41,6 +41,13 @@ services:
       - 27017
     logging:
       driver: none
+  notif-db:
+    image: mongo
+    container_name: notif-db-mongo
+    expose:
+      - 27017
+    logging:
+      driver: none
   user-db:
     image: mongo
     container_name: user-db-mongo
@@ -71,6 +78,13 @@ services:
       - 7474:7474
     logging:
       driver: none
+  activity-db:
+    image: mongo
+    container_name: activity-db-mongo
+    expose:
+      - 27017
+    logging:
+      driver: none
   auth:
     image: chortech/auth:latest
     container_name: auth-service
@@ -82,7 +96,7 @@ services:
       - auth-db
     environment:
       STAGE: "true"
-      HOST: http://5.253.25.167/
+      HOST: http://185.239.107.34/
       REDIS_URL: redis://auth-cache:6379
       MONGO_URL: mongodb://auth-db:27017
       NATS_URL: http://nats-streaming:4222
@@ -108,6 +122,21 @@ services:
       DEBUG: "true"
     secrets:
       - user-service-secrets
+  notification:
+    image: chortech/notification:latest
+    container_name: notification-service
+    restart: always
+    expose:
+      - 3000
+    depends_on:
+      - notif-db
+    environment:
+      MONGO_URL: mongodb://notif-db:27017
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      SECRETS: /run/secrets/notification-service-secrets
+    secrets:
+      - notification-service-secrets
   group:
     image: chortech/group:latest
     container_name: group-service
@@ -121,7 +150,10 @@ services:
       MONGO_URI: mongodb://group-db:27017
       NATS_URL: http://nats-streaming:4222
       NATS_CLUSTER_ID: chortec
+      SECRETS: /run/secrets/group-service-secrets
       DEBUG: "true"
+    secrets:
+      - group-service-secrets
   expense:
     image: chortech/expense:latest
     container_name: expense-service
@@ -137,6 +169,20 @@ services:
     depends_on:
       - expense-db
       - nats-streaming
+  activity:
+    image: chortech/activity:latest
+    container_name: activity-service
+    restart: always
+    expose:
+      - 3000
+    depends_on:
+      - group-db
+    environment:
+      HOST: http://5.253.25.167/
+      MONGO_URI: mongodb://activity-db:27017
+      NATS_URL: http://nats-streaming:4222
+      NATS_CLUSTER_ID: chortec
+      DEBUG: "true"
   api-docs:
     image: chortech/api-docs
     container_name: api-docs
@@ -160,5 +206,9 @@ services:
 secrets:
   user-service-secrets:
     file: ./secrets/user-service-secrets.json
+  notification-service-secrets:
+    file: ./secrets/notification-services-secrets.json
   auth-service-secrets:
     file: ./secrets/auth-service-secrets.json
+  group-service-secrets:
+    file: ./secrets/group-service-secrets.json

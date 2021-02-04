@@ -8,28 +8,20 @@
     "start:prod": "node build/index.js",
     "test": "jest --watch-all --no-cache",
     "common": "npm update @chortec/common",
-    "build": "tsc"
+    "build": "tsc",
+    "test:ci": "jest"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/src/test/config.ts"
-    ],
     "setupFilesAfterEnv": [
       "./src/test/setup.ts"
     ],
-    "testTimeout": 10000
+    "testTimeout": 20000
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "config": {
-    "mongodbMemoryServer": {
-      "version": "latest",
-      "disablePostinstall": "1"
-    }
-  },
   "devDependencies": {
     "@types/jest": "^26.0.14",
     "@types/redis-mock": "^0.17.0",
