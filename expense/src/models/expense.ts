@@ -164,10 +164,16 @@ class Expense {
       `MATCH (u:${Nodes.User})-
       [r:${Relations.Participate}]
       ->(e:${Nodes.Expense} {id: $expenseid}) 
+      CALL {
+      	WITH e
+        OPTIONAL MATCH (e)-[:ASSIGNED]->(g:Group)
+        RETURN g
+      }
       RETURN 
         apoc.map.merge(
           properties(e), 
           {
+            group: properties(g),
             participants: collect(
               apoc.map.merge(properties(u), 
               {balance: r.amount})
