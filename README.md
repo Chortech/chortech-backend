@@ -1,3 +1,3 @@
-# Chortec
+# Chortech
 
 Calculate your expenses
